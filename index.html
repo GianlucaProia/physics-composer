@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhysicsComposer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --text-main: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f9fafb;
+            --white: #ffffff;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            background-color: var(--white);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        header {
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+            letter-spacing: -0.05em;
+        }
+
+        .btn-ghost {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .hero {
+            padding: 5rem 5% 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .cta-button {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            width: auto;
+        }
+
+        .cta-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .mockup-container {
+            margin-top: 4rem;
+            background: var(--bg-light);
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+        }
+
+        .preview-box {
+            width: 100%;
+            height: 450px;
+            background: #fff;
+            border: 1px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            border-radius: 8px;
+            font-style: italic;
+        }
+
+        .features {
+            padding: 4rem 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #f3f4f6;
+            transition: border 0.3s;
+        }
+        
+        .feature-card:hover {
+            border-color: var(--primary);
+        }
+
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .pionieri-section {
+            background-color: var(--bg-light);
+            padding: 6rem 5%;
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        .pionieri-card {
+            max-width: 700px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 3.5rem;
+            border-radius: 20px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05);
+        }
+
+        .counter {
+            display: inline-block;
+            background: #fef2f2;
+            color: var(--error);
+            padding: 0.5rem 1.2rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Form styling */
+        .form-container {
+            margin-top: 2.5rem;
+            text-align: left;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="email"] {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        input[type="email"]:focus {
+            border-color: var(--primary);
+        }
+
+        .privacy-group {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+
+        .privacy-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-top: 3px;
+            cursor: pointer;
+        }
+
+        .privacy-text {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .privacy-text a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        footer {
+            padding: 4rem 5%;
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-light);
+            border-top: 1px solid #eee;
+        }
+
+        .footer-info {
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .pionieri-card { padding: 2rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">PhysicsComposer</div>
+        <a href="#pionieri" class="btn-ghost">Supporto Docenti</a>
+    </header>
+
+<section class="hero">
+        <h1>Insegna la fisica.<br>Rendila dinamica.</h1>
+        <p>Il laboratorio virtuale per le scuole superiori. Visualizza piani inclinati, sistemi di molle e analisi dati dinamica con un solo click.</p>
+        <a href="#pionieri" class="cta-button">Diventa un Docente Pioniere</a>
+        
+        <!-- Contenitore Demo -->
+        <div style="margin-top: 5rem; text-align: center;">
+            <div style="margin-bottom: 2.5rem;">
+                <h2 style="font-size: 2.2rem; color: var(--text-main); margin-bottom: 0.75rem; letter-spacing: -0.02em;">
+                    Demo: il laboratorio a portata di click
+                </h2>
+                <p style="color: var(--text-light); font-size: 1.15rem; max-width: 650px; margin: 0 auto;">
+                    Dalla configurazione della gravità alla scomposizione dei vettori: scopri come PhysicsComposer modella la realtà in tempo reale.
+                </p>
+            </div>
+
+            <div class="mockup-container" style="padding: 10px; background: #fff; line-height: 0;">
+<!-- Inizio Blocco Video Professionale PhysicsComposer -->
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); background: #000;">
+        <iframe 
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+            src="https://www.youtube.com/embed/gx9dU4LYfB8?autoplay=1&mute=1" 
+            title="PhysicsComposer Demo"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+
+</div>
+<!-- Fine Blocco Video -->
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="feature-card">
+            <h3>Visualizzazione Pura</h3>
+            <p>Vettori di forza, velocità e accelerazione che si aggiornano istantaneamente. Supporto LaTeX integrato per formule sempre perfette.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Analisi Dati Reale</h3>
+            <p>Non solo simulazione: importa dati, genera grafici e calcola rette di regressione in tempo reale.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Zero Installazione</h3>
+            <p>Progettato per girare interamente nel browser. Niente installazioni sui PC della scuola o conflitti con i tecnici IT. Apri e insegni.</p>
+        </div>
+    </section>
+	
+	<!-- Templates -->
+<section style="padding: 4rem 5%; background-color: #fff; max-width: 1200px; margin: 0 auto; text-align: center;">
+    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 3rem; border-radius: 24px; border: 1px solid #dbeafe;">
+        <h2 style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">Pronto all'uso, zero configurazione.</h2>
+        <p style="font-size: 1.1rem; color: var(--text-main); max-width: 800px; margin: 0 auto 2.5rem;">
+            Temi di non avere tempo per costruire le tue simulazioni? PhysicsComposer include una libreria di <strong>Templates Pronti</strong>: trascina un esperimento pre-assemblato e inizia subito la lezione.
+        </p>
+        
+        <!--<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem;">
+            <span style="background: #fff; padding: 0.6rem 1.2rem; border-radius: 50px; font-size: 0.9rem; font-weight: 600; color: #1e40af; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">⚡ Piano Inclinato Standard</span>
+            <span style="background: #fff; padding: 0.6rem 1.2rem; border-radius: 50px; font-size: 0.9rem; font-weight: 600; color: #1e40af; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">⚡ Moto Armonico Semplice</span>
+            <span style="background: #fff; padding: 0.6rem 1.2rem; border-radius: 50px; font-size: 0.9rem; font-weight: 600; color: #1e40af; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">⚡ Collisioni Elastiche</span>
+            <span style="background: #fff; padding: 0.6rem 1.2rem; border-radius: 50px; font-size: 0.9rem; font-weight: 600; color: #1e40af; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">⚡ Sistemi a più corpi</span>
+        </div>-->
+    </div>
+</section>
+
+    <section id="pionieri" class="pionieri-section">
+        <div class="pionieri-card">
+            <div class="counter">Solo 26 posti rimasti per il test gratuito</div>
+            <h2>Programma Pionieri: A.S. 2026/2027</h2>
+            <p style="margin-bottom: 2rem; color: var(--text-light);">
+                Cerchiamo 100 docenti innovatori per rifinire gli ultimi moduli. Unisciti a noi e trasforma il modo in cui i tuoi studenti vedono la fisica.
+            </p>
+            
+			<ul style="text-align: left; max-width: 500px; margin: 0 auto 2.5rem; list-style-type: '✓ '; padding-left: 1rem; font-size: 0.95rem;">
+				<li><strong>Licenza FULL gratuita</strong> per 12 mesi</li>
+				<li>Accesso immediato ai moduli core (Molle, Carrucole, Leve)</li>
+				<li><strong>Nuovi moduli in arrivo ogni mese:</strong> Termodinamica, Ottica, Onde, Fluidodinamica</li>
+				<li>Possibilità di influenzare lo sviluppo delle nuove funzioni</li>
+				<li>Sconto riservato per l'attivazione con <strong>Carta del Docente</strong></li>
+			</ul>
+
+            <div class="form-container">
+                <!-- Sostituisci l'action con il tuo link Formspree o Mailchimp -->
+				<form id="pionieri-form" action="https://formspree.io/f/mvzllrwg" method="POST">
+					<div class="form-group">
+						<label for="email" style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">Email Istituzionale</label>
+						<!-- Importante: aggiungi name="email" così Formspree sa cosa sta ricevendo -->
+						<input type="email" id="email" name="email" placeholder="nome.cognome@scuola.it" required>
+					</div>
+                    <div class="privacy-group">
+                        <input type="checkbox" id="privacy" name="privacy" required>
+                        <label for="privacy" class="privacy-text">
+                            Ho letto l'informativa sulla <a href="Privacy.html">Privacy Policy</a> e acconsento al trattamento della mia email per ricevere aggiornamenti sul progetto PhysicsComposer.
+                        </label>
+                    </div>
+
+                    <button id="submit-btn" type="submit" class="cta-button" style="width: 100%;">Ottieni l'accesso gratuito</button>
+                </form>
+				<div id="success-message" style="display: none; padding: 2rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; text-align: center; margin-top: 1rem;">
+					<h3 style="color: #166534; margin-bottom: 0.5rem;">✓ Richiesta inviata!</h3>
+					<p style="color: #166534; font-size: 0.9rem;">Grazie Pioniere. Controlla la tua inbox, riceverai presto le istruzioni per l'accesso.</p>
+				</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-info">
+            <p><strong>PhysicsComposer</strong> di [Tuo Nome e Cognome]</p>
+            <p style="font-size: 0.8rem; margin-top: 0.3rem;">Titolare del trattamento dati ai sensi del GDPR</p>
+        </div>
+        
+        <p>&copy; 2026 PhysicsComposer - Progettato per i dipartimenti di Fisica delle Scuole Superiori.</p>
+        
+        <div style="margin-top: 1.5rem;">
+            <a href="#privacy-policy" id="privacy-policy" style="color: var(--text-light); text-decoration: none; margin: 0 10px;">Privacy Policy</a>
+            <a href="mailto:tua-email@esempio.com" style="color: var(--text-light); text-decoration: none; margin: 0 10px;">Contatti</a>
+        </div>
+    </footer>
+	
+	<script>
+    const form = document.getElementById("pionieri-form");
+    const successMessage = document.getElementById("success-message");
+    const submitBtn = document.getElementById("submit-btn");
+
+    form.addEventListener("submit", async function(event) {
+        event.preventDefault();
+        
+        const data = new FormData(event.target);
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Invio in corso...";
+
+        try {
+            const response = await fetch(event.target.action, {
+                method: form.method,
+                body: data,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                // Nascondi il form e mostra il messaggio carino
+                form.style.display = "none";
+                successMessage.style.display = "block";
+            } else {
+                alert("Ops! C'è stato un errore. Riprova tra poco.");
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Ottieni l'accesso gratuito";
+            }
+        } catch (error) {
+            alert("Errore di connessione. Controlla la tua rete.");
+            submitBtn.disabled = false;
+        }
+    });
+</script>
+
+</body>
+</html>
