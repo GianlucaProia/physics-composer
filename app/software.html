@@ -1375,10 +1375,12 @@ body.presenting #present-title {
   </aside>
 </div>
 
-
-
-
-
+  <script>
+if (sessionStorage.getItem('beta_access') !== 'true') {
+    window.location.href = 'index.html';
+}
+  </script>
+  
   <script>
 // ═══ MODULE: state.js ═══
 // ─── State ───────────────────────────────────────────────────────────────────
