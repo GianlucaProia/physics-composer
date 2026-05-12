@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhysicsComposer - Accesso Beta</title>
+    <link rel="icon" type="image/svg+xml" href="../images/logo.svg">
+    <style>
+        body { font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f8fafc; }
+        .card { background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 400px; width: 90%; }
+        img { width: 60px; margin-bottom: 1rem; }
+        input { width: 100%; padding: 12px; margin: 1rem 0; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; }
+        button { background: #2563eb; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; }
+        button:hover { background: #1d4ed8; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <img src="../images/logo.svg" alt="Logo">
+        <h2>Area Beta</h2>
+        <p>Inserisci la password inviata via email per accedere al simulatore.</p>
+        <input type="password" id="pw" placeholder="Password">
+        <button onclick="accessApp()">Entra nel Laboratorio</button>
+    </div>
+
+    <script>
+        function accessApp() {
+            const pass = document.getElementById('pw').value;
+            // Usiamo una codifica base64 semplicissima solo per non avere la password in chiaro nel codice
+            if (btoa(pass) === "UElPTklFUkk=") { // La password è: PIONIERI
+                sessionStorage.setItem('beta_access', 'true');
+                window.location.href = 'software.html';
+            } else {
+                alert("Password errata. Controlla la mail di benvenuto!");
+            }
+        }
+    </script>
+</body>
+</html>
