@@ -20,14 +20,14 @@
         <h2>Area Beta</h2>
         <p>Inserisci la password inviata via email per accedere al simulatore.</p>
         <input type="password" id="pw" placeholder="Password">
-        <button onclick="accessApp()">Entra nel Laboratorio</button>
+        <button onclick="accessApp()">ENTRA</button>
     </div>
 
     <script>
         function accessApp() {
             const pass = document.getElementById('pw').value;
             // Usiamo una codifica base64 semplicissima solo per non avere la password in chiaro nel codice
-            if (btoa(pass) === "UElPTklFUkk=") { // La password è: PIONIERI
+            if (btoa(pass) === "UElPTklFUkk=") {
                 sessionStorage.setItem('beta_access', 'true');
                 window.location.href = 'software.html';
             } else {
