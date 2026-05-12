@@ -1,0 +1,19346 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Physics Composer v0.9</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBkMGQxNCIvPgogIDxwb2x5Z29uIHBvaW50cz0iMTYsNCAyOCwxMCAyOCwyMiAxNiwyOCA0LDIyIDQsMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzYwYzBmMCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPGxpbmUgeDE9IjE2IiB5MT0iOSIgeDI9IjE2IiB5Mj0iMjMiIHN0cm9rZT0iIzYwYzBmMCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8bGluZSB4MT0iOSIgeTE9IjEzIiB4Mj0iMjMiIHkyPSIxOSIgc3Ryb2tlPSIjNjBjMGYwIiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDxsaW5lIHgxPSI5IiB5MT0iMTkiIHgyPSIyMyIgeTI9IjEzIiBzdHJva2U9IiM2MGMwZjAiIHN0cm9rZS13aWR0aD0iMS41Ii8+Cjwvc3ZnPg==">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts-stat@1.2.0/dist/ecStat.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts-stat@1.2.0/dist/echart-stat.min.js"></script>
+  <style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f11;
+    --panel: #17171a;
+    --border: #2a2a30;
+    --accent: #c8f060;
+    --accent2: #60c8f0;
+    --text: #e8e8ec;
+    --muted: #666670;
+    --hover: #1e1e24;
+    --snap-color: #c8f060;
+    --canvas-bg: #0f0f11;
+    --canvas-dot: rgba(255,255,255,0.06);
+  }
+
+  /* ── Tema Light ── */
+  body.theme-light {
+    --bg: #f4f4f6;
+    --panel: #ffffff;
+    --border: #d0d0d8;
+    --accent: #4a8c00;
+    --accent2: #0070a8;
+    --text: #1a1a2e;
+    --muted: #888896;
+    --hover: #ebebf0;
+    --snap-color: #4a8c00;
+    --canvas-bg: #f9f9fb;
+    --canvas-dot: rgba(0,0,0,0.08);
+  }
+
+  /* ── Tema Blueprint ── */
+  body.theme-blueprint {
+    --bg: #0a1628;
+    --panel: #0f1f3d;
+    --border: #1e3a6e;
+    --accent: #60c8f0;
+    --accent2: #f0c060;
+    --text: #c8e8f8;
+    --muted: #4a7a9a;
+    --hover: #162848;
+    --snap-color: #60c8f0;
+    --canvas-bg: #0a1628;
+    --canvas-dot: rgba(96,200,240,0.08);
+  }
+
+  /* ── Tema Amber ── */
+  body.theme-amber {
+    --bg: #110e00;
+    --panel: #1a1500;
+    --border: #3a3000;
+    --accent: #f0c040;
+    --accent2: #f08040;
+    --text: #f0e0a0;
+    --muted: #806040;
+    --hover: #221c00;
+    --snap-color: #f0c040;
+    --canvas-bg: #110e00;
+    --canvas-dot: rgba(240,192,64,0.07);
+  }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    flex-shrink: 0;
+  }
+
+  header h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  header span {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* ── Toolbar stile Word ── */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px 8px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    min-height: 36px;
+  }
+
+  .toolbar-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    margin: 0 4px;
+  }
+
+  .toolbar-btn {
+    background: none;
+    border: 1px solid transparent;
+    color: var(--muted);
+    font-size: 13px;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s;
+  }
+  .toolbar-btn:hover {
+    background: var(--hover);
+    color: var(--accent);
+    border-color: var(--border);
+  }
+  .toolbar-btn.active {
+    background: rgba(200,240,96,0.12);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* ── Menu File nella toolbar ── */
+  .menu-item { position: relative; }
+
+  .menu-btn {
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    transition: background 0.1s;
+  }
+  .menu-btn:hover, .menu-item.open .menu-btn {
+    background: var(--hover);
+    color: var(--accent);
+  }
+
+  .menu-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    background: #1a1a22;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    min-width: 210px;
+    padding: 4px;
+    z-index: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+  .menu-item.open .menu-dropdown { display: block; }
+
+  .menu-drop-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.1s;
+  }
+  .menu-drop-item:hover {
+    background: var(--hover);
+    color: var(--accent);
+  }
+  .menu-icon { width: 16px; height: 16px; flex-shrink: 0; }
+  .menu-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 8px;
+  }
+
+  .workspace {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* Wrapper canvas + slides bar */
+  .canvas-area {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: width 0.25s ease;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .sidebar.collapsed {
+    width: 36px;
+    overflow-y: hidden;
+  }
+  .sidebar.collapsed .sidebar-section,
+  .sidebar.collapsed .sidebar-label {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.1s ease;
+  }
+  .sidebar:not(.collapsed) .sidebar-section,
+  .sidebar:not(.collapsed) .sidebar-label {
+    opacity: 1;
+    transition: opacity 0.2s ease 0.1s;
+  }
+  .sidebar.collapsed .element-btn span {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.1s ease;
+  }
+  .sidebar:not(.collapsed) .element-btn span {
+    opacity: 1;
+    transition: opacity 0.2s ease 0.1s;
+  }
+  .sidebar.collapsed .element-btn {
+    justify-content: center;
+    padding: 9px 6px;
+  }
+  .sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 8px 8px 4px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--panel);
+  }
+  .sidebar.collapsed .sidebar-toggle {
+    justify-content: center;
+  }
+  .sidebar-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 14px;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: color 0.1s;
+    line-height: 1;
+  }
+  .sidebar-toggle-btn:hover { color: var(--accent); }
+
+  .sidebar-section {
+    padding: 14px 14px 8px;
+  }
+
+  .sidebar-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #e8e8ec;
+    margin-bottom: 10px;
+  }
+
+  .element-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 10px;
+    margin-bottom: 4px;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    text-align: left;
+    transition: all 0.12s;
+  }
+  .element-btn:hover {
+    background: var(--hover);
+    border-color: var(--border);
+  }
+  .element-btn:active { transform: scale(0.97); }
+  .element-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .element-btn:disabled:hover { background: none; border-color: transparent; }
+
+  .element-btn svg {
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+
+  .workspace-btn {
+    border-color: rgba(200,240,96,0.25) !important;
+    color: #c8f060 !important;
+  }
+  .workspace-btn:hover {
+    background: rgba(200,240,96,0.08) !important;
+    border-color: #c8f060 !important;
+  }
+
+  .element-btn .el-name { flex: 1; }
+  .element-btn .el-shortcut {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    background: var(--bg);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  .divider { height: 1px; background: var(--border); margin: 6px 14px; }
+
+  /* CANVAS AREA */
+  .canvas-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: -1px -1px;
+  }
+
+  #canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: default;
+    background: transparent;
+    position: relative;
+    z-index: 1;
+  }
+  #canvas.panning { cursor: grabbing; }
+  #canvas.pan-ready { cursor: grab; }
+
+
+
+  #canvas-controls {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+  }
+  #canvas-controls button {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0.85;
+    transition: opacity 0.15s, background 0.15s;
+  }
+  #canvas-controls button:hover {
+    opacity: 1;
+    background: var(--border);
+  }
+  #canvas-controls button.active {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(200,240,96,0.08);
+    opacity: 1;
+  }
+  .diagram-element {
+    cursor: grab;
+    user-select: none;
+  }
+  .diagram-element:active { cursor: grabbing; }
+  .diagram-element.selected .el-outline {
+    stroke: var(--accent);
+    stroke-opacity: 0.6;
+    stroke-dasharray: 4 3;
+  }
+  .diagram-element.snapping .el-outline {
+    stroke: var(--accent);
+    stroke-opacity: 1;
+    fill: rgba(200, 240, 96, 0.04);
+  }
+
+  .diagram-element.bound .el-outline {
+    stroke: #c8f060;
+    stroke-opacity: 0.25;
+    fill: rgba(200, 240, 96, 0.03);
+  }
+
+  .el-outline {
+    fill: transparent;
+    stroke: transparent;
+    stroke-width: 1.5;
+    pointer-events: none;
+  }
+
+  /* Delete button - visibile solo quando l'elemento è selezionato (click) */
+  .delete-btn {
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+    pointer-events: none;
+  }
+  .diagram-element.selected .delete-btn {
+    opacity: 1;
+    pointer-events: all !important;
+  }
+  .delete-btn circle {
+    fill: #cc3333;
+    stroke: #ff5555;
+    stroke-width: 1;
+    transition: fill 0.1s;
+  }
+  .delete-btn:hover circle { fill: #ff2222; }
+  .delete-btn text { fill: white; }
+  /* Snap indicator */
+  .snap-indicator {
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+  }
+  .snap-indicator.visible { opacity: 1; }
+
+  /* Status bar */
+  /* PANNELLO PROPRIETÀ */
+  .props-panel {
+    width: 280px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: width 0.2s ease;
+  }
+  .props-panel.collapsed {
+    width: 0;
+    border-left: none;
+  }
+  .props-panel-tab {
+    width: 20px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 11px;
+    transition: color 0.1s, background 0.1s;
+    writing-mode: vertical-rl;
+    user-select: none;
+  }
+  .props-panel-tab:hover { color: var(--accent); background: rgba(200,240,96,0.05); }
+  .props-empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .props-content { padding: 0; }
+  .props-header {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 13px 16px 11px;
+    border-bottom: 1px solid var(--border);
+  }
+  .prop-row {
+    margin-bottom: 10px;
+  }
+  .prop-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #e8e8ec;
+    margin-bottom: 5px;
+  }
+  .prop-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 6px 10px;
+    transition: border-color 0.15s;
+  }
+  .prop-input-wrap:focus-within { border-color: var(--accent); }
+  .prop-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    width: 100%;
+  }
+  .prop-unit {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: #e8e8ec;
+    flex-shrink: 0;
+  }
+  .prop-hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  /* Sezioni collassabili */
+  .prop-section { border-bottom: 1px solid var(--border); }
+  .prop-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    cursor: pointer;
+    user-select: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.12s;
+  }
+  .prop-section-header:hover { color: var(--text); }
+  .prop-section-header.open { color: var(--accent2); }
+  .prop-section-chevron {
+    font-size: 9px;
+    transition: transform 0.15s;
+  }
+  .prop-section-header.open .prop-section-chevron { transform: rotate(90deg); }
+  .prop-section-body {
+    padding: 6px 16px 14px;
+    display: none;
+  }
+  .prop-section-body.open { display: block; }
+
+  /* Barra toggle visibilità vettori */
+  .vis-toggle-bar {
+    display: flex;
+    gap: 6px;
+    padding: 10px 16px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .vis-toggle-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 7px 4px;
+    border-radius: 5px;
+    border: 1px solid rgba(255,255,255,0.35);
+    background: none;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .vis-toggle-btn .vis-icon {
+    font-size: 15px;
+    line-height: 1;
+  }
+  .vis-toggle-btn .vis-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: rgba(255,255,255,0.7);
+    transition: color 0.12s;
+  }
+  .vis-toggle-btn.active-v0  { border-color: #60f0a0; background: rgba(96,240,160,0.1); }
+  .vis-toggle-btn.active-v0 .vis-label { color: #60f0a0; }
+  .vis-toggle-btn.active-f   { border-color: #f06090; background: rgba(240,96,144,0.1); }
+  .vis-toggle-btn.active-f  .vis-label { color: #f06090; }
+  .vis-toggle-btn.active-a   { border-color: #d060f0; background: rgba(208,96,240,0.1); }
+  .vis-toggle-btn.active-a  .vis-label { color: #d060f0; }
+  .vis-toggle-btn.active-r   { border-color: #f0e060; background: rgba(240,224,96,0.1); }
+  .vis-toggle-btn.active-r  .vis-label { color: #f0e060; }
+  .vis-toggle-btn.active-n   { border-color: #60f0c0; background: rgba(96,240,192,0.1); }
+  .vis-toggle-btn.active-n  .vis-label { color: #60f0c0; }
+  .vis-toggle-btn.active-fr  { border-color: #f0c060; background: rgba(240,192,96,0.1); }
+  .vis-toggle-btn.active-fr .vis-label { color: #f0c060; }
+
+  .prop-input-wrap.readonly {
+    background: transparent;
+    border-color: transparent;
+    padding-left: 0;
+  }
+  .prop-input-wrap.readonly .prop-input {
+    color: var(--accent2);
+    font-weight: 500;
+    font-size: 13px;
+  }
+
+  /* ── Modal relazione ─────────────────────────────────────────────────────── */
+  .relation-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200; backdrop-filter: blur(2px);
+  }
+  .relation-modal {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; width: 320px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5); overflow: hidden;
+  }
+  .relation-modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent);
+  }
+  .relation-close {
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 14px; transition: color 0.1s;
+  }
+  .relation-close:hover { color: #ff5555; }
+  .relation-modal-body { padding: 18px; }
+  .relation-modal-footer {
+    display: flex; justify-content: flex-end; gap: 8px;
+    padding: 12px 18px; border-top: 1px solid var(--border);
+  }
+  .relation-btn-ok {
+    background: var(--accent); color: #0f0f11; border: none;
+    border-radius: 5px; padding: 7px 18px; cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;
+  }
+  .relation-btn-ok:hover { opacity: 0.85; }
+  .relation-btn-del {
+    background: none; color: #ff5555; border: 1px solid #ff5555;
+    border-radius: 5px; padding: 7px 14px; cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; margin-right: auto;
+  }
+  .relation-btn-del:hover { background: rgba(255,85,85,0.1); }
+  .relation-pair {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+  }
+  .relation-pair-item {
+    flex: 1; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px 10px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--accent2); text-align: center;
+  }
+  .relation-pair-arrow { color: var(--muted); font-size: 16px; }
+  .relation-field { margin-bottom: 14px; }
+  .relation-field label {
+    display: block; font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px;
+  }
+  .relation-field input {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 5px; padding: 8px 10px; color: var(--text);
+    font-family: 'IBM Plex Mono', monospace; font-size: 14px;
+    outline: none; box-sizing: border-box; transition: border-color 0.15s;
+  }
+  .relation-field input:focus { border-color: var(--accent); }
+  .relation-info { font-size: 11px; color: var(--muted); line-height: 1.5; font-style: italic; }
+
+  /* Toggle modalità */
+  .prop-toggle-row {
+    display: flex;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .prop-toggle-btn {
+    flex: 1;
+    padding: 6px 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: var(--muted);
+    transition: all 0.12s;
+    letter-spacing: 0.04em;
+  }
+  .prop-toggle-btn.active {
+    background: rgba(96,200,240,0.15);
+    color: var(--accent2);
+  }
+
+/* ─── Slides Bar ─────────────────────────────────────────────────────────────*/
+#slides-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  min-height: 56px;
+  flex-shrink: 0;
+  transition: min-height 0.2s ease, padding 0.2s ease;
+  position: relative;
+}
+#slides-bar.collapsed {
+  min-height: 16px;
+  padding: 0 12px;
+}
+#slides-bar.collapsed #slides-list,
+#slides-bar.collapsed #slides-add-btn {
+  display: none;
+}
+#slides-bar-toggle {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  padding: 2px 16px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  line-height: 1;
+  user-select: none;
+  z-index: 10;
+}
+#slides-bar-toggle:hover { color: var(--accent); }
+#slides-list {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  overflow-x: auto;
+  padding: 2px 0;
+}
+.slide-thumb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+  min-width: 70px;
+}
+.slide-thumb:hover { opacity: 0.85; }
+.slide-thumb.active { opacity: 1; }
+.slide-thumb-preview {
+  width: 70px; height: 44px;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  font-size: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+}
+.slide-thumb.active .slide-thumb-preview {
+  border-color: var(--accent);
+}
+.slide-thumb-label {
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--muted);
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.slide-thumb.active .slide-thumb-label { color: var(--accent); }
+.slide-thumb.drag-over .slide-thumb-preview {
+  border-color: var(--accent2);
+  box-shadow: 0 0 0 2px var(--accent2);
+}
+#slides-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+#slides-actions button {
+  background: var(--hover);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#slides-actions button:hover { background: var(--border); }
+#btn-present { background: rgba(200,240,96,0.1) !important; color: var(--accent) !important; border-color: var(--accent) !important; }
+#btn-present:hover { background: rgba(200,240,96,0.2) !important; }
+#btn-exit-slides { color: #cc3333 !important; }
+
+/* ─── Present Overlay ────────────────────────────────────────────────────────*/
+#present-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#present-canvas {
+  width: 100vw;
+  height: 100vh;
+}
+#present-nav {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  padding: 8px 20px;
+}
+#present-nav button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 8px;
+  opacity: 0.8;
+}
+#present-nav button:hover { opacity: 1; }
+#present-counter {
+  color: rgba(255,255,255,0.7);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  min-width: 50px;
+  text-align: center;
+}
+#btn-exit-present {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 16px;
+  border-radius: 50%;
+  width: 36px; height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#present-title {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,0.5);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+/* Workspace in slides mode */
+.slides-mode .workspace {
+  flex-direction: column;
+}
+
+/* ─── Modalità presentazione ─────────────────────────────────────────────────*/
+body.presenting .workspace {
+  position: fixed;
+  inset: 0;
+  z-index: 8000;
+}
+body.presenting .canvas-area {
+  flex: 1;
+}
+body.presenting #present-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent !important;
+  z-index: 8500;
+  pointer-events: none;
+}
+body.presenting #present-nav {
+  pointer-events: all;
+  background: rgba(0,0,0,0.5);
+}
+body.presenting #btn-exit-present {
+  pointer-events: all;
+  background: rgba(0,0,0,0.5);
+}
+body.presenting #present-title {
+  pointer-events: none;
+  color: rgba(255,255,255,0.6);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+/* Nasconde l'SVG clonato in presentazione (non lo usiamo più) */
+#present-canvas { display: none; }
+</style>
+</head>
+<body>
+
+<!-- HEADER: titolo -->
+<header>
+  <h1>⬡ Physics Composer</h1>
+</header>
+
+<!-- TOOLBAR stile Word -->
+<div class="toolbar" id="toolbar">
+
+  <!-- Menu File -->
+  <div class="menu-item" id="menu-file">
+    <button class="menu-btn" onclick="toggleMenu('menu-file')">File</button>
+    <div class="menu-dropdown" id="menu-file-dropdown">
+      <button class="menu-drop-item" onclick="newWorkspace();closeMenus()">
+        <svg class="menu-icon" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" fill="currentColor"/><path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" fill="currentColor"/></svg>
+        Nuovo workspace
+      </button>
+      <div style="height:1px;background:var(--border);margin:4px 0"></div>
+      <button class="menu-drop-item" onclick="saveWorkspace();closeMenus()">
+        <svg class="menu-icon" viewBox="0 0 16 16"><path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4.5L9.5 0H4a2 2 0 0 0-2 2zm0 1h7v3.5h4V12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3zm5 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM5 4h4V1.5L12.5 5H5V4z" fill="currentColor"/></svg>
+        Salva workspace
+      </button>
+      <button class="menu-drop-item" onclick="loadWorkspace();closeMenus()">
+        <svg class="menu-icon" viewBox="0 0 16 16"><path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h2.764c.958 0 1.76.56 2.311 1.184C7.985 3.648 8.48 4 9 4h4.5A1.5 1.5 0 0 1 15 5.5v7a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 12.5v-9z" fill="currentColor"/></svg>
+        Carica workspace
+      </button>
+      <div style="height:1px;background:var(--border);margin:4px 0"></div>
+      <button class="menu-drop-item" onclick="enterSlidesModeUI();closeMenus()">
+        <svg class="menu-icon" viewBox="0 0 16 16"><path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm2-1a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2z" fill="currentColor"/></svg>
+        Nuova presentazione
+      </button>
+    </div>
+  </div>
+
+  <span style="color:var(--border);padding:0 2px;font-size:16px;align-self:center;">|</span>
+
+  <!-- Menu Modifica -->
+  <div class="menu-item" id="menu-edit">
+    <button class="menu-btn" onclick="toggleMenu('menu-edit')">Modifica</button>
+    <div class="menu-dropdown" id="menu-edit-dropdown">
+      <button class="menu-drop-item" onclick="if(selectedId){copyCluster(selectedId);}closeMenus()">
+        <svg class="menu-icon" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z" fill="currentColor"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z" fill="currentColor"/></svg>
+        Copia sistema <span style="opacity:0.5;font-size:10px">Ctrl+C</span>
+      </button>
+      <button class="menu-drop-item" onclick="pasteCluster();closeMenus()">
+        <svg class="menu-icon" viewBox="0 0 16 16"><path d="M5 1.5A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-3z" fill="currentColor"/><path d="M3 1.5H2a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5v-1z" fill="currentColor"/></svg>
+        Incolla sistema <span style="opacity:0.5;font-size:10px">Ctrl+V</span>
+      </button>
+      <div style="border-top:1px solid #3a3a44;margin:4px 0"></div>
+      <button class="menu-drop-item" onclick="if(selectedId){const e=document.createEvent('KeyboardEvent');deleteElement(selectedId);}closeMenus()">
+        <svg class="menu-icon" viewBox="0 0 16 16"><path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5zm-1 1H3a.5.5 0 0 0 0 1h.5v9a2 2 0 0 0 2 2h5a2 2 0 0 0 2-2v-9H13a.5.5 0 0 0 0-1h-1.5V1.5A1.5 1.5 0 0 0 10 0H6a1.5 1.5 0 0 0-1.5 1.5V2z" fill="currentColor"/></svg>
+        Elimina elemento <span style="opacity:0.5;font-size:10px">Canc</span>
+      </button>
+      <button class="menu-drop-item" onclick="if(selectedId){const visited=new Set([selectedId]);const queue=[selectedId];while(queue.length){const cur=queue.shift();for(const r of relations){if(r.aId===cur&&!visited.has(r.bId)){visited.add(r.bId);queue.push(r.bId);}if(r.bId===cur&&!visited.has(r.aId)){visited.add(r.aId);queue.push(r.aId);}}}const toDelete=[...visited].filter(id=>{const el=elements.find(e=>e.id===id);return el&&el.type!=='axis_xy';});const delSet=new Set(toDelete);relations=relations.filter(r=>!delSet.has(r.aId)&&!delSet.has(r.bId));toDelete.forEach(id=>{const idx=elements.findIndex(e=>e.id===id);if(idx>=0)elements.splice(idx,1);});selectedId=null;render();updatePropsPanel();showToast('🗑 Eliminati '+toDelete.length+' elementi');}closeMenus()">
+        <svg class="menu-icon" viewBox="0 0 16 16"><path d="M11 1.5v1H15a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.62 16H4.38a2 2 0 0 1-1.989-1.84L1.538 3.5H1a.5.5 0 0 1 0-1h4v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5z" fill="currentColor"/></svg>
+        Elimina sistema <span style="opacity:0.5;font-size:10px">Ctrl+Canc</span>
+      </button>
+      <div style="border-top:1px solid #3a3a44;margin:4px 0"></div>
+      <button class="menu-drop-item" onclick="clearCanvas();closeMenus()">
+        <svg class="menu-icon" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" fill="currentColor"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2h3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1h3a1 1 0 0 1 1 1zm-1.5 1H3v9a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4z" fill="currentColor"/></svg>
+        Cancella tutto
+      </button>
+    </div>
+  </div>
+
+  <div class="toolbar-sep"></div>
+
+  <!-- Menu Vista -->
+  <div class="menu-item" id="menu-view">
+    <button class="menu-btn" onclick="toggleMenu('menu-view')">Vista</button>
+    <div class="menu-dropdown" id="menu-view-dropdown" style="min-width:230px;padding:10px 14px;">
+      <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Vettori</div>
+
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);min-width:70px;">Scala</span>
+        <input type="range" id="vector-scale" min="30" max="400" value="140" step="5"
+          style="flex:1;accent-color:var(--accent);cursor:pointer;"
+          oninput="window._vectorScale=parseInt(this.value);document.getElementById('vector-scale-val').textContent=this.value;render()">
+        <span id="vector-scale-val" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);min-width:24px;text-align:right;">140</span>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);min-width:70px;">Spessore</span>
+        <input type="range" id="vector-stroke" min="1" max="6" value="1.5" step="0.5"
+          style="flex:1;accent-color:var(--accent);cursor:pointer;"
+          oninput="window._vectorStroke=parseFloat(this.value);document.getElementById('vector-stroke-val').textContent=this.value;render()">
+        <span id="vector-stroke-val" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);min-width:24px;text-align:right;">1.5</span>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);min-width:70px;">Punta</span>
+        <input type="range" id="vector-head" min="5" max="20" value="9" step="1"
+          style="flex:1;accent-color:var(--accent);cursor:pointer;"
+          oninput="window._vectorHead=parseInt(this.value);document.getElementById('vector-head-val').textContent=this.value;render()">
+        <span id="vector-head-val" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);min-width:24px;text-align:right;">9</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar-sep"></div>
+
+</div>
+
+<div class="workspace">
+  <aside class="sidebar collapsed" id="sidebar">
+    <div class="sidebar-toggle">
+      <button class="sidebar-toggle-btn" id="sidebar-toggle-btn" title="Comprimi/espandi" onclick="
+        const sb = document.getElementById('sidebar');
+        const btn = document.getElementById('sidebar-toggle-btn');
+        sb.classList.toggle('collapsed');
+        btn.textContent = sb.classList.contains('collapsed') ? '▶' : '◀';
+      ">▶</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Sistema di riferimento</div>
+      <button class="element-btn" id="btn-axis-xy" onclick="addReferenceSystem('axis_xy')">
+        <svg width="28" height="28" viewBox="0 0 28 28">
+          <line x1="4" y1="24" x2="24" y2="24" stroke="#60c8f0" stroke-width="1.5"/>
+          <polygon points="22,21 26,24 22,27" fill="#60c8f0"/>
+          <line x1="4" y1="24" x2="4" y2="4" stroke="#60c8f0" stroke-width="1.5"/>
+          <polygon points="1,6 4,2 7,6" fill="#60c8f0"/>
+        </svg>
+        <span class="el-name">2D — piano (x,y)</span>
+      </button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Superfici</div>
+      <button class="element-btn" onclick="addElement('inclined_plane')">
+        <svg width="32" height="24" viewBox="0 0 32 24"><polygon points="2,22 30,22 30,6" fill="none" stroke="#c8f060" stroke-width="1.5"/><line x1="2" y1="22" x2="30" y2="22" stroke="#c8f060" stroke-width="2.5"/></svg>
+        <span class="el-name">Piano inclinato</span>
+      </button>
+      <button class="element-btn" onclick="addElement('lever')">
+        <svg width="36" height="24" viewBox="0 0 36 24">
+          <rect x="1" y="9" width="34" height="5" fill="rgba(200,240,96,0.15)" stroke="#c8f060" stroke-width="1.5" rx="1"/>
+          <line x1="18" y1="9" x2="18" y2="14" stroke="#c8f060" stroke-width="2"/>
+          <polygon points="18,14 12,22 24,22" fill="rgba(200,240,96,0.2)" stroke="#c8f060" stroke-width="1.5"/>
+        </svg>
+        <span class="el-name">Leva</span>
+      </button>
+      <button class="element-btn" onclick="addElement('floor')">
+        <svg width="32" height="16" viewBox="0 0 32 16"><line x1="2" y1="6" x2="30" y2="6" stroke="#c8f060" stroke-width="2"/><line x1="4" y1="6" x2="2" y2="12" stroke="#c8f060" stroke-width="1" opacity="0.5"/><line x1="10" y1="6" x2="8" y2="12" stroke="#c8f060" stroke-width="1" opacity="0.5"/><line x1="16" y1="6" x2="14" y2="12" stroke="#c8f060" stroke-width="1" opacity="0.5"/><line x1="22" y1="6" x2="20" y2="12" stroke="#c8f060" stroke-width="1" opacity="0.5"/><line x1="28" y1="6" x2="26" y2="12" stroke="#c8f060" stroke-width="1" opacity="0.5"/></svg>
+        <span class="el-name">Pavimento</span>
+      </button>
+      <button class="element-btn" onclick="addElement('wall')">
+        <svg width="16" height="28" viewBox="0 0 16 28"><line x1="10" y1="2" x2="10" y2="26" stroke="#c8f060" stroke-width="2"/><line x1="10" y1="4" x2="14" y2="6" stroke="#c8f060" stroke-width="1" opacity="0.5"/><line x1="10" y1="10" x2="14" y2="12" stroke="#c8f060" stroke-width="1" opacity="0.5"/><line x1="10" y1="16" x2="14" y2="18" stroke="#c8f060" stroke-width="1" opacity="0.5"/><line x1="10" y1="22" x2="14" y2="24" stroke="#c8f060" stroke-width="1" opacity="0.5"/></svg>
+        <span class="el-name">Parete</span>
+      </button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Corpi</div>
+      <button class="element-btn" onclick="addElement('point_mass')">
+        <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="#f0a060" stroke="#f0a060" stroke-width="1"/><circle cx="12" cy="12" r="2" fill="#fff" opacity="0.3"/></svg>
+        <span class="el-name">Corpo puntiforme</span>
+      </button>
+      <button class="element-btn" onclick="addElement('rect_body')">
+        <svg width="36" height="24" viewBox="0 0 36 24"><rect x="2" y="4" width="32" height="18" fill="none" stroke="#f0a060" stroke-width="1.5" rx="1"/></svg>
+        <span class="el-name">Corpo rettangolare</span>
+      </button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Vincoli</div>
+      <button class="element-btn" onclick="addElement('spring')">
+        <svg width="38" height="16" viewBox="0 0 38 16">
+          <line x1="0" y1="8" x2="5" y2="8" stroke="#f0c060" stroke-width="1.5"/>
+          <polyline points="5,8 7,3 10,13 13,3 16,13 19,3 22,13 25,3 28,13 31,8" fill="none" stroke="#f0c060" stroke-width="1.5" stroke-linejoin="round"/>
+          <line x1="31" y1="8" x2="35" y2="8" stroke="#f0c060" stroke-width="1.5"/>
+          <line x1="0" y1="3" x2="0" y2="13" stroke="#f0c060" stroke-width="2"/>
+          <line x1="35" y1="3" x2="35" y2="13" stroke="#f0c060" stroke-width="2"/>
+        </svg>
+        <span class="el-name">Molla</span>
+      </button>
+      <button class="element-btn" onclick="addElement('rope')">
+        <svg width="40" height="18" viewBox="0 0 40 18">
+          <line x1="0" y1="9" x2="40" y2="9" stroke="#c8f060" stroke-width="2" stroke-dasharray="4,2"/>
+          <circle cx="0" cy="9" r="2" fill="#c8f060"/>
+          <circle cx="40" cy="9" r="2" fill="#c8f060"/>
+        </svg>
+        <span class="el-name">Fune</span>
+      </button>
+      <button class="element-btn" onclick="addElement('pulley_simple')">
+        <svg width="32" height="36" viewBox="0 0 60 70">
+          <line x1="6" y1="6" x2="54" y2="6" stroke="#c8f060" stroke-width="2"/>
+          <line x1="6" y1="6" x2="1" y2="1" stroke="#c8f060" stroke-width="1" opacity="0.6"/>
+          <line x1="14" y1="6" x2="9" y2="1" stroke="#c8f060" stroke-width="1" opacity="0.6"/>
+          <line x1="22" y1="6" x2="17" y2="1" stroke="#c8f060" stroke-width="1" opacity="0.6"/>
+          <line x1="30" y1="6" x2="25" y2="1" stroke="#c8f060" stroke-width="1" opacity="0.6"/>
+          <line x1="38" y1="6" x2="33" y2="1" stroke="#c8f060" stroke-width="1" opacity="0.6"/>
+          <line x1="46" y1="6" x2="41" y2="1" stroke="#c8f060" stroke-width="1" opacity="0.6"/>
+          <line x1="30" y1="6" x2="30" y2="30" stroke="#c8f060" stroke-width="1.5"/>
+          <circle cx="30" cy="50" r="20" fill="none" stroke="#c8f060" stroke-width="2"/>
+          <circle cx="30" cy="50" r="13" fill="none" stroke="#c8f060" stroke-width="1" opacity="0.5"/>
+          <circle cx="30" cy="50" r="3" fill="#c8f060"/>
+        </svg>
+        <span class="el-name">Carrucola semplice</span>
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Controller</div>
+      <button class="element-btn" onclick="addElement('slider')">
+        <svg width="36" height="24" viewBox="0 0 200 60">
+          <rect x="0" y="0" width="200" height="60" rx="8" fill="rgba(200,240,96,0.06)" stroke="rgba(200,240,96,0.3)" stroke-width="2"/>
+          <rect x="16" y="33" width="168" height="6" rx="3" fill="rgba(200,240,96,0.2)"/>
+          <rect x="16" y="33" width="84" height="6" rx="3" fill="rgba(200,240,96,0.5)"/>
+          <circle cx="100" cy="36" r="10" fill="#1a2a00" stroke="#c8f060" stroke-width="2.5"/>
+        </svg>
+        <span class="el-name">Slider</span>
+      </button>
+      <button class="element-btn" onclick="addElement('display')">
+        <svg width="36" height="24" viewBox="0 0 160 56">
+          <rect x="0" y="0" width="160" height="56" rx="8" fill="rgba(96,192,240,0.06)" stroke="rgba(96,192,240,0.35)" stroke-width="1.5"/>
+          <text x="10" y="16" font-family="IBM Plex Mono,monospace" font-size="10" fill="rgba(96,192,240,0.7)">valore</text>
+          <text x="80" y="40" font-family="IBM Plex Mono,monospace" font-size="22" fill="#60c0f0" text-anchor="middle">—</text>
+        </svg>
+        <span class="el-name">Display</span>
+      </button>
+      <button class="element-btn" onclick="addElement('option_list')">
+        <svg width="36" height="36" viewBox="0 0 180 90">
+          <rect x="0" y="0" width="180" height="90" rx="8" fill="rgba(240,160,96,0.06)" stroke="rgba(240,160,96,0.3)" stroke-width="1.5"/>
+          <rect x="4" y="4" width="172" height="26" rx="5" fill="rgba(240,160,96,0.2)"/>
+          <text x="12" y="22" font-family="IBM Plex Mono,monospace" font-size="13" fill="#f0a060">Opzione 1</text>
+          <text x="12" y="50" font-family="IBM Plex Mono,monospace" font-size="13" fill="rgba(240,160,96,0.5)">Opzione 2</text>
+          <text x="12" y="78" font-family="IBM Plex Mono,monospace" font-size="13" fill="rgba(240,160,96,0.5)">Opzione 3</text>
+        </svg>
+        <span class="el-name">Opzioni</span>
+      </button>
+      <button class="element-btn" onclick="addElement('data_table')">
+        <svg width="36" height="32" viewBox="0 0 180 100">
+          <rect x="0" y="0" width="180" height="100" rx="6" fill="rgba(96,192,240,0.04)" stroke="rgba(96,192,240,0.4)" stroke-width="1.5"/>
+          <rect x="0" y="0" width="180" height="28" rx="5" fill="rgba(96,192,240,0.18)"/>
+          <line x1="90" y1="0" x2="90" y2="100" stroke="rgba(96,192,240,0.2)" stroke-width="1"/>
+          <line x1="0" y1="28" x2="180" y2="28" stroke="rgba(96,192,240,0.4)" stroke-width="1.5"/>
+          <line x1="0" y1="64" x2="180" y2="64" stroke="rgba(96,192,240,0.15)" stroke-width="1"/>
+          <text x="45" y="19" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="bold" fill="#60c0f0">Col 1</text>
+          <text x="135" y="19" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="bold" fill="#60c0f0">Col 2</text>
+          <text x="45" y="50" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(96,192,240,0.7)">dato</text>
+          <text x="135" y="50" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(96,192,240,0.7)">dato</text>
+        </svg>
+        <span class="el-name">Tabella</span>
+      </button>
+      <button class="element-btn" onclick="addElement('chart')">
+        <svg width="36" height="32" viewBox="0 0 180 120">
+          <rect x="0" y="0" width="180" height="120" rx="6" fill="rgba(240,192,96,0.04)" stroke="rgba(240,192,96,0.3)" stroke-width="1.5"/>
+          <line x1="24" y1="10" x2="24" y2="100" stroke="rgba(240,192,96,0.3)" stroke-width="1.5"/>
+          <line x1="24" y1="100" x2="170" y2="100" stroke="rgba(240,192,96,0.3)" stroke-width="1.5"/>
+          <polyline points="30,80 60,55 90,65 120,35 150,20" fill="none" stroke="#f0c060" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+          <circle cx="30" cy="80" r="3" fill="#f0c060"/>
+          <circle cx="60" cy="55" r="3" fill="#f0c060"/>
+          <circle cx="90" cy="65" r="3" fill="#f0c060"/>
+          <circle cx="120" cy="35" r="3" fill="#f0c060"/>
+          <circle cx="150" cy="20" r="3" fill="#f0c060"/>
+        </svg>
+        <span class="el-name">Grafico</span>
+      </button>
+      <button class="element-btn" onclick="addElement('stats')">
+        <svg width="36" height="32" viewBox="0 0 180 140">
+          <rect x="0" y="0" width="180" height="140" rx="8" fill="rgba(160,224,160,0.08)" stroke="rgba(160,224,160,0.4)" stroke-width="2"/>
+          <rect x="0" y="0" width="180" height="32" rx="8" fill="rgba(160,224,160,0.2)"/>
+          <rect x="0" y="16" width="180" height="16" fill="rgba(160,224,160,0.2)"/>
+          <text x="90" y="22" text-anchor="middle" font-size="14" fill="#a0e0a0" font-family="monospace" font-weight="bold">μ ± σ</text>
+          <line x1="0" y1="32" x2="180" y2="32" stroke="rgba(160,224,160,0.4)" stroke-width="1.5"/>
+          <text x="14" y="56" font-size="12" fill="rgba(160,224,160,0.7)" font-family="monospace">Media</text>
+          <text x="166" y="56" text-anchor="end" font-size="12" fill="#a0e0a0" font-family="monospace" font-weight="bold">3.14</text>
+          <text x="14" y="80" font-size="12" fill="rgba(160,224,160,0.7)" font-family="monospace">Dev.std</text>
+          <text x="166" y="80" text-anchor="end" font-size="12" fill="#a0e0a0" font-family="monospace" font-weight="bold">0.06</text>
+        </svg>
+        <span class="el-name">Statistiche</span>
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Annotazioni</div>
+      <button class="element-btn" onclick="addElement('text_label')">
+        <svg width="32" height="36" viewBox="0 0 32 36">
+          <text x="4" y="26" font-family="serif" font-size="22" fill="#c8f060" font-weight="bold">T</text>
+          <line x1="2" y1="30" x2="30" y2="30" stroke="#c8f060" stroke-width="1.5" opacity="0.5"/>
+        </svg>
+        <span class="el-name">Testo</span>
+      </button>
+      <button class="element-btn" onclick="addElement('arrow')">
+        <svg width="36" height="32" viewBox="0 0 140 80">
+          <defs><marker id="ah_prev" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+            <polygon points="0 0,8 4,0 8" fill="#f06060"/>
+          </marker></defs>
+          <line x1="10" y1="65" x2="118" y2="15" stroke="#f06060" stroke-width="2.5" marker-end="url(#ah_prev)" stroke-linecap="round"/>
+        </svg>
+        <span class="el-name">Freccia</span>
+      </button>
+      <button class="element-btn" onclick="addElement('link')">
+        <svg width="36" height="28" viewBox="0 0 36 28">
+          <!-- Riquadro con freccia esterna - icona "apri in nuova scheda" -->
+          <rect x="2" y="8" width="16" height="16" rx="2" fill="none" stroke="#60c0f0" stroke-width="2"/>
+          <polyline points="14,4 32,4 32,22" fill="none" stroke="#60c0f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="18" y1="18" x2="32" y2="4" stroke="#60c0f0" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="el-name">Link</span>
+      </button>
+      <button class="element-btn" onclick="addElement('image')">
+        <svg width="36" height="32" viewBox="0 0 180 140">
+          <rect x="0" y="0" width="180" height="140" rx="8" fill="#1a1a22" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+          <circle cx="52" cy="48" r="18" fill="rgba(255,255,255,0.15)"/>
+          <polyline points="0,110 60,70 100,90 140,50 180,80" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="4" stroke-linejoin="round"/>
+        </svg>
+        <span class="el-name">Immagine</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <div class="canvas-area">
+  <div class="canvas-wrap">
+    <svg id="canvas" xmlns="http://www.w3.org/2000/svg"></svg>
+
+    <div id="canvas-controls">
+      <button id="btn-pan-toggle" onclick="togglePanMode()" title="Trascina area di lavoro">
+        <svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:middle;margin-right:4px"><path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2z" fill="currentColor"/><path d="M3 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H3zm4 2.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" fill="currentColor"/></svg>Pan
+      </button>
+      <button id="btn-center" onclick="centerElements()" title="Centra elementi (C)">
+        <svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:middle;margin-right:4px"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" fill="currentColor"/><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" fill="currentColor"/></svg>Centra
+      </button>
+    </div>
+  </div>
+
+  <!-- BARRA SLIDES -->
+  <div id="slides-bar" style="display:none">
+    <button id="slides-bar-toggle" onclick="
+      const bar = document.getElementById('slides-bar');
+      bar.classList.toggle('collapsed');
+      this.textContent = bar.classList.contains('collapsed') ? '▲ slides' : '▼ slides';
+    ">▼ slides</button>
+    <div id="slides-list"></div>
+    <div id="slides-actions">
+      <button id="btn-add-slide" onclick="slidesAddSlide()">+ Nuova slide</button>
+      <button id="btn-present" onclick="startPresentation()">▶ Presenta</button>
+    </div>
+  </div>
+
+  <!-- OVERLAY PRESENTAZIONE -->
+  <div id="present-overlay" style="display:none">
+    <svg id="present-canvas" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="present-nav">
+      <button id="btn-prev-slide" onclick="presentPrev()">◀</button>
+      <span id="present-counter">1 / 1</span>
+      <button id="btn-next-slide" onclick="presentNext()">▶</button>
+    </div>
+    <button id="btn-exit-present" onclick="stopPresentation()">✕</button>
+    <div id="present-title"></div>
+  </div><!-- fine present-overlay -->
+  </div><!-- fine canvas-area -->
+  <div class="relation-overlay" id="relation-overlay" style="display:none">
+    <div class="relation-modal" id="relation-modal">
+      <div class="relation-modal-header">
+        <span id="relation-title">Vincolo</span>
+        <button class="relation-close" id="relation-close">✕</button>
+      </div>
+      <div class="relation-modal-body" id="relation-modal-body"></div>
+      <div class="relation-modal-footer">
+        <button class="relation-btn-del" id="relation-btn-del" style="display:none">Rimuovi vincolo</button>
+        <button class="relation-btn-ok" id="relation-btn-ok">Conferma</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANNELLO PROPRIETÀ DESTRA -->
+  <aside class="props-panel collapsed" id="props-panel">
+    <div class="props-empty" id="props-empty">
+      <span>Seleziona un elemento<br>per vederne le proprietà</span>
+    </div>
+    <div class="props-content" id="props-content" style="display:none">
+      <div class="props-header" id="props-header">—</div>
+      <div class="props-fields" id="props-fields"></div>
+    </div>
+  </aside>
+</div>
+
+
+
+
+
+  <script>
+// ═══ MODULE: state.js ═══
+// ─── State ───────────────────────────────────────────────────────────────────
+let elements = [];
+let relations = [];
+let selectedId = null;
+let dragging = null;
+
+// Esponi su window per accesso da foreignObject/ECharts
+Object.defineProperty(window, '_pcElements', { get: () => elements });
+Object.defineProperty(window, '_pcRelations', { get: () => relations });
+let idCounter = 0;
+const SNAP_DIST = 10;
+
+// ─── Stato presentazione ─────────────────────────────────────────────────────
+let _slidesMode = false;
+let _slides = [];        // array di {id, title, elements, relations, idCounter}
+let _currentSlide = 0;
+
+function isSlidesMode() { return _slidesMode; }
+function getSlides() { return _slides; }
+function getCurrentSlideIdx() { return _currentSlide; }
+
+function _serializeCurrentSlide() {
+  return {
+    elements: JSON.parse(JSON.stringify(elements)),
+    relations: JSON.parse(JSON.stringify(relations)),
+    idCounter: idCounter,
+  };
+}
+
+function _loadSlideData(data) {
+  elements.length = 0;
+  elements.push(...JSON.parse(JSON.stringify(data.elements)));
+  relations.length = 0;
+  relations.push(...JSON.parse(JSON.stringify(data.relations)));
+  idCounter = data.idCounter;
+}
+
+function saveCurrentSlide() {
+  if (!_slidesMode || !_slides[_currentSlide]) return;
+  Object.assign(_slides[_currentSlide], _serializeCurrentSlide());
+}
+
+function initSlidesMode() {
+  _slidesMode = true;
+  _slides = [{
+    id: Date.now(),
+    title: 'Slide 1',
+    ..._serializeCurrentSlide()
+  }];
+  _currentSlide = 0;
+}
+
+function goToSlide(idx) {
+  if (idx < 0 || idx >= _slides.length) return;
+  saveCurrentSlide();
+  _currentSlide = idx;
+  _loadSlideData(_slides[_currentSlide]);
+}
+
+function addEmptySlide() {
+  saveCurrentSlide();
+  _slides.push({
+    id: Date.now(),
+    title: `Slide ${_slides.length + 1}`,
+    elements: [],
+    relations: [],
+    idCounter: 1,
+  });
+  _currentSlide = _slides.length - 1;
+  _loadSlideData(_slides[_currentSlide]);
+  if (typeof updateRefSystemBtn === 'function') updateRefSystemBtn();
+}
+
+function duplicateSlide(idx) {
+  saveCurrentSlide();
+  const src = _slides[idx];
+  const copy = {
+    id: Date.now(),
+    title: src.title + ' (copia)',
+    elements: JSON.parse(JSON.stringify(src.elements)),
+    relations: JSON.parse(JSON.stringify(src.relations)),
+    idCounter: src.idCounter,
+  };
+  _slides.splice(idx + 1, 0, copy);
+  _currentSlide = idx + 1;
+  _loadSlideData(_slides[_currentSlide]);
+  if (typeof updateRefSystemBtn === 'function') updateRefSystemBtn();
+}
+
+function deleteSlide(idx) {
+  if (_slides.length <= 1) return;
+  _slides.splice(idx, 1);
+  _currentSlide = Math.min(_currentSlide, _slides.length - 1);
+  _loadSlideData(_slides[_currentSlide]);
+  if (typeof updateRefSystemBtn === 'function') updateRefSystemBtn();
+}
+
+function exitSlidesMode() {
+  _slidesMode = false;
+  // Carica slide 1 come workspace corrente
+  if (_slides[0]) _loadSlideData(_slides[0]);
+  _slides = [];
+  _currentSlide = 0;
+}
+const DRAG_THRESHOLD = 4; // px di movimento prima di considerarlo un drag
+
+// ═══ MODULE: svg-helpers.js ═══
+// ─── SVG helpers ─────────────────────────────────────────────────────────────
+const SVG_NS = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs = {}) {
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+function line(g, x1, y1, x2, y2, col, w=1, dash='') {
+  const l = svgEl('line', {x1,y1,x2,y2,stroke:col,'stroke-width':w});
+  if (dash) l.setAttribute('stroke-dasharray', dash);
+  g.appendChild(l); return l;
+}
+function arrow(g, x1, y1, x2, y2, col, vertical=false) {
+  const sw = window._vectorStroke || 1.5;
+  const hs = window._vectorHead   || 9;
+  const hw = hs * 0.39;
+  line(g, x1, y1, x2, y2, col, sw);
+  const angle = Math.atan2(y2-y1, x2-x1);
+  const p1x = x2 - hs*Math.cos(angle) + hw*Math.sin(angle);
+  const p1y = y2 - hs*Math.sin(angle) - hw*Math.cos(angle);
+  const p2x = x2 - hs*Math.cos(angle) - hw*Math.sin(angle);
+  const p2y = y2 - hs*Math.sin(angle) + hw*Math.cos(angle);
+  const poly = svgEl('polygon', {points:`${x2},${y2} ${p1x},${p1y} ${p2x},${p2y}`, fill:col});
+  g.appendChild(poly);
+}
+function poly(g, pts, fill, stroke, sw) {
+  const el = svgEl('polygon', {points:pts, fill, stroke, 'stroke-width':sw});
+  g.appendChild(el); return el;
+}
+function circle(g, cx, cy, r, fill, stroke, sw, dash='') {
+  const el = svgEl('circle', {cx,cy,r,fill,stroke,'stroke-width':sw});
+  if (dash) el.setAttribute('stroke-dasharray', dash);
+  g.appendChild(el); return el;
+}
+function ellipseEl(g, cx, cy, rx, ry, stroke) {
+  const el = svgEl('ellipse', {cx,cy,rx,ry,fill:'none',stroke,'stroke-width':0.8,opacity:0.5});
+  g.appendChild(el);
+}
+function rect(g, x, y, w, h, fill, stroke, sw) {
+  const el = svgEl('rect', {x,y,width:w,height:h,fill,stroke,'stroke-width':sw,rx:1});
+  g.appendChild(el); return el;
+}
+function text(g, x, y, txt, fill, size='13px', anchor='start') {
+  const el = svgEl('text', {x,y,fill,'font-size':size,'font-family':'IBM Plex Mono, monospace','text-anchor':anchor});
+  el.textContent = txt;
+  g.appendChild(el); return el;
+}
+function path(g, d, fill, stroke, sw, dash='') {
+  const el = svgEl('path', {d,fill,stroke,'stroke-width':sw});
+  if (dash) el.setAttribute('stroke-dasharray', dash);
+  g.appendChild(el); return el;
+}
+function svgArc(g, cx, cy, r, startDeg, endDeg, col) {
+  const s = startDeg * Math.PI/180;
+  const e = endDeg * Math.PI/180;
+  const x1 = cx + r*Math.cos(s), y1 = cy + r*Math.sin(s);
+  const x2 = cx + r*Math.cos(e), y2 = cy + r*Math.sin(e);
+  const el = svgEl('path', {d:`M${x1},${y1} A${r},${r} 0 0,1 ${x2},${y2}`, fill:'none', stroke:col, 'stroke-width':1});
+  g.appendChild(el);
+}
+
+
+// ─── SVG Text con supporto LaTeX opzionale ────────────────────────────────────
+// Usa foreignObject + KaTeX se il testo contiene $, altrimenti SVG text normale
+function svgLatexText(g, text, x, y, opts = {}) {
+  const {
+    fontSize = 12, fill = '#e8e8ec', fontFamily = 'IBM Plex Mono,monospace',
+    fontWeight = 'normal', fontStyle = 'normal', textAnchor = 'start', width = 200,
+  } = opts;
+
+  const hasLatex = typeof text === 'string' && /\$/.test(text);
+
+  if (hasLatex && typeof katex !== 'undefined') {
+    const foX = textAnchor === 'middle' ? x - width/2 : textAnchor === 'end' ? x - width : x;
+    const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+    fo.setAttribute('x', foX); fo.setAttribute('y', y - fontSize);
+    fo.setAttribute('width', width + 200); // extra spazio per testo dopo LaTeX
+    fo.setAttribute('height', fontSize * 2.5);
+    fo.setAttribute('pointer-events', 'none');
+    fo.setAttribute('overflow', 'visible');
+    const div = document.createElement('div');
+    div.style.cssText = `color:${fill};font-size:${fontSize}px;font-weight:${fontWeight};
+      font-style:${fontStyle};font-family:${fontFamily};white-space:nowrap;line-height:${fontSize*1.4}px;
+      text-align:${textAnchor==='middle'?'center':textAnchor==='end'?'right':'left'};
+      overflow:visible;`;
+    try {
+      div.innerHTML = renderMixedLatex(text, fill, fontSize);
+    } catch(e) { div.textContent = text; }
+    fo.appendChild(div); g.appendChild(fo);
+  } else {
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('x', x); t.setAttribute('y', y);
+    t.setAttribute('font-size', fontSize); t.setAttribute('font-family', fontFamily);
+    t.setAttribute('font-weight', fontWeight); t.setAttribute('font-style', fontStyle); t.setAttribute('fill', fill);
+    t.setAttribute('text-anchor', textAnchor); t.setAttribute('pointer-events', 'none');
+    t.textContent = text || '';
+    g.appendChild(t);
+  }
+}
+
+// ═══ MODULE: refs.js ═══
+// ─── Helpers: sistema di riferimento ─────────────────────────────────────────
+function getRefSystem() {
+  return elements.find(e => e && e.type && DEFS[e.type]?.isRefSystem);
+}
+
+// Converte coordinate fisiche (metri) → coordinate canvas (px)
+function physicsToCanvas(physX, physY) {
+  const ref = getRefSystem();
+  if (!ref) return null;
+  const ML = 50, MB = 50, MT = 24, MR = 24;
+  const W = 340, H = 300;
+  const axisW = W - ML - MR;
+  const axisH = H - MB - MT;
+  const halfX = Math.max(0.1, parseFloat(ref.props?.halfX) || 5);
+  const halfY = Math.max(0.1, parseFloat(ref.props?.halfY) || 5);
+  const flipX = ref.props?.flipX ? -1 : 1;
+  const flipY = ref.props?.flipY ? -1 : 1;
+  const scaleX = axisW / (2 * halfX);
+  const scaleY = axisH / (2 * halfY);
+  const ox = ref.x + ML + axisW / 2;
+  const oy = ref.y + MT + axisH / 2;
+  return {
+    x: ox + flipX * physX * scaleX,
+    y: oy - flipY * physY * scaleY
+  };
+}
+
+// Riposiziona tutti i corpi con coordinate fisiche definite
+function repositionPhysicsBodies() {
+  for (const el of elements) {
+    if (el.type !== 'point_mass') continue;
+    const px = el.props?.px, py = el.props?.py;
+    if (px === '' || px === undefined || py === '' || py === undefined) continue;
+    const pos = physicsToCanvas(parseFloat(px), parseFloat(py));
+    if (!pos) continue;
+    const def = DEFS[el.type];
+    el.x = pos.x - def.w / 2;
+    el.y = pos.y - def.h / 2;
+  }
+}
+
+// ═══ MODULE: inclined-geometry.js ═══
+// ─── Geometria piano inclinato (solo funzioni pure, no DOM) ──────────────────
+function getInclinedPlaneDims(el, scaleX, scaleY) {
+  const p    = el.props || {};
+  const mode = p.inputMode || 'angle+base';
+  const ang  = parseFloat(p.angle) || 30;
+  const rad  = ang * Math.PI / 180;
+  let base, height, length;
+
+  if (mode === 'angle+base') {
+    base   = parseFloat(p.base)   || 5;
+    height = base * Math.tan(rad);
+    length = base / Math.cos(rad);
+  } else if (mode === 'angle+height') {
+    height = parseFloat(p.height) || 3;
+    base   = height / Math.tan(rad);
+    length = height / Math.sin(rad);
+  } else if (mode === 'angle+length') {
+    length = parseFloat(p.length) || 6;
+    base   = length * Math.cos(rad);
+    height = length * Math.sin(rad);
+  } else {
+    base   = parseFloat(p.base)   || 5;
+    height = parseFloat(p.height) || 3;
+    length = Math.hypot(base, height);
+  }
+
+  return {
+    base, height, length,
+    basePx:   base   * scaleX,
+    heightPx: height * scaleY,
+    angle: mode === 'base+height' ? Math.atan2(height, base) * 180 / Math.PI : ang
+  };
+}
+
+// ═══ MODULE: import-data.js ═══
+// ─── Import dati da CSV / XLSX ────────────────────────────────────────────────
+
+// Input file globale — creato una volta sola, mai rimosso dal DOM
+var _importInput = null;
+var _importCallback = null;
+
+function _ensureImportInput() {
+  if (_importInput && document.body.contains(_importInput)) return;
+  _importInput = document.createElement('input');
+  _importInput.type = 'file';
+  _importInput.accept = '.csv,.xlsx,.xls,.txt,.tsv';
+  _importInput.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none;';
+  document.body.appendChild(_importInput);
+  _importInput.addEventListener('change', async () => {
+    const file = _importInput.files[0];
+    // Reset immediato per permettere re-upload dello stesso file
+    _importInput.value = '';
+    if (!file || !_importCallback) return;
+    const cb = _importCallback;
+    _importCallback = null;
+    try {
+      let result;
+      if (/\.(xlsx|xls)$/i.test(file.name)) {
+        const buf = await file.arrayBuffer();
+        result = await _parseXLSX(buf);
+      } else {
+        const text = await file.text();
+        result = _parseCSV(text);
+      }
+      if (!result) throw new Error('File vuoto o non riconosciuto');
+      cb(null, result);
+    } catch(err) {
+      cb(err, null);
+    }
+  });
+}
+
+// Normalizza separatore decimale europeo: 0,08 → 0.08
+function normalizeNum(v) {
+  if (typeof v === 'number') return String(v);
+  const s = String(v ?? '').trim();
+  if (/^-?[\d.]+,\d+$/.test(s)) return s.replace('.','').replace(',','.');
+  if (/^-?\d+,\d+$/.test(s)) return s.replace(',','.');
+  return s;
+}
+
+function _parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) throw new Error('Il file deve avere almeno una riga di intestazione e una di dati');
+  const first = lines[0];
+  const sep = [';', ',', '\t'].reduce((best, s) =>
+    (first.split(s).length > first.split(best).length ? s : best), ',');
+  const parseRow = line => {
+    const cells = []; let cur = ''; let inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; continue; }
+      if (c === sep && !inQ) { cells.push(cur.trim()); cur = ''; }
+      else cur += c;
+    }
+    cells.push(cur.trim());
+    return cells;
+  };
+  const headers = parseRow(lines[0]).map(h => h || '');
+  const rows = lines.slice(1).map(l => {
+    const cells = parseRow(l);
+    while (cells.length < headers.length) cells.push('');
+    return cells.slice(0, headers.length).map(normalizeNum);
+  });
+  return { headers, rows };
+}
+
+function _parseXLSX(arrayBuffer) {
+  return new Promise((resolve, reject) => {
+    const doRead = () => {
+      try {
+        const XLSX = window.XLSX;
+        if (!XLSX) { reject(new Error('SheetJS non disponibile')); return; }
+        const wb = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+        if (data.length < 2) { reject(new Error('Almeno una riga header + una di dati')); return; }
+        const headers = data[0].map(h => String(h ?? '').trim());
+        const rows = data.slice(1)
+          .map(row => headers.map((_, i) => normalizeNum(row[i] ?? '')))
+          .filter(row => row.some(c => c !== ''));
+        resolve({ headers, rows });
+      } catch(e) { reject(e); }
+    };
+    if (window.XLSX) { doRead(); return; }
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    script.onload = doRead;
+    script.onerror = () => reject(new Error('Impossibile caricare SheetJS'));
+    document.head.appendChild(script);
+  });
+}
+
+function importDataToTable(elId, onDone) {
+  // Crea sempre un input fresco — garantisce che change scatti sempre
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.csv,.xlsx,.xls,.txt,.tsv';
+  inp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
+  document.body.appendChild(inp);
+
+  inp.addEventListener('change', async () => {
+    const file = inp.files[0];
+    document.body.removeChild(inp);
+    if (!file) return;
+    try {
+      let result;
+      if (/\.(xlsx|xls)$/i.test(file.name)) {
+        const buf = await file.arrayBuffer();
+        result = await _parseXLSX(buf);
+      } else {
+        const text = await file.text();
+        result = _parseCSV(text);
+      }
+      if (!result) throw new Error('File vuoto o non riconosciuto');
+      const el = (typeof elements !== 'undefined' ? elements : []).find(e => e.id === elId);
+      if (!el) { alert('Tabella non trovata'); return; }
+      el.props.headers     = result.headers;
+      el.props.rows        = result.rows;
+      el.props.currentPage = 0;
+      el.props.selectedRow = -1;
+
+      const maxLen = Math.max(...result.headers.map(h => h.length), 4);
+      el.props.colWidth = Math.max(80, Math.min(160, maxLen * 9));
+      if (typeof _chartOverlays !== 'undefined') {
+        const rels = window._pcRelations || [];
+        (window._pcElements || []).filter(e => e.type === 'chart').forEach(ch => {
+          const rel = rels.find(r => r.type === 'chart_prop' &&
+            (r.aId === elId || r.bId === elId) &&
+            (r.aId === ch.id || r.bId === ch.id));
+          if (rel && _chartOverlays.has(ch.id)) {
+            const entry = _chartOverlays.get(ch.id);
+            if (entry?.chart) entry.chart.dispose();
+            if (entry?.div) entry.div.remove();
+            _chartOverlays.delete(ch.id);
+          }
+        });
+      }
+      render();
+      if (onDone) onDone();
+    } catch (err) {
+      alert('Errore importazione: ' + err.message);
+    }
+  });
+
+  // Usa setTimeout per uscire dallo stack dell'evento corrente
+  setTimeout(() => inp.click(), 0);
+}
+
+// ═══ MODULE: defs.js ═══
+// ─── Element definitions ─────────────────────────────────────────────────────
+const DEFS = {
+  axis_h: {
+    label: 'Asse orizzontale',
+    w: 200, h: 40,
+    draw(g, el) {
+      line(g, 10, 20, 180, 20, '#60c8f0', 1.5);
+      arrow(g, 180, 20, 200, 20, '#60c8f0');
+      text(g, 196, 15, 'x', '#60c8f0', '13px');
+      for (let i = 40; i < 180; i += 40) {
+        line(g, i, 14, i, 26, '#60c8f0', 0.7, '2,3');
+      }
+    }
+  },
+  axis_v: {
+    label: 'Asse verticale',
+    w: 40, h: 200,
+    draw(g, el) {
+      line(g, 20, 190, 20, 20, '#60c8f0', 1.5);
+      arrow(g, 20, 20, 20, 0, '#60c8f0', true);
+      text(g, 25, 14, 'y', '#60c8f0', '13px');
+      for (let i = 40; i < 180; i += 40) {
+        line(g, 14, i, 26, i, '#60c8f0', 0.7, '2,3');
+      }
+    }
+  },
+  axis_xy: {
+    label: 'Sistema 2D (x,y)',
+    w: 340, h: 300,
+    isRefSystem: true,
+    draw(g, el) {
+      const col = '#60c8f0';
+      const ML = 50, MB = 50, MT = 24, MR = 24;
+      const W = 340, H = 300;
+      const axisW = W - ML - MR;
+      const axisH = H - MB - MT;
+
+      const halfX = Math.max(0.1, parseFloat(el.props?.halfX) || 5);
+      const halfY = Math.max(0.1, parseFloat(el.props?.halfY) || 5);
+      const flipX = el.props?.flipX ? -1 : 1;
+      const flipY = el.props?.flipY ? -1 : 1;
+      const scaleX = axisW / (2 * halfX);
+      const scaleY = axisH / (2 * halfY);
+
+      // Origine al centro
+      const ox = ML + axisW / 2;
+      const oy = MT + axisH / 2;
+
+      function niceStep(half) {
+        const raw = half / 2.5;
+        if (!isFinite(raw) || raw <= 0) return 1;
+        const exp = Math.floor(Math.log10(raw));
+        const frac = raw / Math.pow(10, exp);
+        const nice = frac < 1.5 ? 1 : frac < 3.5 ? 2 : frac < 7.5 ? 5 : 10;
+        return Math.max(1e-9, nice * Math.pow(10, exp));
+      }
+      const stepX = niceStep(halfX);
+      const stepY = niceStep(halfY);
+
+      // Asse x — direzione dipende da flipX
+      const xEnd = ox + flipX * (axisW / 2 + 10);
+      const xStart = ox - flipX * (axisW / 2 + 10);
+      line(g, xStart, oy, xEnd, oy, col, 1.5);
+      arrow(g, xEnd - flipX * 14, oy, xEnd, oy, col);
+      text(g, xEnd + flipX * 4, oy - 6, 'x', col, '12px');
+
+      // Asse y
+      const yEnd = oy - flipY * (axisH / 2 + 10);
+      const yStart = oy + flipY * (axisH / 2 + 10);
+      line(g, ox, yStart, ox, yEnd, col, 1.5);
+      arrow(g, ox, yEnd + flipY * 14, ox, yEnd, col, true);
+      text(g, ox + 5, yEnd - flipY * 4, 'y', col, '12px');
+
+      // Tacche asse x
+      for (let i = 1; ; i++) {
+        const v = i * stepX;
+        if (v > halfX + stepX * 0.01) break;
+        for (const sign of [1, -1]) {
+          const px = ox + flipX * sign * v * scaleX;
+          if (px < ML - 4 || px > W - MR + 4) continue;
+          line(g, px, oy - 4, px, oy + 4, col, 1);
+          const lv = flipX * sign * v;
+          const label = Number.isInteger(lv) ? `${lv}` : `${parseFloat(lv.toPrecision(3))}`;
+          text(g, px - label.length * 3, oy + 14, label, col, '10px');
+        }
+      }
+
+      // Tacche asse y
+      for (let i = 1; ; i++) {
+        const v = i * stepY;
+        if (v > halfY + stepY * 0.01) break;
+        for (const sign of [1, -1]) {
+          const py = oy - flipY * sign * v * scaleY;
+          if (py < MT - 4 || py > H - MB + 4) continue;
+          line(g, ox - 4, py, ox + 4, py, col, 1);
+          const lv = flipY * sign * v;
+          const label = Number.isInteger(lv) ? `${lv}` : `${parseFloat(lv.toPrecision(3))}`;
+          text(g, ox - 8 - label.length * 5, py + 3, label, col, '10px');
+        }
+      }
+
+      // Origine
+      circle(g, ox, oy, 2.5, col, 'none', 0);
+      text(g, ox - 14, oy + 14, '0', col, '10px');
+
+      // Freccia gravità
+      const gVal = el.props?.gravity;
+      if (gVal !== undefined && gVal !== '') {
+        const ax = W - MR - 18, ay = MT + 10;
+        line(g, ax, ay, ax, ay + 28, '#ffb347', 1.8);
+        arrow(g, ax, ay + 14, ax, ay + 34, '#ffb347');
+        text(g, ax - `g = ${gVal} m/s²`.length * 3.5, ay - 4, `g = ${gVal} m/s²`, '#ffb347', '13px');
+      }
+    }
+  },
+
+  axis_xyz: {
+    label: 'Sistema 3D (x,y,z)',
+    w: 340, h: 300,
+    isRefSystem: true,
+    draw(g, el) {
+      const col = '#60c8f0';
+      const colZ = '#a0d8f0';
+      const W = 340, H = 300;
+      // Origine al centro-basso
+      const ox = 80, oy = 230;
+
+      const halfX = Math.max(0.1, parseFloat(el.props?.halfX) || 5);
+      const halfY = Math.max(0.1, parseFloat(el.props?.halfY) || 5);
+      const halfZ = Math.max(0.1, parseFloat(el.props?.halfZ) || 5);
+      const flipX = el.props?.flipX ? -1 : 1;
+      const flipY = el.props?.flipY ? -1 : 1;
+      const flipZ = el.props?.flipZ ? -1 : 1;
+
+      // Lunghezze assi in pixel (fisse)
+      const lenX = 180, lenY = 160, lenZ = 110;
+
+      // Vettori direzione assonometria
+      const dX = { x: flipX * 1,     y: 0 };           // asse x → destra
+      const dY = { x: 0,              y: -flipY * 1 };  // asse y → su
+      const dZ = { x: -flipZ * 0.5,  y: flipZ * 0.4 }; // asse z → obliquo sx-giù
+
+      function axPt(d, len, frac) {
+        return { x: ox + d.x * len * frac, y: oy + d.y * len * frac };
+      }
+
+      function niceStep(half) {
+        const raw = half / 2.5;
+        if (!isFinite(raw) || raw <= 0) return 1;
+        const exp = Math.floor(Math.log10(raw));
+        const frac = raw / Math.pow(10, exp);
+        const nice = frac < 1.5 ? 1 : frac < 3.5 ? 2 : frac < 7.5 ? 5 : 10;
+        return Math.max(1e-9, nice * Math.pow(10, exp));
+      }
+
+      // Asse X
+      const xTip = axPt(dX, lenX, 1);
+      line(g, ox, oy, xTip.x + dX.x * 10, xTip.y + dX.y * 10, col, 1.5);
+      arrow(g, xTip.x, xTip.y, xTip.x + dX.x * 14, xTip.y + dX.y * 14, col);
+      text(g, xTip.x + dX.x * 16, xTip.y + dX.y * 16 + 4, 'x', col, '12px');
+
+      // Asse Y
+      const yTip = axPt(dY, lenY, 1);
+      line(g, ox, oy, yTip.x + dY.x * 10, yTip.y + dY.y * 10, col, 1.5);
+      arrow(g, yTip.x, yTip.y, yTip.x + dY.x * 14, yTip.y + dY.y * 14, col);
+      text(g, yTip.x + dY.x * 16 + 4, yTip.y + dY.y * 16, 'y', col, '12px');
+
+      // Asse Z
+      const zTip = axPt(dZ, lenZ, 1);
+      line(g, ox, oy, zTip.x + dZ.x * 10, zTip.y + dZ.y * 10, colZ, 1.5);
+      arrow(g, zTip.x, zTip.y, zTip.x + dZ.x * 14, zTip.y + dZ.y * 14, colZ);
+      text(g, zTip.x + dZ.x * 16, zTip.y + dZ.y * 16 + 4, 'z', colZ, '12px');
+
+      // Tacche asse X
+      const stepX = niceStep(halfX);
+      for (let i = 1; i * stepX <= halfX + stepX * 0.01; i++) {
+        const v = i * stepX;
+        const p = axPt(dX, lenX, v / halfX);
+        if (p.x < 0 || p.x > W) continue;
+        line(g, p.x, p.y - 4, p.x, p.y + 4, col, 1);
+        const lv = flipX * v;
+        text(g, p.x - 4, p.y + 14, `${Number.isInteger(lv) ? lv : parseFloat(lv.toPrecision(3))}`, col, '8px');
+      }
+
+      // Tacche asse Y
+      const stepY = niceStep(halfY);
+      for (let i = 1; i * stepY <= halfY + stepY * 0.01; i++) {
+        const v = i * stepY;
+        const p = axPt(dY, lenY, v / halfY);
+        if (p.y < 0 || p.y > H) continue;
+        line(g, ox - 4, p.y, ox + 4, p.y, col, 1);
+        const lv = flipY * v;
+        text(g, ox - 26, p.y + 3, `${Number.isInteger(lv) ? lv : parseFloat(lv.toPrecision(3))}`, col, '8px');
+      }
+
+      // Tacche asse Z
+      const stepZ = niceStep(halfZ);
+      for (let i = 1; i * stepZ <= halfZ + stepZ * 0.01; i++) {
+        const v = i * stepZ;
+        const p = axPt(dZ, lenZ, v / halfZ);
+        const perp = { x: -dZ.y, y: dZ.x };
+        line(g, p.x - perp.x * 4, p.y - perp.y * 4, p.x + perp.x * 4, p.y + perp.y * 4, colZ, 1);
+        const lv = flipZ * v;
+        text(g, p.x - 18, p.y + 10, `${Number.isInteger(lv) ? lv : parseFloat(lv.toPrecision(3))}`, colZ, '8px');
+      }
+
+      // Origine
+      circle(g, ox, oy, 2.5, col, 'none', 0);
+      text(g, ox - 14, oy + 14, '0', col, '10px');
+
+      // Freccia gravità
+      const gVal = el.props?.gravity;
+      if (gVal !== undefined && gVal !== '') {
+        const ax = W - 30, ay = 20;
+        line(g, ax, ay, ax, ay + 28, '#ffb347', 1.8);
+        arrow(g, ax, ay + 14, ax, ay + 34, '#ffb347');
+        text(g, ax - `g = ${gVal} m/s²`.length * 3.5, ay - 4, `g = ${gVal} m/s²`, '#ffb347', '13px');
+      }
+    }
+  },
+  inclined_plane: {
+    label: 'Piano inclinato',
+    w: 180, h: 120,
+    draw(g, el) {
+      const ref   = getRefSystem();
+      const ML = 50, W = 340, MR = 24, MB = 50, H = 300, MT = 24;
+      const axisW = W - ML - MR, axisH = H - MB - MT;
+      const halfX = Math.max(0.1, parseFloat(ref?.props?.halfX) || 5);
+      const halfY = Math.max(0.1, parseFloat(ref?.props?.halfY) || 5);
+      const scaleX = ref ? axisW / (2 * halfX) : 18;
+      const scaleY = ref ? axisH / (2 * halfY) : 18;
+      const scaleIso = Math.min(scaleX, scaleY); // scala isotropica per coerenza visiva
+
+      // Calcola base e altezza in px con scala isotropica
+      const { basePx, heightPx } = getInclinedPlaneDims(el, scaleIso, scaleIso);
+      const flipX = el.props?.flipX;
+      const col   = '#c8f060';
+      const bPx   = Math.max(20, el._wPx ?? basePx);
+      const hPx   = Math.max(10, el._hPx ?? heightPx);
+
+      // Aggiorna dimensioni per hit/outline
+      DEFS.inclined_plane.w = bPx;
+      DEFS.inclined_plane.h = hPx;
+      el._wPx = bPx;
+      el._hPx = hPx;
+
+      // Se nascosto, non disegnare il triangolo
+      if (el.props?.visible === false) return;
+
+      // Triangolo: angolo in basso
+      // flipX=false: salita da sinistra (vertice in alto a destra)
+      // flipX=true:  salita da destra  (vertice in alto a sinistra)
+      let pts;
+      if (!flipX) {
+        pts = `0,${hPx} ${bPx},${hPx} ${bPx},0`;
+      } else {
+        pts = `0,${hPx} ${bPx},${hPx} 0,0`;
+      }
+      poly(g, pts, 'none', col, 1.5);
+
+      // Angolo in gradi — sotto la base, fuori dal triangolo
+      const angDeg = getInclinedPlaneDims(el, scaleX, scaleY).angle;
+      if (!flipX) {
+        text(g, 2, hPx + 14, `${angDeg.toFixed(1)}°`, col, '13px');
+      } else {
+        text(g, bPx - 36, hPx + 14, `${angDeg.toFixed(1)}°`, col, '13px');
+      }
+
+      // ── Forze di reazione quando il corpo è nascosto ───────────────────────
+      const bodyReact = el.props?._showBodyReaction;
+      if (bodyReact) {
+        el.props._showBodyReaction = null;
+        const planeN = bodyReact.planeN;
+        if (planeN && planeN.NValid && planeN.NMag > 1e-9) {
+          const MAX_LEN = window._vectorScale || 70;
+          const geo = planeN.geo; // contiene nx,ny (normale verso corpo) e dx,dy (lungo piano)
+
+          if (geo) {
+            const scaleV = MAX_LEN / Math.max(planeN.NMag, 1);
+
+            // Punto di applicazione: usa _contactLocal convertito in coord canvas, poi in coord piano
+            let cx, cy;
+            const contactLocal = bodyReact.contactLocal;
+            const bodyEl = bodyReact.bodyEl;
+            if (contactLocal && bodyEl) {
+              // _contactLocal è in coord locali del corpo (non ruotato)
+              // Applica rotazione del corpo per ottenere coord canvas
+              const angleRad = bodyEl._rotation ? (bodyEl._rotation.angle * Math.PI / 180) : 0;
+              const rx = contactLocal.x * Math.cos(angleRad) - contactLocal.y * Math.sin(angleRad);
+              const ry = contactLocal.x * Math.sin(angleRad) + contactLocal.y * Math.cos(angleRad);
+              // Converti in coord locali del piano
+              cx = (bodyEl.x + rx) - el.x;
+              cy = (bodyEl.y + ry) - el.y;
+            } else if (bodyEl) {
+              // fallback punto materiale: proiezione del centro sull'ipotenusa
+              const bW = bodyEl._wPx ?? 28, bH = bodyEl._hPx ?? 28;
+              const bodyCx = bodyEl.x + bW / 2;
+              const bodyCy = bodyEl.y + bH / 2;
+              const localX = bodyCx - el.x;
+              const localY = bodyCy - el.y;
+              const t = (localX - geo.x0) * geo.dx + (localY - geo.y0) * geo.dy;
+              const tClamped = Math.max(0, Math.min(geo.lenPx, t));
+              cx = geo.x0 + tClamped * geo.dx;
+              cy = geo.y0 + tClamped * geo.dy;
+            } else {
+              cx = bPx * 0.5; cy = hPx * 0.5;
+            }
+
+            // Reazione vincolare N: INTO il piano = direzione opposta a geo.nx/ny
+            const nLen = Math.min(MAX_LEN, planeN.NMag * scaleV);
+            const Ncol = '#60f0c0';
+            const nex = cx + (-geo.nx) * nLen;
+            const ney = cy + (-geo.ny) * nLen;
+            arrow(g, cx, cy, nex, ney, Ncol);
+            const angN = Math.atan2(ney - cy, nex - cx);
+            text(g, nex + 8*Math.cos(angN), ney + 8*Math.sin(angN) + 4, 'N', Ncol, '12px', 'middle');
+
+            // Attrito: calcolato dalla componente parallela totale
+            // Ppar è la componente del peso lungo il piano (in unità fisiche)
+            // Fext_par è la componente delle forze esterne lungo il piano
+            const Fpar_tot = (planeN.Ppar || 0) + (planeN.Fext_par || 0);
+            const rel2 = bodyReact.rel;
+            const muS = parseFloat(rel2?.props?.muS);
+            const muK = parseFloat(rel2?.props?.muK);
+            const v0s = parseFloat(bodyEl?.props?.v0s) || 0;
+            const isMoving = Math.abs(v0s) > 1e-9;
+
+            let fVal = 0, frictionDir = 0;
+            if (isMoving && !isNaN(muK) && muK > 0) {
+              fVal = muK * planeN.NMag;
+              frictionDir = v0s > 0 ? -1 : 1;
+            } else if (!isMoving && !isNaN(muS) && muS > 0 && Math.abs(Fpar_tot) > 1e-9) {
+              const fsMax = muS * planeN.NMag;
+              fVal = Math.min(Math.abs(Fpar_tot), fsMax);
+              frictionDir = Fpar_tot > 0 ? -1 : 1;
+            }
+
+            if (fVal > 1e-9) {
+              const fLen = Math.min(MAX_LEN, fVal * scaleV);
+              // Reazione sul piano = opposta all'attrito sul corpo
+              // Attrito sul corpo: frictionDir * (geo.dx, geo.dy)
+              // Reazione: -frictionDir * (geo.dx, geo.dy)
+              const Fcol = '#f0a060';
+              const fex = cx + (-frictionDir) * geo.dx * fLen;
+              const fey = cy + (-frictionDir) * geo.dy * fLen;
+              arrow(g, cx, cy, fex, fey, Fcol);
+              const angF = Math.atan2(fey - cy, fex - cx);
+              text(g, fex + 8*Math.cos(angF), fey + 8*Math.sin(angF) + 4, 'f', Fcol, '12px', 'middle');
+            }
+          }
+        }
+      }
+
+      // ── Reazione molle nascoste sul piano ─────────────────────────────────
+      const springReacts = el.props?._showSpringReactions;
+      if (springReacts && springReacts.length > 0) {
+        el.props._showSpringReactions = null;
+        const geoSp = typeof getPlaneGeometry === 'function' ? getPlaneGeometry(el) : null;
+        if (geoSp) {
+          const MAX_LEN2 = window._vectorScale || 70;
+          const MIN_LEN2 = Math.max(10, MAX_LEN2 * 0.2);
+          for (const { springEl, rel } of springReacts) {
+            const F_el = parseFloat(springEl.props?._F_el) || 0;
+            if (Math.abs(F_el) < 1e-9) continue;
+            // Trova il corpo collegato alla molla per usare la sua scala
+            const bodyRel2 = relations.find(r => r.type === 'spring_body' && (r.aId === springEl.id || r.bId === springEl.id));
+            const bodyEl2 = bodyRel2 ? elements.find(e => e.id === (bodyRel2.aId === springEl.id ? bodyRel2.bId : bodyRel2.aId)) : null;
+            const maxMag2 = bodyEl2?._vecMaxMag || Math.abs(F_el);
+            const scale2 = MAX_LEN2 / maxMag2;
+
+            const sAnchor = parseFloat(rel.props?.sAnchor) || 0;
+            const sPx = (Math.max(0, Math.min(geoSp.lenM, sAnchor)) / geoSp.lenM) * geoSp.lenPx;
+            const ax = geoSp.x0 + geoSp.dx * sPx;
+            const ay = geoSp.y0 + geoSp.dy * sPx;
+            // Reazione opposta: se F_el > 0 (allungata, tira corpo verso basso) → reazione va verso l'alto
+            const dir = F_el > 0 ? -1 : 1;
+            const fLen2 = Math.max(MIN_LEN2, Math.abs(F_el) * scale2);
+            const Scol = '#a060f0';
+            const sex = ax + dir * geoSp.dx * fLen2;
+            const sey = ay + dir * geoSp.dy * fLen2;
+            arrow(g, ax, ay, sex, sey, Scol);
+            const angS = Math.atan2(sey - ay, sex - ax);
+            text(g, sex + 8*Math.cos(angS), sey + 8*Math.sin(angS) + 4, 'Fs', Scol, '12px', 'middle');
+          }
+        }
+      }
+    }
+  },
+  floor: {
+    label: 'Pavimento',
+    w: 220, h: 30,
+    getW(el) {
+      // Calcola larghezza in px dalla scala del riferimento e props xMin/xMax
+      const ref = getRefSystem();
+      if (!ref) return el.props?.wPx || 220;
+      const ML = 50, W = 340, MR = 24;
+      const axisW = W - ML - MR;
+      const halfX = Math.max(0.1, parseFloat(ref.props?.halfX) || 5);
+      const scaleX = axisW / (2 * halfX);
+      const xMin = parseFloat(el.props?.xMin) ?? 0;
+      const xMax = parseFloat(el.props?.xMax) ?? 10;
+      const lenM = Math.max(0.1, xMax - xMin);
+      return Math.round(lenM * scaleX);
+    },
+    draw(g, el) {
+      const ref = getRefSystem();
+      const ML = 50, W = 340, MR = 24;
+      const axisW = W - ML - MR;
+      const halfX = Math.max(0.1, parseFloat(ref?.props?.halfX) || 5);
+      const scaleX = ref ? axisW / (2 * halfX) : 22;
+      const xMin = parseFloat(el.props?.xMin) ?? 0;
+      const xMax = parseFloat(el.props?.xMax) ?? 10;
+      const lenPx = el._wPx ?? Math.max(10, Math.round((xMax - xMin) * scaleX));
+      // NON sovrascrivere DEFS.floor.w qui — viene gestito in render()
+      if (el.props?.visible === false) return;
+      line(g, 0, 10, lenPx, 10, '#c8f060', 2.5);
+
+      // Linea rossa sopra se c'è attrito (μₛ o μₖ impostati nella relazione)
+      for (let x = 4; x < lenPx; x += 14) {
+        line(g, x, 10, x - 8, 28, '#c8f060', 1, '');
+      }
+      // Marcatore origine x=0 — sotto la linea, rosso, più lungo
+      const ox0Pos = Math.round(-xMin * scaleX);
+      if (xMin <= 0 && xMax >= 0) {
+        line(g, ox0Pos, 10, ox0Pos, 30, '#ff6060', 2);
+        text(g, ox0Pos - 3, 42, '0', '#ff6060', '13px');
+      }
+    }
+  },
+  wall: {
+    label: 'Parete',
+    w: 14, h: 200,
+    draw(g, el) {
+      const ref = getRefSystem();
+      const MB = 50, H = 300, MT = 24;
+      const axisH = H - MB - MT;
+      const halfY = Math.max(0.1, parseFloat(ref?.props?.halfY) || 5);
+      const scaleY = ref ? axisH / (2 * halfY) : 13;
+      const yMin = parseFloat(el.props?.yMin) ?? 0;
+      const yMax = parseFloat(el.props?.yMax) ?? 10;
+      const lenPx = el._hPx ?? Math.max(20, Math.round((yMax - yMin) * scaleY));
+      DEFS.wall.h = lenPx;
+      el._hPx = lenPx;
+
+      if (el.props?.visible === false) return;
+
+      const col   = '#c8f060';
+      const flipX = el.props?.flipX;
+      // flipX=false: parete a sinistra del corpo → linea a destra del bbox, tacchette a sinistra
+      // flipX=true:  parete a destra del corpo  → linea a sinistra del bbox, tacchette a destra
+      const lx = flipX ? 0 : 13; // la linea è al bordo "esterno" del bbox
+
+      line(g, lx, 0, lx, lenPx, col, 2.5);
+      for (let y = 8; y < lenPx; y += 16) {
+        if (!flipX) line(g, lx, y, lx - 10, y + 8, col, 1, ''); // tacchette a sinistra
+        else        line(g, lx, y, lx + 10, y + 8, col, 1, ''); // tacchette a destra
+      }
+
+      // Marcatore origine y=0
+      if (yMin <= 0 && yMax >= 0) {
+        const oy0 = Math.round(lenPx + yMin * scaleY);
+        if (!flipX) {
+          line(g, lx - 10, oy0, lx, oy0, '#ff6060', 2);
+          text(g, lx - 22, oy0 + 4, '0', '#ff6060', '13px');
+        } else {
+          line(g, lx, oy0, lx + 10, oy0, '#ff6060', 2);
+          text(g, lx + 12, oy0 + 4, '0', '#ff6060', '13px');
+        }
+      }
+    }
+  },
+  rect_body: {
+    label: 'Corpo rettangolare',
+    w: 50, h: 32,
+    draw(g, el) {
+      const cx = 25, cy = 16;
+      const p = el.props;
+      if (p?.visible === false) return; // render.js gestisce il disco
+      const bodyVisible = true;
+      if (bodyVisible) {
+        rect(g, 0, 0, 50, 32, 'none', '#f0a060', 1.5);
+      if (p) {
+        if (el._rotation) {
+          const angleRad = el._rotation.angle * Math.PI / 180;
+          const cosA = Math.cos(angleRad), sinA = Math.sin(angleRad);
+          // Centro visivo del bbox dopo rotazione attorno a (0,0), in coordinate locali del gruppo:
+          const visCx = cx * cosA - cy * sinA;
+          const visCy = cx * sinA + cy * cosA;
+          // counterG annulla la rotazione → in counterG, il centro visivo è:
+          const ctrCx = visCx * cosA + visCy * sinA;   // rotate(-angle) di (visCx, visCy)
+          const ctrCy = -visCx * sinA + visCy * cosA;
+          // Che è esattamente (cx, cy) — la contro-rotazione riporta al punto originale.
+          // MA il punto da cui partono i vettori deve essere il centro VISIVO.
+          // In counterG, il centro visivo corrisponde a (visCx, visCy) ruotato di -angle:
+          // = (cx, cy). Però i vettori devono partire dal centro CANVAS del corpo.
+          // Soluzione: passiamo (visCx, visCy) come centro, così in counterG i vettori
+          // partono dal punto che corrisponde visivamente al centro del corpo ruotato.
+          const counterG = svgEl('g', {
+            transform: `rotate(${-el._rotation.angle}, ${el._rotation.cx}, ${el._rotation.cy})`
+          });
+          g.appendChild(counterG);
+          // Punto di ancoraggio per corpo nascosto: centro lato di contatto ruotato
+          // In counterG, questo corrisponde a (lcx*cos - lcy*sin, lcx*sin + lcy*cos)
+          let anchor = null;
+          if (!p.visible && el._contactLocal) {
+            const lcx = el._contactLocal.x, lcy = el._contactLocal.y;
+            anchor = {
+              x: lcx * cosA - lcy * sinA,
+              y: lcx * sinA + lcy * cosA
+            };
+          }
+          drawBodyVectors(counterG, el, visCx, visCy, anchor);
+        } else {
+          drawBodyVectors(g, el, cx, cy);
+        }
+      }
+      }
+    }
+  },
+  point_mass: {
+    label: 'Corpo puntiforme',
+    w: 28, h: 28,
+    draw(g, el) {
+      const cx = 14, cy = 14;
+      const p = el.props;
+      if (!p) return;
+      if (p.visible === false) return; // render.js gestisce il disco
+      const bodyVisible = true;
+      if (bodyVisible) {
+        circle(g, cx, cy, 9, 'none', '#f0a060', 2);
+        circle(g, cx, cy, 3, '#f0a060', 'none', 0);
+      }
+      drawBodyVectors(g, el, cx, cy);
+    }
+  },
+  block: {
+    label: 'Blocco',
+    w: 60, h: 50,
+    draw(g, el) {
+      if (el.props?.visible === false) return;
+      rect(g, 5, 14, 44, 30, 'none', '#f0a060', 1.5);
+      line(g, 5, 14, 15, 6, '#f0a060', 1, '');
+      line(g, 49, 14, 59, 6, '#f0a060', 1, '');
+      line(g, 15, 6, 59, 6, '#f0a060', 1, '');
+      line(g, 49, 44, 59, 36, '#f0a060', 1, '');
+      line(g, 59, 6, 59, 36, '#f0a060', 1, '');
+      text(g, 27, 33, 'M', '#f0a060', '12px', 'middle');
+    }
+  },
+  sphere: {
+    label: 'Sfera',
+    w: 50, h: 50,
+    draw(g, el) {
+      if (el.props?.visible === false) return;
+      circle(g, 25, 25, 20, 'none', '#f0a060', 1.5);
+      ellipseEl(g, 25, 25, 20, 5, '#f0a060');
+      line(g, 25, 5, 25, 45, '#f0a060', 0.7, '2,3');
+    }
+  },
+  circular_path: {
+    label: 'Traiettoria circolare',
+    w: 120, h: 120,
+    draw(g, el) {
+      circle(g, 60, 60, 50, 'none', '#d060f0', 1.5, '5,4');
+      // center dot
+      circle(g, 60, 60, 2, '#d060f0', 'none', 0);
+      // radius line
+      line(g, 60, 60, 110, 60, '#d060f0', 0.8, '2,3');
+      text(g, 85, 55, 'r', '#d060f0', '12px', 'middle');
+    }
+  },
+  spring: {
+    label: 'Molla',
+    w: 90, h: 90,
+    draw(g, el) {
+      // Per molla su piano flipX=true: inverti anchor nel draw
+      const anchorRaw = el.props?.anchor || 'left';
+      const anchor = el._planeFlipX
+        ? (anchorRaw === 'left' ? 'right' : anchorRaw === 'right' ? 'left' : anchorRaw)
+        : anchorRaw;
+      const col = '#60c8f0';
+      const horiz = anchor === 'left' || anchor === 'right';
+      const nCoils = 8, zigH = 10; // aumentato da 6 a 10
+      const tailAnchor = 10, tailFree = 8;
+
+      // Lunghezza zigzag: si adatta a L/L0 se entrambi impostati
+      const k  = parseFloat(el.props?.k);
+      const L0 = parseFloat(el.props?.L0);
+      const L  = parseFloat(el.props?._L_calc);  // calcolata dall'equilibrio
+      const ref_s = getRefSystem();
+      const axisW_s=340-50-24, axisH_s=300-50-24;
+      const hX_s=Math.max(0.1,parseFloat(ref_s?.props?.halfX)||5);
+      const hY_s=Math.max(0.1,parseFloat(ref_s?.props?.halfY)||5);
+      const sX_s=axisW_s/(2*hX_s), sY_s=axisH_s/(2*hY_s);
+      const scale_s = horiz ? sX_s : sY_s;
+      const visScale_d = Math.max(1, parseFloat(el.props?.visScale) || 5);
+      const baseZigPx = nCoils * 6; // lunghezza zigzag a riposo in px
+      // L0 → baseZigPx, Δx amplificato di visScale
+      const dxVal_d = (!isNaN(L) && !isNaN(L0)) ? (L - L0) : 0;
+      const Lpx_d = baseZigPx + dxVal_d * scale_s * visScale_d;
+      const zigLen = Math.max(nCoils * 3, Math.round(Lpx_d));
+      const springLen = tailAnchor + zigLen + tailFree;
+
+      // Colore: verde=riposo, giallo=allungata, azzurro=compressa
+      const drawCol = col; // colore unico indipendente dallo stato
+
+      const isSeriesFirst  = el._seriesRole === 'first' || !el._seriesRole;
+      const isSeriesMiddle = el._seriesRole === 'middle';
+      const isSeriesLast   = el._seriesRole === 'last';
+      const showWallAnchor = !el._inParallel && isSeriesFirst;
+      const showWallFree   = !el._inParallel && isSeriesFirst;
+
+      if (horiz) {
+        const cy = 16;
+        if (anchor === 'left') {
+          const wx = 8;
+          if (showWallAnchor) {
+            line(g, wx, 0, wx, 32, drawCol, 2);
+            for (let y = 2; y < 32; y += 6) line(g, wx, y, wx - 6, y + 4, drawCol, 1);
+          } else if (!el._inParallel) {
+            circle(g, 0, cy, 4, drawCol, drawCol, 0);
+            line(g, 0, cy, wx, cy, drawCol, 1.5); // collega pallino alla molla
+          }
+          // Linea dal bordo al muro (o dal pallino al muro)
+          line(g, wx, cy, wx + tailAnchor, cy, drawCol, 1.5);
+          const pts = [[wx + tailAnchor, cy]];
+          const dz = zigLen / nCoils;
+          for (let i = 0; i < nCoils; i++)
+            pts.push([wx + tailAnchor + i*dz + dz/2, (i%2===0) ? cy-zigH : cy+zigH]);
+          pts.push([wx + tailAnchor + zigLen, cy]);
+          g.appendChild(svgEl('path', { d: pts.map((p,i)=>(i===0?'M':'L')+p[0]+','+p[1]).join(' '),
+            fill:'none', stroke:drawCol, 'stroke-width':1.5, 'stroke-linejoin':'round', 'pointer-events':'none' }));
+          const xFreeEnd = wx + tailAnchor + zigLen + tailFree;
+          line(g, wx + tailAnchor + zigLen, cy, xFreeEnd, cy, drawCol, 1.5);
+          if (!el._inParallel && (!el._seriesRole || isSeriesLast)) line(g, xFreeEnd, cy-zigH, xFreeEnd, cy+zigH, drawCol, 2);
+        } else {
+          const wx = springLen + 6;
+          // Muro a destra: solo per prima molla o singola
+          if (!el._inParallel && (!el._seriesRole || isSeriesFirst)) {
+            line(g, wx, 0, wx, 32, drawCol, 2);
+            for (let y = 2; y < 32; y += 6) line(g, wx, y, wx + 6, y + 4, drawCol, 1);
+          }
+          // Lato sinistro (estremo libero x=0) e destra (muro wx):
+          if (!el._inParallel) {
+            if (!el._seriesRole) {
+              // Singola standalone: tacca libera a sinistra
+              line(g, 0, cy-zigH, 0, cy+zigH, drawCol, 2);
+            } else if (isSeriesFirst) {
+              // Prima in serie: nessuna tacca né pallino a sinistra (ha già il muro a destra)
+            } else {
+              // Middle/last: pallino sul lato DESTRO (dove era il muro) che coincide con l'estremo libero della molla precedente
+              circle(g, wx, cy, 4, drawCol, drawCol, 0);
+            }
+          }
+          line(g, 0, cy, tailFree, cy, drawCol, 1.5);
+          const pts = [[tailFree, cy]];
+          const dz = zigLen / nCoils;
+          for (let i = 0; i < nCoils; i++)
+            pts.push([tailFree + i*dz + dz/2, (i%2===0) ? cy-zigH : cy+zigH]);
+          pts.push([tailFree + zigLen, cy]);
+          g.appendChild(svgEl('path', { d: pts.map((p,i)=>(i===0?'M':'L')+p[0]+','+p[1]).join(' '),
+            fill:'none', stroke:drawCol, 'stroke-width':1.5, 'stroke-linejoin':'round', 'pointer-events':'none' }));
+          line(g, tailFree + zigLen, cy, wx, cy, drawCol, 1.5);
+        }
+      } else {
+        const cx = 16;
+        if (anchor === 'top') {
+          const wy = 8;
+          if (showWallAnchor) {
+            line(g, 0, wy, 24, wy, drawCol, 2);
+            for (let x = 2; x < 24; x += 6) line(g, x, wy, x + 4, wy - 6, drawCol, 1);
+          } else if (!el._inParallel) {
+            circle(g, cx, 0, 4, drawCol, drawCol, 0);
+            line(g, cx, 0, cx, wy, drawCol, 1.5); // collega pallino alla molla
+          }
+          line(g, cx, wy, cx, wy + tailAnchor, drawCol, 1.5);
+          const pts = [[cx, wy + tailAnchor]];
+          const dz = zigLen / nCoils;
+          for (let i = 0; i < nCoils; i++)
+            pts.push([(i%2===0) ? cx+zigH : cx-zigH, wy + tailAnchor + i*dz + dz/2]);
+          pts.push([cx, wy + tailAnchor + zigLen]);
+          g.appendChild(svgEl('path', { d: pts.map((p,i)=>(i===0?'M':'L')+p[0]+','+p[1]).join(' '),
+            fill:'none', stroke:drawCol, 'stroke-width':1.5, 'stroke-linejoin':'round', 'pointer-events':'none' }));
+          const yFreeEnd = wy + tailAnchor + zigLen + tailFree;
+          line(g, cx, wy + tailAnchor + zigLen, cx, yFreeEnd, drawCol, 1.5);
+          if (!el._inParallel && (!el._seriesRole || isSeriesLast)) line(g, cx-zigH, yFreeEnd, cx+zigH, yFreeEnd, drawCol, 2);
+        } else {
+          const wy = springLen + 6;
+          line(g, cx, 0, cx, tailFree, drawCol, 1.5);
+          const pts = [[cx, tailFree]];
+          const dz = zigLen / nCoils;
+          for (let i = 0; i < nCoils; i++)
+            pts.push([(i%2===0) ? cx+zigH : cx-zigH, tailFree + i*dz + dz/2]);
+          pts.push([cx, tailFree + zigLen]);
+          g.appendChild(svgEl('path', { d: pts.map((p,i)=>(i===0?'M':'L')+p[0]+','+p[1]).join(' '),
+            fill:'none', stroke:drawCol, 'stroke-width':1.5, 'stroke-linejoin':'round', 'pointer-events':'none' }));
+          line(g, cx, tailFree + zigLen, cx, wy, drawCol, 1.5);
+          // Muro in basso e pallino giunzione:
+          if (!el._inParallel) {
+            if (!el._seriesRole) {
+              // Singola: tacca libera in alto + muro in basso
+              line(g, cx-zigH, 0, cx+zigH, 0, drawCol, 2);
+              line(g, 0, wy, 24, wy, drawCol, 2);
+              for (let x = 2; x < 24; x += 6) line(g, x, wy, x + 4, wy + 6, drawCol, 1);
+            } else if (isSeriesFirst) {
+              // Prima: solo muro in basso
+              line(g, 0, wy, 24, wy, drawCol, 2);
+              for (let x = 2; x < 24; x += 6) line(g, x, wy, x + 4, wy + 6, drawCol, 1);
+            } else {
+              // Middle/last: pallino sul lato INFERIORE (wy) che coincide con l'estremo libero della precedente
+              circle(g, cx, wy, 4, drawCol, drawCol, 0);
+            }
+          }
+        }
+      }
+
+      // ── Tacca posizione di riposo ─────────────────────────────────────────
+      const k2  = parseFloat(el.props?.k);
+      const L0v = parseFloat(el.props?.L0);
+      const Lv  = parseFloat(el.props?.L);
+      const Lv_chk = parseFloat(el.props?._L_calc);
+      const hasPhys  = !isNaN(k2) && !isNaN(L0v) && !isNaN(Lv_chk) && L0v > 1e-9;
+
+      // ── Forza di reazione quando il corpo è nascosto ──────────────────────
+      if (el.props?._showReaction) {
+        el.props._showReaction = false;
+        const Lv3 = parseFloat(el.props?._L_calc);
+        const dx3 = (!isNaN(Lv3) && !isNaN(L0v)) ? Lv3 - L0v : 0;
+        const F3 = k2 * dx3;
+        if (Math.abs(F3) > 1e-9) {
+          const fCol = '#a060f0';
+          const MAX_LEN3 = window._vectorScale || 70;
+          const fLen3 = Math.max(10, Math.min(MAX_LEN3, MAX_LEN3 * Math.abs(dx3) / Math.max(Math.abs(dx3), 0.01)));
+          if (horiz) {
+            const cy4 = 16;
+            const dir_ext4 = anchor === 'left' ? 1 : -1;
+            // Forza di reazione: opposta alla forza sulla molla
+            const dir_f4 = dx3 > 0 ? dir_ext4 : -dir_ext4;
+            const xFree4 = anchor === 'left' ? 8 + tailAnchor + zigLen + tailFree : 0;
+            arrow(g, xFree4, cy4, xFree4 + dir_f4 * fLen3, cy4, fCol);
+            text(g, xFree4 + dir_f4 * fLen3 + (dir_f4>0?6:-6), cy4-6, 'F', fCol, '13px', dir_f4>0?'start':'end');
+          } else {
+            const cx4 = 16;
+            const dir_ext4 = anchor === 'top' ? 1 : -1;
+            const dir_f4 = dx3 > 0 ? dir_ext4 : -dir_ext4;
+            const yFree4 = anchor === 'top' ? 8 + tailAnchor + zigLen + tailFree : 0;
+            arrow(g, cx4, yFree4, cx4, yFree4 + dir_f4 * fLen3, fCol);
+            text(g, cx4 - 8, yFree4 + dir_f4 * fLen3 * 0.5 + 4, 'F', fCol, '13px', 'end');
+          }
+        }
+      }
+
+      // ── Vettore tensione T dalla fune (rope_spring) ────────────────────────
+      if (hasPhys) {
+        const ropeSpringRelD = relations.find(r =>
+          r.type === 'rope_spring' && (r.aId === el.id || r.bId === el.id)
+        );
+        if (ropeSpringRelD) {
+          const ropeElD = elements.find(e =>
+            e.id === (ropeSpringRelD.aId === el.id ? ropeSpringRelD.bId : ropeSpringRelD.aId)
+          );
+          if (ropeElD) {
+            // Cerca corpo hanging sulla stessa fune
+            let hangRelD = relations.find(r =>
+              r.type === 'rope_body' &&
+              (r.aId === ropeElD.id || r.bId === ropeElD.id) &&
+              r.props?.anchor === 'hanging'
+            );
+            // Se non trovato, cerca sull'altra fune della stessa carrucola
+            if (!hangRelD) {
+              const pulleyRelD = relations.find(r =>
+                r.type === 'rope_on_pulley' && (r.aId === ropeElD.id || r.bId === ropeElD.id)
+              );
+              if (pulleyRelD) {
+                const pulleyIdD = pulleyRelD.aId === ropeElD.id ? pulleyRelD.bId : pulleyRelD.aId;
+                const otherRopeRelsD = relations.filter(r =>
+                  r.type === 'rope_on_pulley' && r.id !== pulleyRelD.id &&
+                  (r.aId === pulleyIdD || r.bId === pulleyIdD)
+                );
+                for (const orrD of otherRopeRelsD) {
+                  const otherRopeIdD = orrD.aId === pulleyIdD ? orrD.bId : orrD.aId;
+                  hangRelD = relations.find(r =>
+                    r.type === 'rope_body' &&
+                    (r.aId === otherRopeIdD || r.bId === otherRopeIdD) &&
+                    r.props?.anchor === 'hanging'
+                  );
+                  if (hangRelD) break;
+                }
+              }
+            }
+            if (hangRelD) {
+              const hangBodyD = elements.find(e =>
+                (e.id === hangRelD.aId || e.id === hangRelD.bId) && e.type !== 'rope'
+              );
+              if (hangBodyD) {
+                const ref_d = getRefSystem();
+                const g_d = Math.abs(parseFloat(ref_d?.props?.gravity) || 9.81);
+                const m_d = parseFloat(hangBodyD.props?.mass) || 0;
+                if (m_d > 0) {
+                  const T_d = m_d * g_d;
+                  const tCol = '#60a0f0';
+                  // Usa la stessa scala del corpo collegato per coerenza visiva
+                  const MAX_LEN_T = window._vectorScale || 70;
+                  const MIN_LEN_T = Math.max(10, MAX_LEN_T * 0.2);
+                  const bodyMaxMag = hangBodyD._vecMaxMag || T_d;
+                  const scaleT = MAX_LEN_T / bodyMaxMag;
+                  const fLen_T = Math.max(MIN_LEN_T, T_d * scaleT);
+                  // Estremo libero della molla (opposto alla parete)
+                  if (!horiz) {
+                    const cx_t = 16;
+                    const yFreeD = anchor === 'bottom' ? 0 : (8 + tailAnchor + zigLen + tailFree);
+                    // T verso l'alto (ancora = bottom → libero in alto → freccia verso su)
+                    const dir_T = anchor === 'bottom' ? -1 : 1;
+                    arrow(g, cx_t, yFreeD, cx_t, yFreeD + dir_T * fLen_T, tCol);
+                    text(g, cx_t + 10, yFreeD + dir_T * fLen_T * 0.5 + 4, 'T', tCol, '13px', 'start');
+                  } else {
+                    // Molla orizzontale (anche su piano inclinato)
+                    const cy_t = 16;
+                    const xFreeD = anchor === 'left'
+                      ? (8 + tailAnchor + zigLen + tailFree) // estremo libero a destra
+                      : 0; // estremo libero a sinistra
+                    const dir_T = anchor === 'left' ? 1 : -1;
+                    arrow(g, xFreeD, cy_t, xFreeD + dir_T * fLen_T, cy_t, tCol);
+                    text(g, xFreeD + dir_T * fLen_T * 0.5, cy_t - 8, 'T', tCol, '13px', 'middle');
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // ── Label k (sempre visibile) ──────────────────────────────────────────
+      if (!isNaN(k) && k > 0) {
+        let kText = 'k';
+        if (el._inParallel) {
+          const grpK = parallelGroup(el.id);
+          const sorted = [...grpK].sort((a, b) => horiz ? a.y - b.y : a.x - b.x);
+          const idx = sorted.findIndex(s => s.id === el.id);
+          if (idx >= 0) kText = `k${idx+1}`;
+        } else if (el._seriesRole) {
+          // Trova indice nella catena serie
+          const seriesRels2 = relations.filter(r => r.type === 'spring_spring' && r.props?.layout === 'series');
+          const adj2 = {};
+          for (const r of seriesRels2) {
+            if (!adj2[r.aId]) adj2[r.aId] = [];
+            if (!adj2[r.bId]) adj2[r.bId] = [];
+            adj2[r.aId].push(r.bId);
+            adj2[r.bId].push(r.aId);
+          }
+          const vis2 = new Set(), chain2 = [];
+          const q2 = [el.id];
+          while (q2.length) {
+            const cur = q2.shift();
+            if (vis2.has(cur)) continue;
+            vis2.add(cur);
+            const sp2 = elements.find(e => e.id === cur);
+            if (sp2) chain2.push(sp2);
+            (adj2[cur]||[]).forEach(id => { if (!vis2.has(id)) q2.push(id); });
+          }
+          const anc2 = el.props?.anchor || 'left';
+          const gO = (sp, ax) => ax==='x' ? (sp._origSeriesX??sp.x) : (sp._origSeriesY??sp.y);
+          if (anc2==='left')   chain2.sort((a,b)=>gO(a,'x')-gO(b,'x'));
+          if (anc2==='right')  chain2.sort((a,b)=>gO(b,'x')-gO(a,'x'));
+          if (anc2==='top')    chain2.sort((a,b)=>gO(a,'y')-gO(b,'y'));
+          if (anc2==='bottom') chain2.sort((a,b)=>gO(b,'y')-gO(a,'y'));
+          const idx2 = chain2.findIndex(s => s.id === el.id);
+          if (idx2 >= 0) kText = `k${idx2+1}`;
+        }
+        const kCol = 'rgba(96,200,240,0.85)';
+        if (horiz) {
+          const cx_k = 8 + tailAnchor + zigLen / 2;
+          text(g, cx_k, -4, kText, kCol, '13px', 'middle');
+        } else {
+          const cy_k = (anchor === 'top' ? 8 : 0) + tailAnchor + zigLen / 2;
+          text(g, 16 + zigH + 10, cy_k + 4, kText, kCol, '13px', 'start');
+        }
+      }
+    }
+  },
+
+
+  rope: {
+    label: 'Fune',
+    w: 120, h: 20,
+    draw(g, el) {
+      if (el.props?.visible === false) return; // nascosta
+      const hasRopeBody = typeof drawRopeElement === 'function' &&
+        (el._lx !== undefined || el._rx !== undefined);
+      if (hasRopeBody) {
+        drawRopeElement(g, el);
+      } else {
+        const col = '#c8f060';
+        line(g, 0, 10, 120, 10, col, 2, '6,3');
+        circle(g, 0, 10, 3, col, 'none', 0);
+        circle(g, 120, 10, 3, col, 'none', 0);
+      }
+    }
+  },
+  lever: {
+    label: 'Leva',
+    w: 200, h: 36,
+    isRefSystem: false,
+    draw(g, el) {
+      if (typeof updateLeverGeometry === 'function') updateLeverGeometry(el);
+      const col = '#c8f060';
+      const lengthPx = el._lengthPx || 200;
+      const thick = el._thicknessPx || 6;
+      const fulcrumH = el._fulcrumH || 20;
+      const fulcrumPos = (typeof getLeverFulcrumFrac === 'function') ? getLeverFulcrumFrac(el) : 0.5;
+      const fxLocal = fulcrumPos * lengthPx;
+      const fyLocal = thick / 2;
+      const barY = 0;
+
+      // Calcola theta: equilibrio se ci sono molle, altrimenti tocca la base
+      let leverTheta = 0;
+      if (typeof getLeverMoments === 'function') {
+      const hasSpring = relations.some(r => {
+        if (r.type !== 'spring_on_lever') return false;
+        if (r.aId !== el.id && r.bId !== el.id) return false;
+        const sEl = elements.find(e => e.id === (r.aId === el.id ? r.bId : r.aId));
+        return sEl && parseFloat(sEl.props?.k) > 0;
+      });
+        if (hasSpring && typeof getLeverEquilibriumAngle === 'function') {
+          // Angolo di equilibrio con le molle
+          const thetaEq = getLeverEquilibriumAngle(el);
+          leverTheta = (thetaEq !== null) ? thetaEq * 180 / Math.PI : 0;
+        } else {
+          // Senza molle: lato pesante tocca la base del fulcro
+          const { totalMoment, d1M, d2M } = getLeverMoments(el, 0);
+          if (Math.abs(totalMoment) > 1e-6) {
+            const scaleIso2 = el._scaleIso || 18;
+            const armDownM = totalMoment < 0 ? d2M : d1M;
+            const armDownPx = armDownM * scaleIso2;
+            const thetaRad = Math.min(Math.PI / 4, Math.asin(Math.min(1, fulcrumH / Math.max(1, armDownPx))));
+            leverTheta = thetaRad * 180 / Math.PI * (totalMoment < 0 ? 1 : -1);
+          }
+        }
+      }
+
+      // Sotto-gruppo per la sola barra (ruotata attorno al fulcro)
+      const barG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      if (Math.abs(leverTheta) > 1e-4) {
+        barG.setAttribute('transform',
+          `translate(${fxLocal},${fyLocal}) rotate(${leverTheta}) translate(${-fxLocal},${-fyLocal})`
+        );
+      }
+
+      // Barra della leva
+      rect(barG, 0, barY, lengthPx, thick, 'rgba(200,240,96,0.15)', col, 1.5);
+      // Tacca fulcro sulla barra
+      line(barG, fxLocal, barY, fxLocal, barY + thick, col, 2);
+
+      // Frecce forze esterne (nel barG — seguono la rotazione)
+      const forces = el.props?.forces || [];
+      const lengthM = Math.max(0.5, parseFloat(el.props?.length) || 10);
+      if (forces.length > 0) {
+        const MAX_LEN = window._vectorScale || 70;
+        const MIN_LEN = Math.max(10, MAX_LEN * 0.2);
+        const maxF = Math.max(...forces.map(f => Math.abs(parseFloat(f.F) || 0)), 1);
+        const scale = MAX_LEN / maxF;
+        forces.forEach((f, i) => {
+          const F = parseFloat(f.F) || 0;
+          if (Math.abs(F) < 1e-9) return;
+          const posM = Math.max(0, Math.min(lengthM, parseFloat(f.pos) || 0));
+          const posX = (posM / lengthM) * lengthPx;
+          const angleRad = (parseFloat(f.angle) || 90) * Math.PI / 180;
+          const len = Math.max(MIN_LEN, Math.abs(F) * scale);
+          const dx = Math.cos(angleRad), dy = -Math.sin(angleRad);
+          const x1 = posX, y1 = barY + thick / 2;
+          const x2 = x1 + dx * len, y2 = y1 + dy * len;
+          arrow(barG, x1, y1, x2, y2, '#f0a060');
+          circle(barG, x1, y1, 3, '#f0a060', 'none', 0);
+          const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          lbl.setAttribute('x', x2 + (dx >= 0 ? 5 : -5));
+          lbl.setAttribute('y', y2 + (dy < 0 ? -5 : 12));
+          lbl.setAttribute('fill', '#f0a060');
+          lbl.setAttribute('font-size', '13px');
+          lbl.setAttribute('font-family', 'IBM Plex Mono, monospace');
+          lbl.setAttribute('text-anchor', dx >= 0 ? 'start' : 'end');
+          lbl.textContent = `F${i+1}`;
+          barG.appendChild(lbl);
+        });
+      }
+      g.appendChild(barG);
+
+      // Disegna molle collegate (nel gruppo principale, posizione calcolata con theta)
+      const thetaRad2 = leverTheta * Math.PI / 180;
+      const scaleIso = el._scaleIso || 18;
+      const springRelsD = relations.filter(r =>
+        r.type === 'spring_on_lever' && (r.aId === el.id || r.bId === el.id)
+      );
+      for (const rel of springRelsD) {
+        const springEl = elements.find(e => e.id === (rel.aId === el.id ? rel.bId : rel.aId));
+        if (!springEl) continue;
+        const k = parseFloat(springEl.props?.k) || 0;
+        const L0m = parseFloat(springEl.props?.L0) || 1;
+        // Lunghezza visiva di riposo: stessa della molla normale (~90px)
+        const L0px = 90;
+        const posM = Math.max(0, Math.min(lengthM, rel.props?.pos != null ? parseFloat(rel.props.pos) : getLeverFulcrumFrac(el) * lengthM));
+        const side = rel.props?.side || 'below';
+
+        // Punto di attacco: bordo della barra (non centro)
+        const localX = (posM / lengthM) * lengthPx;
+        const localY = side === 'below' ? barY + thick : barY; // bordo inf o sup
+        const dx2 = localX - fxLocal, dy2 = localY - fyLocal;
+        const cosT = Math.cos(thetaRad2), sinT = Math.sin(thetaRad2);
+        const attachX = fxLocal + dx2 * cosT - dy2 * sinT;
+        const attachY = fyLocal + dx2 * sinT + dy2 * cosT;
+
+        // Deformazione in px
+        const arm = posM - (getLeverFulcrumFrac(el) * lengthM);
+        const deltaYpx = arm * Math.sin(thetaRad2) * scaleIso;
+        // Allungamento in px: positivo = allungamento, negativo = compressione
+        // se below: punto scende (deltaYpx>0) → compressione → deltaAllungPx negativo
+        const deltaAllungPx = side === 'below' ? -deltaYpx : deltaYpx;
+        const springLpx = Math.max(20, L0px + deltaAllungPx);
+
+        // Crea gruppo separato per la molla (con data-id per click)
+        const springG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        springG.setAttribute('class', 'diagram-element' + (selectedId === springEl.id ? ' selected' : ''));
+        springG.setAttribute('data-id', springEl.id);
+
+        const sign = side === 'below' ? 1 : -1;
+        const col2 = '#60c8f0';
+        const nCoils = 8, zigH = 10, tailA = 10, tailF = 8;
+        const zigLen = springLpx - tailA - tailF;
+        const dz = Math.max(1, zigLen / nCoils);
+
+        // Linea attacco (da bordo barra al primo punto)
+        const ln1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        ln1.setAttribute('x1', 0); ln1.setAttribute('y1', 0);
+        ln1.setAttribute('x2', 0); ln1.setAttribute('y2', sign * tailA);
+        ln1.setAttribute('stroke', col2); ln1.setAttribute('stroke-width', '1.5');
+        springG.appendChild(ln1);
+
+        // Zigzag
+        const pts2 = [[0, sign * tailA]];
+        for (let i = 0; i < nCoils; i++)
+          pts2.push([(i % 2 === 0) ? zigH : -zigH, sign * (tailA + i * dz + dz / 2)]);
+        pts2.push([0, sign * (tailA + zigLen)]);
+        const path2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path2.setAttribute('d', pts2.map((p, i) => (i === 0 ? 'M' : 'L') + p[0] + ',' + p[1]).join(' '));
+        path2.setAttribute('fill', 'none'); path2.setAttribute('stroke', col2);
+        path2.setAttribute('stroke-width', '1.5'); path2.setAttribute('stroke-linejoin', 'round');
+        path2.setAttribute('pointer-events', 'none');
+        springG.appendChild(path2);
+
+        // Coda libera
+        const yEnd = sign * (tailA + zigLen + tailF);
+        const ln2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        ln2.setAttribute('x1', 0); ln2.setAttribute('y1', sign * (tailA + zigLen));
+        ln2.setAttribute('x2', 0); ln2.setAttribute('y2', yEnd);
+        ln2.setAttribute('stroke', col2); ln2.setAttribute('stroke-width', '1.5');
+        springG.appendChild(ln2);
+
+        // Base (linea + trattini)
+        const baseLn = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        baseLn.setAttribute('x1', -zigH); baseLn.setAttribute('y1', yEnd);
+        baseLn.setAttribute('x2', zigH); baseLn.setAttribute('y2', yEnd);
+        baseLn.setAttribute('stroke', col2); baseLn.setAttribute('stroke-width', '2');
+        springG.appendChild(baseLn);
+        for (let h = -zigH + 2; h < zigH; h += 5) {
+          const hatch = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          hatch.setAttribute('x1', h); hatch.setAttribute('y1', yEnd);
+          hatch.setAttribute('x2', h - 4); hatch.setAttribute('y2', yEnd + sign * 6);
+          hatch.setAttribute('stroke', col2); hatch.setAttribute('stroke-width', '1');
+          hatch.setAttribute('opacity', '0.6');
+          springG.appendChild(hatch);
+        }
+
+        // Label k accanto allo zigzag
+        if (!isNaN(k) && k > 0) {
+          const cy_k = sign * (tailA + zigLen / 2);
+          const kLbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          kLbl.setAttribute('x', zigH + 6);
+          kLbl.setAttribute('y', cy_k + 4);
+          kLbl.setAttribute('fill', 'rgba(96,200,240,0.85)');
+          kLbl.setAttribute('font-size', '13px');
+          kLbl.setAttribute('font-family', 'IBM Plex Mono, monospace');
+          kLbl.setAttribute('text-anchor', 'start');
+          kLbl.setAttribute('pointer-events', 'none');
+          kLbl.textContent = 'k';
+          springG.appendChild(kLbl);
+        }
+
+        // Vettore forza F sulla molla (se showF attivo)
+        if (springEl.props?.showF && Math.abs(k) > 1e-9) {
+          const thetaForF = leverTheta * Math.PI / 180;
+          const armForF = posM - (getLeverFulcrumFrac(el) * lengthM);
+          const deltaYF = armForF * Math.sin(thetaForF);
+          const deltaXF = side === 'below' ? -deltaYF : deltaYF; // positivo=allungamento
+          const Fval = k * deltaXF;
+          if (Math.abs(Fval) > 1e-9) {
+            const MAX_LEN = window._vectorScale || 70;
+            const fLen = Math.max(10, Math.min(MAX_LEN, Math.abs(Fval) / Math.max(Math.abs(Fval), 1) * MAX_LEN));
+            const fSign = side === 'below' ? 1 : -1;
+            // Forza del vincolo (leva) sulla molla:
+            // estesa (deltaXF>0): vincolo tira verso l'alto → -fSign
+            // compressa (deltaXF<0): vincolo spinge verso il basso → +fSign
+            const fDir = deltaXF > 0 ? -fSign : fSign;
+            arrow(springG, 0, 0, 0, fDir * fLen, '#a060f0');
+            const fLbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            fLbl.setAttribute('x', zigH + 4);
+            fLbl.setAttribute('y', fDir * fLen);
+            fLbl.setAttribute('fill', '#a060f0');
+            fLbl.setAttribute('font-size', '13px');
+            fLbl.setAttribute('font-family', 'IBM Plex Mono,monospace');
+            fLbl.setAttribute('pointer-events', 'none');
+            fLbl.textContent = 'F';
+            springG.appendChild(fLbl);
+          }
+        }
+        // pointer-events:none — la selezione viene gestita da overlay separato nel canvas
+        springG.setAttribute('pointer-events', 'none');
+        springG.setAttribute('transform', `translate(${attachX}, ${attachY})`);
+        g.appendChild(springG);
+
+        // Accumula dati per overlay cliccabile (aggiunto al canvas dopo il render)
+        if (!window._leverSpringOverlays) window._leverSpringOverlays = [];
+        window._leverSpringOverlays.push({ springEl, leverEl: el, attachX, attachY, springLpx, side });
+        springEl.x = el.x + attachX - 10;
+        springEl.y = el.y + (side === 'below' ? attachY : attachY - springLpx);
+        // _L_calc in props (letto dal pannello proprietà)
+        const L0m2 = parseFloat(springEl.props?.L0) || 0;
+        if (L0m2 > 0) {
+          // Calcola deformazione reale in metri
+          const thetaForCalc = (() => {
+            if (typeof getLeverEquilibriumAngle !== 'function') return 0;
+            const hasK = parseFloat(springEl.props?.k) > 0;
+            if (!hasK) return 0;
+            return getLeverEquilibriumAngle(el) || 0;
+          })();
+          const armForCalc = (posM - (getLeverFulcrumFrac(el) * lengthM));
+          const deltaYm2 = armForCalc * Math.sin(thetaForCalc);
+          const deltaXm2 = side === 'below' ? -deltaYm2 : deltaYm2; // positivo=allungamento
+          springEl.props._L_calc = L0m2 + deltaXm2;
+        } else {
+          springEl.props._L_calc = springLpx / scaleIso;
+        }
+      }
+
+      // Fulcro — fisso nel gruppo principale (non ruota)
+      const tx = fxLocal, ty = barY + thick;
+      const tw = fulcrumH * 0.9, th = fulcrumH;
+      poly(g, `${tx},${ty} ${tx-tw},${ty+th} ${tx+tw},${ty+th}`, 'rgba(200,240,96,0.2)', col, 1.5);
+      circle(g, tx, ty, 3, col, 'none', 0);
+      line(g, tx - tw - 4, ty + th, tx + tw + 4, ty + th, col, 1.5);
+      const hatchCount = 6;
+      const hatchW = (tw * 2 + 8) / hatchCount;
+      for (let i = 0; i < hatchCount; i++) {
+        const hx = tx - tw - 4 + i * hatchW;
+        line(g, hx, ty + th, hx - 5, ty + th + 6, col, 1, null, 0.5);
+      }
+    }
+  },
+  hanging_rope: {
+    w: 20, h: 120,
+    draw(g, el) {
+      const col = '#c8f060';
+      const W = 20, ropeH = 120;
+      const cx = W / 2;
+      // Soffitto: linea orizzontale con tacchette
+      line(g, 0, 8, W, 8, col, 2);
+      for (let x = 2; x < W; x += 6) {
+        line(g, x, 8, x - 4, 2, col, 1);
+      }
+      // Fune verticale
+      line(g, cx, 8, cx, ropeH - 6, col, 2);
+      // Punto finale (attacco)
+      circle(g, cx, ropeH - 6, 3, col, 'none', 0);
+    }
+  },
+  pulley_simple: {
+    label: 'Carrucola semplice',
+    w: 60, h: 70,
+    draw(g, el) {
+      const col = '#c8f060';
+      const anchor = el.props?.anchor || 'top';
+      const r = 20, rInner = 13;
+
+      if (anchor === 'top') {
+        // Soffitto sopra, ruota sotto
+        const cx = 30, cy = 50;
+        line(g, 6, 6, 54, 6, col, 2);
+        for (let x = 6; x < 54; x += 8) line(g, x, 6, x - 5, 0, col, 1);
+        line(g, cx, 6, cx, cy - r, col, 1.5);
+        circle(g, cx, cy, r, 'none', col, 2);
+        circle(g, cx, cy, rInner, 'none', col, 1);
+        circle(g, cx, cy, 3, col, 'none', 0);
+
+      } else if (anchor === 'bottom') {
+        // Pavimento sotto, ruota sopra
+        const cx = 30, cy = 20;
+        line(g, 6, 64, 54, 64, col, 2);
+        for (let x = 6; x < 54; x += 8) line(g, x, 64, x + 5, 70, col, 1);
+        line(g, cx, 64, cx, cy + r, col, 1.5);
+        circle(g, cx, cy, r, 'none', col, 2);
+        circle(g, cx, cy, rInner, 'none', col, 1);
+        circle(g, cx, cy, 3, col, 'none', 0);
+
+      } else if (anchor === 'left') {
+        // Parete sinistra, ruota a destra
+        const cx = 40, cy = 35;
+        line(g, 6, 6, 6, 64, col, 2);
+        for (let y = 6; y < 64; y += 8) line(g, 6, y, 0, y - 5, col, 1);
+        line(g, 6, cy, cx - r, cy, col, 1.5);
+        circle(g, cx, cy, r, 'none', col, 2);
+        circle(g, cx, cy, rInner, 'none', col, 1);
+        circle(g, cx, cy, 3, col, 'none', 0);
+
+      } else if (anchor === 'right') {
+        // Parete destra, ruota a sinistra
+        const cx = 20, cy = 35;
+        line(g, 54, 6, 54, 64, col, 2);
+        for (let y = 6; y < 64; y += 8) line(g, 54, y, 60, y - 5, col, 1);
+        line(g, 54, cy, cx + r, cy, col, 1.5);
+        circle(g, cx, cy, r, 'none', col, 2);
+        circle(g, cx, cy, rInner, 'none', col, 1);
+        circle(g, cx, cy, 3, col, 'none', 0);
+      } else if (anchor === 'vertex') {
+        const rV = el._rEff || r;
+        const cx = rV, cy = rV;
+        const rVinner = Math.max(4, rV - 6);
+        circle(g, cx, cy, rV, 'none', col, 2);
+        circle(g, cx, cy, rVinner, 'none', col, 1);
+        circle(g, cx, cy, 3, col, 'none', 0);
+      }
+    }
+  },
+};
+
+
+// text_label viene aggiunto dinamicamente — la definizione è in render.js
+DEFS.text_label = {
+  label: 'Testo',
+  w: 160, h: 40,
+  draw(g, el) {
+    const content  = el.props?.text  || 'Doppio click per modificare';
+    const fontSize = parseFloat(el.props?.fontSize) || 18;
+    const color    = el.props?.color || '#e8e8ec';
+    const bold     = el.props?.bold   ? 'bold'   : 'normal';
+    const italic   = el.props?.italic ? 'italic' : 'normal';
+    const lines    = content.split('\n');
+
+    // Controlla se c'è LaTeX ($...$ o $$...$$)
+    const hasLatex = /\$/.test(content);
+
+    if (hasLatex && typeof katex !== 'undefined') {
+      const lineH = fontSize * 1.8;
+      const W = Math.max(160, fontSize * 0.7 * Math.max(...lines.map(l => l.length || 1)) + 16);
+
+      lines.forEach((lineText, i) => {
+        const trimmed = (lineText || '').trim();
+        const isExplicitDisplay = /^\$\$[\s\S]+\$\$$/.test(trimmed);
+        const foH = isExplicitDisplay ? fontSize * 5 : lineH + 16;
+        const yPos = lines.slice(0, i).reduce((sum, l) => {
+          const t = (l || '').trim();
+          return sum + (/^\$\$[\s\S]+\$\$$/.test(t) ? fontSize * 5 : lineH + 16);
+        }, 0);
+
+        const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+        fo.setAttribute('x', 0);
+        fo.setAttribute('y', yPos);
+        fo.setAttribute('width', W + 80);
+        fo.setAttribute('height', foH);
+
+        const div = document.createElement('div');
+        div.style.cssText = `color:${color};font-size:${fontSize}px;
+          font-weight:${bold};font-style:${italic};
+          white-space:nowrap;overflow:visible;
+          display:flex;align-items:center;min-height:${foH}px;`;
+
+        try {
+          div.innerHTML = renderMixedLatex(lineText || '', color, fontSize);
+        } catch(e) {
+          div.textContent = lineText || '';
+        }
+        fo.appendChild(div);
+        g.appendChild(fo);
+      });
+
+      const totalH = lines.reduce((sum, line) => {
+        const t = (line || '').trim();
+        return sum + (/^\$\$[\s\S]+\$\$$/.test(t) ? fontSize * 5 : lineH + 16);
+      }, 8);
+      el._hPx = Math.max(fontSize + 16, totalH);
+      el._wPx = W;
+    } else {
+      // Testo SVG normale
+      lines.forEach((lineText, i) => {
+        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.setAttribute('x', 0);
+        t.setAttribute('y', fontSize + i * (fontSize * 1.3));
+        t.setAttribute('font-size', fontSize);
+        t.setAttribute('font-family', "'IBM Plex Mono', monospace");
+        t.setAttribute('font-weight', bold);
+        t.setAttribute('font-style', italic);
+        t.setAttribute('fill', color);
+        t.textContent = lineText || ' ';
+        g.appendChild(t);
+      });
+      const lineH = fontSize * 1.3;
+      el._hPx = Math.max(fontSize + 8, lines.length * lineH + 8);
+      el._wPx = Math.max(40, fontSize * 0.62 * Math.max(...lines.map(l => l.length || 1)) + 8);
+    }
+  }
+};
+
+// ─── Slider ──────────────────────────────────────────────────────────────────
+DEFS.slider = {
+  label: 'Slider',
+  w: 200, h: 60,
+  draw(g, el) {
+    const W = 200, H = 60;
+    const trackY = 36, trackX0 = 16, trackX1 = W - 16, trackW = trackX1 - trackX0;
+    const min = parseFloat(el.props?.min ?? 0);
+    const max = parseFloat(el.props?.max ?? 10);
+    const val = Math.max(min, Math.min(max, parseFloat(el.props?.value ?? (min+max)/2)));
+    const frac = max > min ? (val - min) / (max - min) : 0.5;
+    const knobX = trackX0 + frac * trackW;
+    const label = el.props?.label || '';
+    const title = el.props?.title || '';
+    const col = el.props?.color || '#f0a060';
+    // Converte hex in rgba per sfondo e track
+    const hexToRgb = h => { const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return `${r},${g},${b}`; };
+    const rgb = hexToRgb(col.startsWith('#') && col.length===7 ? col : '#f0a060');
+    const colBg    = `rgba(${rgb},0.06)`;
+    const colBord  = `rgba(${rgb},0.3)`;
+    const colTrack = `rgba(${rgb},0.2)`;
+    const colFill  = `rgba(${rgb},0.5)`;
+    const colMuted = `rgba(${rgb},0.5)`;
+
+    // Titolo sopra il rettangolo
+    if (title) {
+      svgLatexText(g, title, 0, -8, { fontSize: 15, fill: col, textAnchor: 'start', width: W });
+    }
+
+    // Sfondo
+    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bg.setAttribute('x', 0); bg.setAttribute('y', 0);
+    bg.setAttribute('width', W); bg.setAttribute('height', H);
+    bg.setAttribute('rx', 8); bg.setAttribute('fill', colBg);
+    bg.setAttribute('stroke', colBord); bg.setAttribute('stroke-width', '1');
+    g.appendChild(bg);
+
+    // Track sfondo
+    const tr = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    tr.setAttribute('x', trackX0); tr.setAttribute('y', trackY - 3);
+    tr.setAttribute('width', trackW); tr.setAttribute('height', 6);
+    tr.setAttribute('rx', 3); tr.setAttribute('fill', colTrack);
+    g.appendChild(tr);
+
+    // Track fill
+    const tf = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    tf.setAttribute('x', trackX0); tf.setAttribute('y', trackY - 3);
+    tf.setAttribute('width', Math.max(0, frac * trackW)); tf.setAttribute('height', 6);
+    tf.setAttribute('rx', 3); tf.setAttribute('fill', colFill);
+    g.appendChild(tf);
+
+    // Label e valore
+    svgLatexText(g, label ? `${label} = ${val.toFixed(2)}` : val.toFixed(2), trackX0, 18, {
+      fontSize: 11, fill: col, textAnchor: 'start', width: W - trackX0 - 4,
+    });
+
+    // Min/Max
+    const tMin = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    tMin.setAttribute('x', trackX0); tMin.setAttribute('y', H - 6);
+    tMin.setAttribute('fill', colMuted); tMin.setAttribute('font-size', '9px');
+    tMin.setAttribute('font-family', 'IBM Plex Mono,monospace');
+    tMin.textContent = min.toFixed(1);
+    g.appendChild(tMin);
+
+    const tMax = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    tMax.setAttribute('x', trackX1); tMax.setAttribute('y', H - 6);
+    tMax.setAttribute('fill', colMuted); tMax.setAttribute('font-size', '9px');
+    tMax.setAttribute('font-family', 'IBM Plex Mono,monospace');
+    tMax.setAttribute('text-anchor', 'end');
+    tMax.textContent = max.toFixed(1);
+    g.appendChild(tMax);
+
+    // Knob
+    const knob = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    knob.setAttribute('cx', knobX); knob.setAttribute('cy', trackY);
+    knob.setAttribute('r', 9); knob.setAttribute('fill', '#1a2a00');
+    knob.setAttribute('stroke', col); knob.setAttribute('stroke-width', '2');
+    knob.setAttribute('data-action', 'slider-drag');
+    knob.setAttribute('data-id', el.id);
+    knob.setAttribute('cursor', 'ew-resize');
+    g.appendChild(knob);
+  }
+};
+
+// ─── Display ─────────────────────────────────────────────────────────────────
+DEFS.display = {
+  label: 'Display',
+  w: 160, h: 70,
+  draw(g, el) {
+    const W = 160, H = 70;
+    const col = el.props?.color || '#60c0f0';
+    const title = el.props?.title || '';
+    const decimals = parseInt(el.props?.decimals ?? 2);
+
+    const hexToRgb = h => { const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return `${r},${g},${b}`; };
+    const rgb = hexToRgb(col.startsWith('#') && col.length===7 ? col : '#60c0f0');
+
+    // Titolo sopra
+    if (title) {
+      const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', 0); t.setAttribute('y', -8);
+      t.setAttribute('fill', col); t.setAttribute('font-size', '15px');
+      t.setAttribute('font-family', 'IBM Plex Mono,monospace');
+      t.setAttribute('pointer-events', 'none');
+      t.textContent = title;
+      g.appendChild(t);
+    }
+
+    // Sfondo
+    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bg.setAttribute('x', 0); bg.setAttribute('y', 0);
+    bg.setAttribute('width', W); bg.setAttribute('height', H);
+    bg.setAttribute('rx', 8);
+    bg.setAttribute('fill', `rgba(${rgb},0.06)`);
+    bg.setAttribute('stroke', `rgba(${rgb},0.4)`); bg.setAttribute('stroke-width', '1.5');
+    g.appendChild(bg);
+
+    // Leggi il valore dalla relazione display_prop
+    let dispVal = '—';
+    let dispLabel = '';
+    if (typeof relations !== 'undefined') {
+      const rel = relations.find(r =>
+        r.type === 'display_prop' && (r.aId === el.id || r.bId === el.id)
+      );
+      if (rel) {
+        const targetEl = elements.find(e => e.id === (rel.aId === el.id ? rel.bId : rel.aId));
+        const key = rel.props?.subKey || rel.props?.propKey;
+        dispLabel = rel.props?.propLabel || key || '';
+        if (targetEl && key) {
+          const vm = key.match(/^forces\[(\d+)\]\.__(\w+)$/);
+          const fm = key.match(/^forces\[(\d+)\]\.(\w+)$/);
+          let raw = null;
+          if (vm) {
+            const f = targetEl.props?.forces?.[parseInt(vm[1])];
+            if (f) raw = vm[2]==='mag' ? Math.hypot(parseFloat(f.fx)||0,parseFloat(f.fy)||0) : Math.atan2(parseFloat(f.fy)||0,parseFloat(f.fx)||0)*180/Math.PI;
+          } else if (fm) {
+            raw = parseFloat(targetEl.props?.forces?.[parseInt(fm[1])]?.[fm[2]]);
+          } else {
+            raw = parseFloat(targetEl.props?.[key]);
+          }
+          if (raw !== null && !isNaN(raw)) dispVal = raw.toFixed(decimals);
+        }
+      }
+    }
+
+    // Label proprietà (piccola, in alto a sinistra)
+    if (dispLabel) {
+      const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      lbl.setAttribute('x', 10); lbl.setAttribute('y', 20);
+      lbl.setAttribute('fill', `rgba(${rgb},0.7)`); lbl.setAttribute('font-size', '10px');
+      lbl.setAttribute('font-family', 'IBM Plex Mono,monospace');
+      lbl.setAttribute('pointer-events', 'none');
+      lbl.textContent = dispLabel;
+      g.appendChild(lbl);
+    }
+
+    // Valore (grande, centrato)
+    const val = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    val.setAttribute('x', W / 2); val.setAttribute('y', dispLabel ? 52 : 46);
+    val.setAttribute('fill', col); val.setAttribute('font-size', '26px');
+    val.setAttribute('font-family', 'IBM Plex Mono,monospace');
+    val.setAttribute('text-anchor', 'middle'); val.setAttribute('font-weight', 'bold');
+    val.setAttribute('pointer-events', 'none');
+    val.textContent = dispVal;
+    g.appendChild(val);
+
+    // Unità (se disponibile)
+    const unit = relations ? (() => {
+      const rel = relations.find(r => r.type === 'display_prop' && (r.aId === el.id || r.bId === el.id));
+      return rel?.props?.unit || '';
+    })() : '';
+    if (unit) {
+      const u = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      u.setAttribute('x', W - 8); u.setAttribute('y', H - 8);
+      u.setAttribute('fill', `rgba(${rgb},0.6)`); u.setAttribute('font-size', '10px');
+      u.setAttribute('font-family', 'IBM Plex Mono,monospace');
+      u.setAttribute('text-anchor', 'end'); u.setAttribute('pointer-events', 'none');
+      u.textContent = unit;
+      g.appendChild(u);
+    }
+  }
+};
+
+// ─── Display ──────────────────────────────────────────────────────────────────
+DEFS.display = {
+  label: 'Display',
+  w: 160, h: 56,
+  draw(g, el) {
+    const col   = el.props?.color || '#60c0f0';
+    const title = el.props?.title || '';
+    const label = el.props?.label || '';
+    const unit  = el.props?.unit  || '';
+    const dec   = parseInt(el.props?.decimals ?? 3);
+    const val   = el.props?._displayValue;
+    const displayText = el.props?._displayText; // testo opzionale (es. "statico"/"dinamico")
+
+    const hexToRgb = h => { const r=parseInt(h.slice(1,3),16),g2=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return `${r},${g2},${b}`; };
+    const rgb = hexToRgb(col.startsWith('#') && col.length===7 ? col : '#60c0f0');
+
+    // Se c'è un testo esplicito, mostralo; altrimenti il valore numerico
+    const numVal = (val !== undefined && val !== null) ? parseFloat(val) : NaN;
+    const dispVal = displayText
+      ? displayText
+      : isNaN(numVal) ? '—'
+      : numVal === 0 ? '—'
+      : numVal.toFixed(dec);
+
+    // Calcola larghezza dinamica in base alla stringa
+    const fullStr = unit ? `${dispVal} ${unit}` : dispVal;
+    const charW = 13; // px per carattere a font-size 20px monospace
+    const minW = 120, pad = 24;
+    const W = Math.max(minW, fullStr.length * charW + pad * 2);
+    const H = 56;
+
+    // Aggiorna w/h per hit area esterna
+    el._wPx = W; el._hPx = H;
+
+    // Titolo esterno
+    if (title) {
+      svgLatexText(g, title, 0, -8, { fontSize: 15, fill: col, textAnchor: 'start', width: W });
+    }
+
+    // Sfondo
+    const bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    bg.setAttribute('x', 0); bg.setAttribute('y', 0);
+    bg.setAttribute('width', W); bg.setAttribute('height', H);
+    bg.setAttribute('rx', 8);
+    bg.setAttribute('fill', `rgba(${rgb},0.06)`);
+    bg.setAttribute('stroke', `rgba(${rgb},0.35)`);
+    bg.setAttribute('stroke-width', '1');
+    g.appendChild(bg);
+
+    // Label piccola in alto a sinistra
+    if (label) {
+      svgLatexText(g, label, 10, 16, { fontSize: 10, fill: `rgba(${rgb},0.7)`, textAnchor: 'start', width: W - 16 });
+    }
+
+    // Valore centrato
+    const valY = label ? 40 : 36;
+    const valEl = document.createElementNS('http://www.w3.org/2000/svg','text');
+    valEl.setAttribute('x', W / 2); valEl.setAttribute('y', valY);
+    valEl.setAttribute('fill', col); valEl.setAttribute('font-size', '20px');
+    valEl.setAttribute('font-family', 'IBM Plex Mono,monospace');
+    valEl.setAttribute('text-anchor', 'middle');
+    valEl.setAttribute('pointer-events', 'none');
+    valEl.textContent = fullStr;
+    g.appendChild(valEl);
+
+    // Hit area + outline selezione (stesso pattern degli altri elementi)
+    const hit = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    hit.setAttribute('x', 0); hit.setAttribute('y', 0);
+    hit.setAttribute('width', W); hit.setAttribute('height', H);
+    hit.setAttribute('rx', 8); hit.setAttribute('fill', 'rgba(0,0,0,0)');
+    g.appendChild(hit);
+
+    const outline = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    outline.setAttribute('class', 'el-outline');
+    outline.setAttribute('x', -3); outline.setAttribute('y', -3);
+    outline.setAttribute('width', W+6); outline.setAttribute('height', H+6);
+    outline.setAttribute('rx', 10); outline.setAttribute('fill', 'none');
+    outline.setAttribute('stroke', 'none');
+    g.appendChild(outline);
+
+    // Delete button
+    const dG = document.createElementNS('http://www.w3.org/2000/svg','g');
+    dG.setAttribute('class', 'delete-btn');
+    dG.setAttribute('transform', `translate(${W-4}, -14)`);
+    dG.setAttribute('data-action', 'delete'); dG.setAttribute('data-id', el.id);
+    const dC = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dC.setAttribute('cx', 9); dC.setAttribute('cy', 6); dC.setAttribute('r', 9);
+    dC.setAttribute('fill', '#cc3333'); dC.setAttribute('stroke', '#ff5555'); dC.setAttribute('stroke-width', '1');
+    const dT = document.createElementNS('http://www.w3.org/2000/svg','text');
+    dT.setAttribute('x', 9); dT.setAttribute('y', 11); dT.setAttribute('text-anchor', 'middle');
+    dT.setAttribute('font-size', '11'); dT.setAttribute('fill', '#ff6666');
+    dT.setAttribute('font-family', 'monospace'); dT.setAttribute('font-weight', 'bold');
+    dT.setAttribute('pointer-events', 'none'); dT.textContent = '✕';
+    dG.appendChild(dC); dG.appendChild(dT);
+    g.appendChild(dG);
+  }
+};
+
+// ─── Option List (dropdown) ───────────────────────────────────────────────────
+DEFS.option_list = {
+  label: 'Lista opzioni',
+  w: 180, h: 36,
+  draw(g, el) {
+    const options  = el.props?.options || [];
+    const selected = parseInt(el.props?.selected ?? 0);
+    const col      = el.props?.color || '#ffffff';
+    const title    = el.props?.title || '';
+    const selOpt   = options[selected] || { label: '—', value: '' };
+    const showValue = el.props?.showValue || false;
+
+    const hexToRgb = h => { const r=parseInt(h.slice(1,3),16),g2=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return `${r},${g2},${b}`; };
+    const rgb = hexToRgb(col.startsWith('#') && col.length===7 ? col : '#c060f0');
+
+    const W = 180, H = 36;
+    el._wPx = W; el._hPx = H;
+
+    // Titolo esterno
+    if (title) {
+      svgLatexText(g, title, 0, -8, { fontSize: 15, fill: col, textAnchor: 'start', width: W });
+    }
+
+    // Sfondo principale
+    const bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    bg.setAttribute('x',0); bg.setAttribute('y',0);
+    bg.setAttribute('width',W); bg.setAttribute('height',H);
+    bg.setAttribute('rx',6);
+    bg.setAttribute('fill', `rgba(${rgb},0.06)`);
+    bg.setAttribute('stroke', `rgba(${rgb},0.35)`);
+    bg.setAttribute('stroke-width','1.5');
+    g.appendChild(bg);
+
+    // Label opzione selezionata
+    svgLatexText(g, selOpt.label, 12, 23, {
+      fontSize: 13, fill: col, textAnchor: 'start', width: W - 40,
+    });
+
+    // Valore a destra (solo se showValue)
+    if (showValue) {
+      const valLbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+      valLbl.setAttribute('x', W - 28); valLbl.setAttribute('y', 23);
+      valLbl.setAttribute('fill', `rgba(${rgb},0.6)`); valLbl.setAttribute('font-size', '13px');
+      valLbl.setAttribute('font-family', 'IBM Plex Mono,monospace');
+      valLbl.setAttribute('text-anchor', 'end');
+      valLbl.setAttribute('pointer-events', 'none');
+      valLbl.textContent = selOpt.value ?? '';
+      g.appendChild(valLbl);
+    }
+
+    // Freccia dropdown ▾
+    const arrow = document.createElementNS('http://www.w3.org/2000/svg','text');
+    arrow.setAttribute('x', W - 10); arrow.setAttribute('y', 24);
+    arrow.setAttribute('fill', `rgba(${rgb},0.7)`); arrow.setAttribute('font-size', '12px');
+    arrow.setAttribute('text-anchor', 'middle');
+    arrow.setAttribute('pointer-events', 'none');
+    arrow.textContent = '▾';
+    g.appendChild(arrow);
+
+    // Hit area per aprire dropdown
+    const hit = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    hit.setAttribute('x',0); hit.setAttribute('y',0);
+    hit.setAttribute('width',W); hit.setAttribute('height',H);
+    hit.setAttribute('rx',6); hit.setAttribute('fill','rgba(0,0,0,0)');
+    hit.setAttribute('data-action','option-open');
+    hit.setAttribute('data-id', el.id);
+    hit.setAttribute('cursor','pointer');
+    g.appendChild(hit);
+
+    // Outline selezione
+    const outline = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    outline.setAttribute('class','el-outline');
+    outline.setAttribute('x',-3); outline.setAttribute('y',-3);
+    outline.setAttribute('width',W+6); outline.setAttribute('height',H+6);
+    outline.setAttribute('rx',8); outline.setAttribute('fill','none');
+    g.appendChild(outline);
+
+    // Delete button
+    const dG = document.createElementNS('http://www.w3.org/2000/svg','g');
+    dG.setAttribute('class','delete-btn');
+    dG.setAttribute('transform',`translate(${W-4},-14)`);
+    dG.setAttribute('data-action','delete'); dG.setAttribute('data-id',el.id);
+    const dC = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dC.setAttribute('cx',9);dC.setAttribute('cy',6);dC.setAttribute('r',9);
+    dC.setAttribute('fill','#cc3333');dC.setAttribute('stroke','#ff5555');dC.setAttribute('stroke-width','1');
+    const dT = document.createElementNS('http://www.w3.org/2000/svg','text');
+    dT.setAttribute('x',9);dT.setAttribute('y',11);dT.setAttribute('text-anchor','middle');
+    dT.setAttribute('font-size','11');dT.setAttribute('fill','#ff6666');
+    dT.setAttribute('font-family','monospace');dT.setAttribute('font-weight','bold');
+    dT.setAttribute('pointer-events','none');dT.textContent='✕';
+    dG.appendChild(dC);dG.appendChild(dT);
+    g.appendChild(dG);
+  }
+};
+
+// ─── Data Table ───────────────────────────────────────────────────────────────
+DEFS.data_table = {
+  label: 'Tabella',
+  w: 200, h: 80,
+  draw(g, el) {
+    const headers  = el.props?.headers || ['Col 1'];
+    const rows     = el.props?.rows    || [[]];
+    const col      = el.props?.color   || '#60c0f0';
+    const title    = el.props?.title   || '';
+    const colW      = parseFloat(el.props?.colWidth) || 90;
+    const rowBg     = el.props?.rowBg     || '';
+    const dataColor = el.props?.dataColor || '';
+    const gridColor = el.props?.gridColor || '';
+    const nCols    = headers.length;
+    const nRows    = rows.length;
+    const ROW_H = 24, HEAD_H = 28;
+    const W = nCols * colW;
+
+    const hexToRgb = h => { const r=parseInt(h.slice(1,3),16),g2=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return `${r},${g2},${b}`; };
+    const rgb = hexToRgb(col.startsWith('#') && col.length===7 ? col : '#60c0f0');
+    const pageSize   = Math.max(1, parseInt(el.props?.pageSize ?? 5));
+    const totalRows  = rows.length;
+    const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
+    let   curPage    = Math.max(0, Math.min(parseInt(el.props?.currentPage ?? 0), totalPages - 1));
+    el.props.currentPage = curPage;
+
+    const hasPaging  = totalRows > pageSize;
+    const pageRows   = hasPaging ? rows.slice(curPage * pageSize, (curPage + 1) * pageSize) : rows;
+    const pageOffset = curPage * pageSize; // indice globale della prima riga visibile
+
+    const NAV_H = hasPaging ? 24 : 0;
+    const H = HEAD_H + pageRows.length * ROW_H + NAV_H;
+    el._wPx = W; el._hPx = H;
+
+    // Titolo esterno
+    if (title) {
+      const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x',0); t.setAttribute('y',-8);
+      t.setAttribute('fill',col); t.setAttribute('font-size','15px');
+      t.setAttribute('font-family','IBM Plex Mono,monospace');
+      t.setAttribute('pointer-events','none');
+      t.textContent = title;
+      g.appendChild(t);
+    }
+
+    // Sfondo header
+    const hBg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    hBg.setAttribute('x',0); hBg.setAttribute('y',0);
+    hBg.setAttribute('width',W); hBg.setAttribute('height',HEAD_H);
+    hBg.setAttribute('fill',`rgba(${rgb},0.18)`);
+    g.appendChild(hBg);
+
+    // Sfondo corpo
+    const bBg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    bBg.setAttribute('x',0); bBg.setAttribute('y',HEAD_H);
+    bBg.setAttribute('width',W); bBg.setAttribute('height',pageRows.length*ROW_H);
+    bBg.setAttribute('fill', rowBg || `rgba(${rgb},0.04)`);
+    g.appendChild(bBg);
+
+    // Bordo esterno
+    const border = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    border.setAttribute('x',0); border.setAttribute('y',0);
+    border.setAttribute('width',W); border.setAttribute('height',H);
+    border.setAttribute('rx',6); border.setAttribute('fill','none');
+    border.setAttribute('stroke',`rgba(${rgb},0.4)`); border.setAttribute('stroke-width','1.5');
+    g.appendChild(border);
+
+    // Linee verticali colonne
+    for (let c=1; c<nCols; c++) {
+      const vl = document.createElementNS('http://www.w3.org/2000/svg','line');
+      vl.setAttribute('x1',c*colW); vl.setAttribute('y1',0);
+      vl.setAttribute('x2',c*colW); vl.setAttribute('y2',H-NAV_H);
+      vl.setAttribute('stroke', gridColor || `rgba(${rgb},0.2)`); vl.setAttribute('stroke-width','1');
+      g.appendChild(vl);
+    }
+
+    // Linea sotto header
+    const hl = document.createElementNS('http://www.w3.org/2000/svg','line');
+    hl.setAttribute('x1',0); hl.setAttribute('y1',HEAD_H);
+    hl.setAttribute('x2',W); hl.setAttribute('y2',HEAD_H);
+    hl.setAttribute('stroke', gridColor || `rgba(${rgb},0.4)`); hl.setAttribute('stroke-width','1.5');
+    g.appendChild(hl);
+
+    // Linee orizzontali righe
+    for (let r=1; r<pageRows.length; r++) {
+      const rl = document.createElementNS('http://www.w3.org/2000/svg','line');
+      rl.setAttribute('x1',0); rl.setAttribute('y1',HEAD_H+r*ROW_H);
+      rl.setAttribute('x2',W); rl.setAttribute('y2',HEAD_H+r*ROW_H);
+      rl.setAttribute('stroke', gridColor || `rgba(${rgb},0.12)`); rl.setAttribute('stroke-width','1');
+      g.appendChild(rl);
+    }
+
+    // Header testo
+    headers.forEach((h,c) => {
+      svgLatexText(g, h, c*colW + colW/2, HEAD_H/2 + 5, {
+        fontSize: 11, fill: col, fontWeight: 'bold',
+        textAnchor: 'middle', width: colW - 4,
+      });
+    });
+
+    // Righe con hit area per selezione riga
+    pageRows.forEach((row,r) => {
+      const globalIdx = pageOffset + r;
+      const isSelected = globalIdx === parseInt(el.props?.selectedRow ?? -1);
+      const rowY = HEAD_H + r*ROW_H;
+      if (isSelected) {
+        const selBg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+        selBg.setAttribute('x',0); selBg.setAttribute('y', rowY);
+        selBg.setAttribute('width',W); selBg.setAttribute('height',ROW_H);
+        selBg.setAttribute('fill', '#2563eb');
+        selBg.setAttribute('pointer-events','none');
+        g.appendChild(selBg);
+      }
+      const rowHit = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      rowHit.setAttribute('x',0); rowHit.setAttribute('y', rowY);
+      rowHit.setAttribute('width',W); rowHit.setAttribute('height',ROW_H);
+      rowHit.setAttribute('fill','rgba(0,0,0,0.001)');
+      rowHit.setAttribute('cursor','pointer');
+      rowHit.setAttribute('data-action','table-row-select');
+      rowHit.setAttribute('data-id', String(el.id));
+      rowHit.setAttribute('data-row', String(globalIdx)); // indice globale!
+      g.appendChild(rowHit);
+      headers.forEach((_,c) => {
+        const val = row[c] ?? '';
+        const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+        t.setAttribute('x', c*colW + colW/2);
+        t.setAttribute('y', rowY + ROW_H/2 + 4);
+        t.setAttribute('text-anchor','middle');
+        t.setAttribute('fill', isSelected ? '#ffffff' : (dataColor || `rgba(${rgb},0.85)`));
+        t.setAttribute('font-size','13px'); t.setAttribute('font-weight', isSelected ? 'bold' : 'normal');
+        t.setAttribute('font-family','IBM Plex Mono,monospace'); t.setAttribute('pointer-events','none');
+        const maxLen = Math.floor(colW / 7);
+        t.textContent = String(val).length>maxLen ? String(val).slice(0,maxLen-1)+'\u2026' : String(val);
+        g.appendChild(t);
+      });
+    });
+
+    // Barra navigazione paginazione
+    if (hasPaging) {
+      const navY = HEAD_H + pageRows.length * ROW_H;
+      const navBg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      navBg.setAttribute('x',0); navBg.setAttribute('y',navY);
+      navBg.setAttribute('width',W); navBg.setAttribute('height',NAV_H);
+      navBg.setAttribute('fill',`rgba(${rgb},0.08)`); navBg.setAttribute('pointer-events','none');
+      g.appendChild(navBg);
+
+      const navLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+      navLine.setAttribute('x1',0); navLine.setAttribute('y1',navY);
+      navLine.setAttribute('x2',W); navLine.setAttribute('y2',navY);
+      navLine.setAttribute('stroke',`rgba(${rgb},0.3)`); navLine.setAttribute('stroke-width','1');
+      g.appendChild(navLine);
+
+      // Testo pagina
+      const pageText = document.createElementNS('http://www.w3.org/2000/svg','text');
+      pageText.setAttribute('x', W/2); pageText.setAttribute('y', navY + 16);
+      pageText.setAttribute('text-anchor','middle'); pageText.setAttribute('fill',`rgba(${rgb},0.8)`);
+      pageText.setAttribute('font-size','10px'); pageText.setAttribute('font-family','IBM Plex Mono,monospace');
+      pageText.setAttribute('pointer-events','none');
+      pageText.textContent = `${curPage+1} / ${totalPages}`;
+      g.appendChild(pageText);
+
+      // Freccia ◀ — pagina precedente
+      const btnPrev = document.createElementNS('http://www.w3.org/2000/svg','text');
+      btnPrev.setAttribute('x', 12); btnPrev.setAttribute('y', navY + 16);
+      btnPrev.setAttribute('fill', curPage > 0 ? col : `rgba(${rgb},0.3)`);
+      btnPrev.setAttribute('font-size','13px'); btnPrev.setAttribute('cursor', curPage > 0 ? 'pointer' : 'default');
+      btnPrev.setAttribute('font-family','monospace'); btnPrev.textContent = '◀';
+      btnPrev.setAttribute('data-action','table-page-prev'); btnPrev.setAttribute('data-id', String(el.id));
+      g.appendChild(btnPrev);
+
+      // Freccia ▶ — pagina successiva
+      const btnNext = document.createElementNS('http://www.w3.org/2000/svg','text');
+      btnNext.setAttribute('x', W - 12); btnNext.setAttribute('y', navY + 16);
+      btnNext.setAttribute('fill', curPage < totalPages-1 ? col : `rgba(${rgb},0.3)`);
+      btnNext.setAttribute('font-size','13px'); btnNext.setAttribute('cursor', curPage < totalPages-1 ? 'pointer' : 'default');
+      btnNext.setAttribute('font-family','monospace'); btnNext.setAttribute('text-anchor','end');
+      btnNext.textContent = '▶';
+      btnNext.setAttribute('data-action','table-page-next'); btnNext.setAttribute('data-id', String(el.id));
+      g.appendChild(btnNext);
+    }
+
+        // Hit area SOLO sull'header (per selezionare elemento e aprire pannello)
+    const hit = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    hit.setAttribute('x',0); hit.setAttribute('y',0);
+    hit.setAttribute('width',W); hit.setAttribute('height',HEAD_H);
+    hit.setAttribute('fill','rgba(0,0,0,0)');
+    g.appendChild(hit);
+
+    const outline = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    outline.setAttribute('class','el-outline');
+    outline.setAttribute('x',-3); outline.setAttribute('y',-3);
+    outline.setAttribute('width',W+6); outline.setAttribute('height',H+6);
+    outline.setAttribute('rx',8); outline.setAttribute('fill','none');
+    g.appendChild(outline);
+
+    const dG = document.createElementNS('http://www.w3.org/2000/svg','g');
+    dG.setAttribute('class','delete-btn');
+    dG.setAttribute('transform',`translate(${W-4},-14)`);
+    dG.setAttribute('data-action','delete'); dG.setAttribute('data-id',el.id);
+    const dC = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dC.setAttribute('cx',9);dC.setAttribute('cy',6);dC.setAttribute('r',9);
+    dC.setAttribute('fill','#cc3333');dC.setAttribute('stroke','#ff5555');dC.setAttribute('stroke-width','1');
+    const dT = document.createElementNS('http://www.w3.org/2000/svg','text');
+    dT.setAttribute('x',9);dT.setAttribute('y',11);dT.setAttribute('text-anchor','middle');
+    dT.setAttribute('font-size','11');dT.setAttribute('fill','#ff6666');
+    dT.setAttribute('font-family','monospace');dT.setAttribute('font-weight','bold');
+    dT.setAttribute('pointer-events','none');dT.textContent='✕';
+    dG.appendChild(dC);dG.appendChild(dT);
+    g.appendChild(dG);
+  }
+};
+
+
+// ─── Chart (ECharts via overlay) ─────────────────────────────────────────────
+DEFS.chart = {
+  label: 'Grafico',
+  w: 280, h: 200,
+  draw(g, el) {
+    const col   = el.props?.color  || '#f0c060';
+    const title = el.props?.title  || '';
+    const W     = parseFloat(el.props?.width)  || 280;
+    const H     = parseFloat(el.props?.height) || 200;
+    el._wPx = W; el._hPx = H;
+
+    if (title) {
+      const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x',0); t.setAttribute('y',-8);
+      t.setAttribute('fill',col); t.setAttribute('font-size','15px');
+      t.setAttribute('font-family','IBM Plex Mono,monospace');
+      t.setAttribute('pointer-events','none');
+      t.textContent = title; g.appendChild(t);
+    }
+
+    const bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    bg.setAttribute('x',0); bg.setAttribute('y',0);
+    bg.setAttribute('width',W); bg.setAttribute('height',H);
+    bg.setAttribute('rx',8); bg.setAttribute('fill','rgba(0,0,0,0)');
+    bg.setAttribute('stroke','rgba(128,128,128,0.25)'); bg.setAttribute('stroke-width','1.5');
+    g.appendChild(bg);
+
+    const outline = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    outline.setAttribute('class','el-outline'); outline.setAttribute('x',-3); outline.setAttribute('y',-3);
+    outline.setAttribute('width',W+6); outline.setAttribute('height',H+6);
+    outline.setAttribute('rx',10); outline.setAttribute('fill','none');
+    g.appendChild(outline);
+
+    const dG = document.createElementNS('http://www.w3.org/2000/svg','g');
+    dG.setAttribute('class','delete-btn'); dG.setAttribute('transform',`translate(${W-4},-14)`);
+    dG.setAttribute('data-action','delete'); dG.setAttribute('data-id',el.id);
+    const dC = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dC.setAttribute('cx',9); dC.setAttribute('cy',6); dC.setAttribute('r',9);
+    dC.setAttribute('fill','#cc3333'); dC.setAttribute('stroke','#ff5555'); dC.setAttribute('stroke-width','1');
+    const dT = document.createElementNS('http://www.w3.org/2000/svg','text');
+    dT.setAttribute('x',9); dT.setAttribute('y',11); dT.setAttribute('text-anchor','middle');
+    dT.setAttribute('font-size','11'); dT.setAttribute('fill','#ff6666');
+    dT.setAttribute('font-family','monospace'); dT.setAttribute('font-weight','bold');
+    dT.setAttribute('pointer-events','none'); dT.textContent='✕';
+    dG.appendChild(dC); dG.appendChild(dT); g.appendChild(dG);
+  }
+};
+
+// ─── Image ────────────────────────────────────────────────────────────────────
+DEFS.image = {
+  label: 'Immagine',
+  w: 200, h: 150,
+  draw(g, el) {
+    const W     = parseFloat(el.props?.width)  || 200;
+    const H     = parseFloat(el.props?.height) || 150;
+    const title = el.props?.title || '';
+    const src   = el.props?.src   || '';
+    const fit   = el.props?.fit   || 'contain';
+    el._wPx = W; el._hPx = H;
+
+    // Titolo esterno
+    if (title) {
+      svgLatexText(g, title, 0, -8, { fontSize: 14, fill: '#e8e8ec', textAnchor: 'start', width: W });
+    }
+
+    // Sfondo / bordo
+    const bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    bg.setAttribute('x',0); bg.setAttribute('y',0);
+    bg.setAttribute('width',W); bg.setAttribute('height',H);
+    bg.setAttribute('rx',6); bg.setAttribute('fill','#1a1a22');
+    bg.setAttribute('stroke','rgba(255,255,255,0.15)'); bg.setAttribute('stroke-width','1.5');
+    g.appendChild(bg);
+
+    if (src) {
+      // Immagine via foreignObject per rispettare object-fit
+      const fo = document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
+      fo.setAttribute('x',0); fo.setAttribute('y',0);
+      fo.setAttribute('width',W); fo.setAttribute('height',H);
+      fo.setAttribute('pointer-events','none');
+      const div = document.createElement('div');
+      div.style.cssText = `width:${W}px;height:${H}px;overflow:hidden;border-radius:6px;`;
+      const img = document.createElement('img');
+      img.src = src;
+      img.style.cssText = `width:100%;height:100%;object-fit:${fit};display:block;`;
+      div.appendChild(img); fo.appendChild(div); g.appendChild(fo);
+    } else {
+      // Placeholder
+      const fo = document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
+      fo.setAttribute('x',0); fo.setAttribute('y',0);
+      fo.setAttribute('width',W); fo.setAttribute('height',H);
+      fo.setAttribute('pointer-events','none');
+      const div = document.createElement('div');
+      div.style.cssText = `width:${W}px;height:${H}px;display:flex;flex-direction:column;
+        align-items:center;justify-content:center;gap:6px;color:rgba(255,255,255,0.3);
+        font-family:'IBM Plex Mono',monospace;font-size:11px;`;
+      div.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21,15 16,10 5,21"/>
+      </svg><span>Clicca per caricare</span>`;
+      fo.appendChild(div); g.appendChild(fo);
+    }
+
+    // Outline selezione
+    const outline = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    outline.setAttribute('class','el-outline');
+    outline.setAttribute('x',-3); outline.setAttribute('y',-3);
+    outline.setAttribute('width',W+6); outline.setAttribute('height',H+6);
+    outline.setAttribute('rx',8); outline.setAttribute('fill','none');
+    g.appendChild(outline);
+
+    // Delete button
+    const dG = document.createElementNS('http://www.w3.org/2000/svg','g');
+    dG.setAttribute('class','delete-btn'); dG.setAttribute('transform',`translate(${W-4},-14)`);
+    dG.setAttribute('data-action','delete'); dG.setAttribute('data-id',el.id);
+    const dC = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dC.setAttribute('cx',9);dC.setAttribute('cy',6);dC.setAttribute('r',9);
+    dC.setAttribute('fill','#cc3333');dC.setAttribute('stroke','#ff5555');dC.setAttribute('stroke-width','1');
+    const dT = document.createElementNS('http://www.w3.org/2000/svg','text');
+    dT.setAttribute('x',9);dT.setAttribute('y',11);dT.setAttribute('text-anchor','middle');
+    dT.setAttribute('font-size','11');dT.setAttribute('fill','#ff6666');
+    dT.setAttribute('font-family','monospace');dT.setAttribute('font-weight','bold');
+    dT.setAttribute('pointer-events','none');dT.textContent='✕';
+    dG.appendChild(dC);dG.appendChild(dT);
+    g.appendChild(dG);
+  }
+};
+
+// ─── Arrow (annotazione) ──────────────────────────────────────────────────────
+DEFS.arrow = {
+  label: 'Freccia',
+  w: 100, h: 4,
+  draw(g, el) {
+    const col    = el.props?.color       || '#f06060';
+    const sw     = parseFloat(el.props?.strokeWidth) || 2;
+    const dx     = parseFloat(el.props?.dx) || 100;
+    const dy     = parseFloat(el.props?.dy) || 0;
+    const hs     = parseFloat(el.props?.headSize) || 10;
+    const label  = el.props?.label || '';
+
+    const len = Math.hypot(dx, dy);
+    if (len < 1) return;
+    el._wPx = Math.abs(dx) + hs * 2;
+    el._hPx = Math.abs(dy) + hs * 2;
+
+    // Direzione unitaria
+    const ux = dx / len, uy = dy / len;
+    // Punta: arretra la linea di hs per non sovrapporsi alla testa
+    const lineEndX = dx - ux * hs * 0.8;
+    const lineEndY = dy - uy * hs * 0.8;
+
+    // Linea freccia
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', lineEndX); line.setAttribute('y2', lineEndY);
+    line.setAttribute('stroke', col);
+    line.setAttribute('stroke-width', sw);
+    line.setAttribute('stroke-linecap', 'round');
+    line.setAttribute('pointer-events', 'none');
+    g.appendChild(line);
+
+    // Testa freccia come poligono
+    const hw = hs * 0.45; // half-width base
+    // Vettore perpendicolare
+    const px = -uy * hw, py = ux * hw;
+    const tipX = dx, tipY = dy;
+    const baseX = dx - ux * hs, baseY = dy - uy * hs;
+    const points = `${tipX},${tipY} ${baseX+px},${baseY+py} ${baseX-px},${baseY-py}`;
+    const head = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    head.setAttribute('points', points);
+    head.setAttribute('fill', col);
+    head.setAttribute('pointer-events', 'none');
+    g.appendChild(head);
+
+    // Etichetta vicino alla coda
+    if (label) {
+      const lColor  = el.props?.labelColor  || col;
+      const lSize   = parseFloat(el.props?.labelSize) || 13;
+      const lBold   = el.props?.labelBold   ? 'bold'   : 'normal';
+      const lItalic = el.props?.labelItalic ? 'italic' : 'normal';
+      svgLatexText(g, label, 10, 18, {
+        fontSize: lSize, fill: lColor, textAnchor: 'start', width: 200,
+        fontWeight: lBold, fontStyle: lItalic,
+      });
+    }
+
+    // Handle di trascinamento — visibili solo se selezionato
+    const isSelected = (typeof selectedId !== 'undefined') && selectedId === el.id;
+    if (isSelected) {
+      // Handle punta
+      const handle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      handle.setAttribute('cx', dx); handle.setAttribute('cy', dy);
+      handle.setAttribute('r', 6);
+      handle.setAttribute('fill', col); handle.setAttribute('fill-opacity', '0.25');
+      handle.setAttribute('stroke', col); handle.setAttribute('stroke-width', '1.5');
+      handle.setAttribute('cursor', 'crosshair');
+      handle.setAttribute('data-action', 'arrow-drag-tip');
+      handle.setAttribute('data-id', String(el.id));
+      g.appendChild(handle);
+
+      // Handle coda
+      const handleTail = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      handleTail.setAttribute('cx', 0); handleTail.setAttribute('cy', 0);
+      handleTail.setAttribute('r', 6);
+      handleTail.setAttribute('fill', col); handleTail.setAttribute('fill-opacity', '0.25');
+      handleTail.setAttribute('stroke', col); handleTail.setAttribute('stroke-width', '1.5');
+      handleTail.setAttribute('cursor', 'crosshair');
+      handleTail.setAttribute('data-action', 'arrow-drag-tail');
+      handleTail.setAttribute('data-id', String(el.id));
+      g.appendChild(handleTail);
+    }
+
+
+  }
+};
+
+// ─── Stats ────────────────────────────────────────────────────────────────────
+function _computeStats(values) {
+  const n = values.length;
+  if (n === 0) return null;
+  const sorted = [...values].sort((a,b) => a-b);
+  const mean = values.reduce((s,v)=>s+v,0) / n;
+  const variance = values.reduce((s,v)=>s+(v-mean)**2,0) / (n > 1 ? n-1 : 1);
+  const std = Math.sqrt(variance);
+  const sem = std / Math.sqrt(n);
+  const min = sorted[0], max = sorted[n-1];
+  const median = n % 2 === 0
+    ? (sorted[n/2-1] + sorted[n/2]) / 2
+    : sorted[Math.floor(n/2)];
+  // IC 95% (t di Student approssimato — per n>=30 usa 1.96, altrimenti tabella)
+  const tTable = [0,12.706,4.303,3.182,2.776,2.571,2.447,2.365,2.306,2.262,2.228,
+    2.201,2.179,2.160,2.145,2.131,2.120,2.110,2.101,2.093,2.086,
+    2.080,2.074,2.069,2.064,2.060,2.056,2.052,2.048,2.045,1.960];
+  const t95 = n <= 30 ? (tTable[n-1] || 1.960) : 1.960;
+  const ci95 = t95 * sem;
+  return { n, mean, std, sem, min, max, median, ci95, t95 };
+}
+
+DEFS.stats = {
+  label: 'Statistiche',
+  w: 180, h: 200,
+  draw(g, el) {
+    const col   = el.props?.color   || '#a0e0a0';
+    const title = el.props?.title   || 'Statistiche';
+    const dec   = parseInt(el.props?.decimals ?? 3);
+    const fs    = parseFloat(el.props?.fontSize ?? 11);
+    const showMedian = el.props?.showMedian === true;
+    const showCI     = el.props?.showCI === true;
+    const rowBg      = el.props?.rowBg    || '';
+    const dataColor  = el.props?.dataColor || '';
+    const gridColor  = el.props?.gridColor || '';
+
+    const hexToRgb = h => {
+      const r=parseInt(h.slice(1,3),16), g2=parseInt(h.slice(3,5),16), b=parseInt(h.slice(5,7),16);
+      return `${r},${g2},${b}`;
+    };
+    const rgb = hexToRgb(col.startsWith('#')&&col.length===7 ? col : '#a0e0a0');
+
+    // Leggi dati dalla relazione
+    const _rels = window._pcRelations || [];
+    const _els  = window._pcElements  || [];
+    const rel = _rels.find(r => r.type==='stats_prop' && (r.aId===el.id||r.bId===el.id));
+    const tblEl = rel ? _els.find(e => e.id===(rel.aId===el.id?rel.bId:rel.aId)) : null;
+    const colIdx = parseInt(rel?.props?.colIdx ?? el.props?.colIdx ?? 0);
+    const colName = tblEl?.props?.headers?.[colIdx] || '';
+
+    // Estrai valori numerici dalla colonna
+    let values = [];
+    if (tblEl?.props?.rows) {
+      tblEl.props.rows.forEach(row => {
+        const v = parseFloat(row[colIdx]);
+        if (!isNaN(v)) values.push(v);
+      });
+    }
+    const s = _computeStats(values);
+
+    // Righe da mostrare
+    const rows = [];
+    if (colName) rows.push({ label: 'Colonna', value: colName, unit: '' });
+    if (s) {
+      rows.push({ label: 'n', value: String(s.n), unit: '' });
+      rows.push({ label: 'Media', value: s.mean.toFixed(dec), unit: '' });
+      rows.push({ label: 'Dev. std.', value: s.std.toFixed(dec), unit: '' });
+      rows.push({ label: 'Err. std.', value: s.sem.toFixed(dec), unit: '' });
+      rows.push({ label: 'Min', value: s.min.toFixed(dec), unit: '' });
+      rows.push({ label: 'Max', value: s.max.toFixed(dec), unit: '' });
+      if (showMedian) rows.push({ label: 'Mediana', value: s.median.toFixed(dec), unit: '' });
+      if (showCI) rows.push({ label: `IC 95%`, value: `±${s.ci95.toFixed(dec)}`, unit: '' });
+    } else {
+      rows.push({ label: '', value: 'Nessun dato', unit: '' });
+    }
+
+    const ROW_H = Math.round(fs * 2.2), HEAD_H = Math.round(fs * 2.6), PAD = 10;
+    const W = Math.max(160, fs * 17);
+    const H = HEAD_H + rows.length * ROW_H + 6;
+    el._wPx = W; el._hPx = H;
+
+    // Titolo esterno
+    if (title) {
+      svgLatexText(g, title, 0, -8, { fontSize: 14, fill: col, textAnchor: 'start', width: W });
+    }
+
+    // Sfondo corpo
+    const bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    bg.setAttribute('x',0); bg.setAttribute('y',0);
+    bg.setAttribute('width',W); bg.setAttribute('height',H);
+    bg.setAttribute('rx',8); bg.setAttribute('fill', rowBg || `rgba(${rgb},0.06)`);
+    bg.setAttribute('stroke', gridColor || `rgba(${rgb},0.4)`); bg.setAttribute('stroke-width','1.5');
+    g.appendChild(bg);
+
+    // Header
+    const hBg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    hBg.setAttribute('x',0); hBg.setAttribute('y',0);
+    hBg.setAttribute('width',W); hBg.setAttribute('height',HEAD_H);
+    hBg.setAttribute('rx',8); hBg.setAttribute('fill',`rgba(${rgb},0.18)`);
+    g.appendChild(hBg);
+    const hRect2 = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    hRect2.setAttribute('x',0); hRect2.setAttribute('y',HEAD_H/2);
+    hRect2.setAttribute('width',W); hRect2.setAttribute('height',HEAD_H/2);
+    hRect2.setAttribute('fill',`rgba(${rgb},0.18)`);
+    g.appendChild(hRect2);
+
+    const hT = document.createElementNS('http://www.w3.org/2000/svg','text');
+    hT.setAttribute('x',W/2); hT.setAttribute('y',HEAD_H/2+5);
+    hT.setAttribute('text-anchor','middle'); hT.setAttribute('fill',col);
+    hT.setAttribute('font-size', String(fs+1)); hT.setAttribute('font-weight','bold');
+    hT.setAttribute('font-family','IBM Plex Mono,monospace');
+    hT.setAttribute('pointer-events','none');
+    hT.textContent = colName ? colName : '—';
+    g.appendChild(hT);
+
+    // Riga separatore header
+    const hl = document.createElementNS('http://www.w3.org/2000/svg','line');
+    hl.setAttribute('x1',0); hl.setAttribute('y1',HEAD_H);
+    hl.setAttribute('x2',W); hl.setAttribute('y2',HEAD_H);
+    hl.setAttribute('stroke', gridColor || `rgba(${rgb},0.4)`); hl.setAttribute('stroke-width','1');
+    g.appendChild(hl);
+
+    // Righe statistiche
+    const labelW = 80;
+    rows.forEach((row, i) => {
+      const y = HEAD_H + i * ROW_H;
+      // Riga alternata
+      if (i % 2 === 0) {
+        const rBg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+        rBg.setAttribute('x',0); rBg.setAttribute('y',y);
+        rBg.setAttribute('width',W); rBg.setAttribute('height',ROW_H);
+        rBg.setAttribute('fill',`rgba(${rgb},0.04)`);
+        g.appendChild(rBg);
+      }
+      // Label
+      const lT = document.createElementNS('http://www.w3.org/2000/svg','text');
+      lT.setAttribute('x', PAD); lT.setAttribute('y', y + ROW_H/2 + 4);
+      lT.setAttribute('fill',`rgba(${rgb},0.7)`); lT.setAttribute('font-size', String(fs-1));
+      lT.setAttribute('font-family','IBM Plex Mono,monospace');
+      lT.setAttribute('pointer-events','none');
+      lT.textContent = row.label;
+      g.appendChild(lT);
+      // Valore
+      const vT = document.createElementNS('http://www.w3.org/2000/svg','text');
+      vT.setAttribute('x', W - PAD); vT.setAttribute('y', y + ROW_H/2 + 4);
+      vT.setAttribute('text-anchor','end'); vT.setAttribute('fill', dataColor || col);
+      vT.setAttribute('font-size', String(fs)); vT.setAttribute('font-weight','bold');
+      vT.setAttribute('font-family','IBM Plex Mono,monospace');
+      vT.setAttribute('pointer-events','none');
+      vT.textContent = row.value;
+      g.appendChild(vT);
+      // Linea separazione
+      if (i < rows.length - 1) {
+        const rl = document.createElementNS('http://www.w3.org/2000/svg','line');
+        rl.setAttribute('x1',0); rl.setAttribute('y1',y+ROW_H);
+        rl.setAttribute('x2',W); rl.setAttribute('y2',y+ROW_H);
+        rl.setAttribute('stroke', gridColor || `rgba(${rgb},0.1)`); rl.setAttribute('stroke-width','1');
+        g.appendChild(rl);
+      }
+    });
+
+    // Outline e delete gestiti da render.js
+  }
+};
+
+// ─── Link ─────────────────────────────────────────────────────────────────────
+DEFS.link = {
+  label: 'Link',
+  w: 160, h: 32,
+  draw(g, el) {
+    const col   = el.props?.color   || '#60c0f0';
+    const url   = el.props?.url     || '';
+    const label = el.props?.label   || url || 'Inserisci URL…';
+    const fs    = parseFloat(el.props?.fontSize ?? 13);
+
+    el._wPx = Math.max(120, label.length * fs * 0.62 + 32);
+    el._hPx = fs * 2.4;
+    const W = el._wPx, H = el._hPx;
+
+    // Sfondo hover
+    const bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    bg.setAttribute('x',0); bg.setAttribute('y',0);
+    bg.setAttribute('width',W); bg.setAttribute('height',H);
+    bg.setAttribute('rx',4); bg.setAttribute('fill',`rgba(96,192,240,0.06)`);
+    g.appendChild(bg);
+
+    // Icona "apri in nuova scheda"
+    const iconG = document.createElementNS('http://www.w3.org/2000/svg','g');
+    iconG.setAttribute('transform',`translate(6, ${H/2 - fs*0.55}) scale(${fs/14})`);
+    iconG.setAttribute('pointer-events','none');
+    const iconCol = url ? col : `rgba(150,150,180,0.5)`;
+    // Riquadro
+    const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.setAttribute('x',0); r.setAttribute('y',5); r.setAttribute('width',10); r.setAttribute('height',10);
+    r.setAttribute('rx',1.5); r.setAttribute('fill','none'); r.setAttribute('stroke',iconCol); r.setAttribute('stroke-width',1.6);
+    iconG.appendChild(r);
+    // Freccia esterna
+    const arrowLine = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+    arrowLine.setAttribute('points','7,0 14,0 14,7'); arrowLine.setAttribute('fill','none');
+    arrowLine.setAttribute('stroke',iconCol); arrowLine.setAttribute('stroke-width',1.6); arrowLine.setAttribute('stroke-linecap','round'); arrowLine.setAttribute('stroke-linejoin','round');
+    iconG.appendChild(arrowLine);
+    const diag = document.createElementNS('http://www.w3.org/2000/svg','line');
+    diag.setAttribute('x1',14); diag.setAttribute('y1',0); diag.setAttribute('x2',6); diag.setAttribute('y2',8);
+    diag.setAttribute('stroke',iconCol); diag.setAttribute('stroke-width',1.6); diag.setAttribute('stroke-linecap','round');
+    iconG.appendChild(diag);
+    g.appendChild(iconG);
+
+    // Testo label con underline simulato
+    const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x', fs * 1.4 + 8); t.setAttribute('y', H/2 + fs*0.38);
+    t.setAttribute('fill', url ? col : `rgba(150,150,180,0.6)`);
+    t.setAttribute('font-size', String(fs));
+    t.setAttribute('font-family','IBM Plex Mono,monospace');
+    t.setAttribute('text-decoration', url ? 'underline' : 'none');
+    t.setAttribute('pointer-events','none');
+    t.textContent = label;
+    g.appendChild(t);
+
+    // Area cliccabile
+    if (url) {
+      const hit = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      hit.setAttribute('x',0); hit.setAttribute('y',0);
+      hit.setAttribute('width',W); hit.setAttribute('height',H);
+      hit.setAttribute('fill','rgba(0,0,0,0)');
+      hit.setAttribute('cursor','pointer');
+      hit.setAttribute('data-action','open-link');
+      hit.setAttribute('data-url', url);
+      g.appendChild(hit);
+    }
+  }
+};
+
+// ═══ MODULE: chart-overlay.js ═══
+// ─── Chart Overlay — div HTML sovrapposti al canvas, stabili tra render ───────
+
+var _chartOverlays = new Map(); // elId → {div, chart}
+
+function updateChartOverlays() {
+  if (typeof echarts === 'undefined') return;
+
+  const canvasWrap = document.querySelector('.canvas-wrap');
+  if (!canvasWrap) return;
+
+  // IDs correnti dei chart
+  const currentIds = new Set(elements.filter(e=>e.type==='chart').map(e=>e.id));
+
+  // Rimuovi overlay orfani
+  const toDelete = [];
+  for (const [id, entry] of _chartOverlays) {
+    if (!currentIds.has(id)) {
+      if (entry.chart) try { entry.chart.dispose(); } catch(e) {}
+      entry.div.remove();
+      toDelete.push(id);
+    }
+  }
+  toDelete.forEach(id => _chartOverlays.delete(id));
+
+  // Aggiorna/crea overlay per ogni chart
+  for (const el of elements) {
+    if (el.type !== 'chart') continue;
+
+    const W = parseFloat(el.props?.width)  || 280;
+    const H = parseFloat(el.props?.height) || 200;
+
+    // Trova posizione nel canvas SVG
+    const svgEl = document.getElementById('canvas');
+    const gEl   = svgEl?.querySelector(`g[data-id="${el.id}"]`);
+    if (!gEl) continue;
+
+    // Converti coordinate SVG → schermo
+    const svgRect = svgEl.getBoundingClientRect();
+    const wrapRect = canvasWrap.getBoundingClientRect();
+    let pt = svgEl.createSVGPoint();
+    const transform = gEl.getCTM();
+    pt.x = 0; pt.y = 0;
+    const screenPt = pt.matrixTransform(transform);
+
+    const left = screenPt.x + svgRect.left - wrapRect.left;
+    const top  = screenPt.y + svgRect.top  - wrapRect.top;
+
+    // Crea o recupera div overlay
+    let entry = _chartOverlays.get(el.id);
+    if (!entry) {
+      const div = document.createElement('div');
+      div.style.cssText = `position:absolute;pointer-events:none;border-radius:8px;overflow:hidden;border:1.5px solid rgba(128,128,128,0.25);background:#fff;box-sizing:border-box;`;
+      canvasWrap.appendChild(div);
+      const chart = echarts.init(div, null, { renderer: 'canvas' });
+      entry = { div, chart };
+      _chartOverlays.set(el.id, entry);
+    }
+
+    // Aggiorna posizione e dimensioni
+    entry.div.style.left   = left  + 'px';
+    entry.div.style.top    = top   + 'px';
+    entry.div.style.width  = W     + 'px';
+    entry.div.style.height = H     + 'px';
+    entry.chart.resize({ width: W, height: H });
+
+    // Leggi dati dalla tabella collegata
+    const chartRel = relations.find(r=>r.type==='chart_prop'&&(r.aId===el.id||r.bId===el.id));
+    const tblEl = chartRel
+      ? elements.find(e=>e.id===(chartRel.aId===el.id?chartRel.bId:chartRel.aId))
+      : null;
+
+    const xCol     = parseInt(chartRel?.props?.xCol ?? 0);
+    const yCols    = chartRel?.props?.yCols || [parseInt(chartRel?.props?.yCol ?? 1)];
+    const yErrors  = chartRel?.props?.yErrors || {};
+    const chartType = el.props?.chartType || 'line';
+    const smooth    = el.props?.smooth !== false;
+    const showGrid  = el.props?.showGrid === true;
+    const xLabel    = el.props?.xLabel || tblEl?.props?.headers?.[xCol] || '';
+    const yLabel    = el.props?.yLabel || (yCols.length === 1 ? (tblEl?.props?.headers?.[yCols[0]] || '') : '');
+    // Applica rette di regressione come markLine sulle serie dati
+    const palette = ['#3a7bd5','#e84393','#f0a020','#20c080','#a040e0','#e04040'];
+
+    // Palette colori per serie multiple
+
+    const xError = parseInt(chartRel?.props?.xError ?? -1);
+
+    let xData = [];
+    const yDataArr = yCols.map(() => []);
+    const errDataArr = yCols.map(() => []);
+    const xErrData = [];
+
+    if (tblEl?.props?.rows) {
+      tblEl.props.rows.forEach(row => {
+        const xv = row[xCol];
+        if (xv === '' || xv === undefined) return;
+        xData.push(String(xv));
+        // Errore X
+        if (xError >= 0) {
+          const xe = row[xError];
+          xErrData.push(xe !== '' && xe !== undefined ? parseFloat(xe) : 0);
+        }
+        yCols.forEach((yCol, si) => {
+          const yv = row[yCol];
+          yDataArr[si].push(yv !== '' && yv !== undefined ? parseFloat(yv) : null);
+          const errCol = parseInt(yErrors[yCol] ?? -1);
+          if (errCol >= 0) {
+            const ev = row[errCol];
+            errDataArr[si].push(ev !== '' && ev !== undefined ? parseFloat(ev) : 0);
+          } else {
+            errDataArr[si].push(null);
+          }
+        });
+      });
+    }
+
+    const isScatter = chartType === 'scatter';
+    const showRegression = el.props?.showRegression === true;
+    const regColor = '#e04040';
+
+    const showError = false; // legacy
+
+    const series = yCols.map((yCol, si) => {
+      const serColor = palette[si % palette.length];
+      const serName = tblEl?.props?.headers?.[yCol] || `Col ${yCol+1}`;
+      const s = {
+        type: isScatter ? 'scatter' : chartType,
+        name: serName,
+        data: isScatter ? xData.map((x,i)=>[parseFloat(x)||0, yDataArr[si][i]]) : yDataArr[si],
+        smooth: chartType === 'line' ? smooth : false,
+        symbol: 'circle', symbolSize: 5,
+        itemStyle: { color: serColor },
+        lineStyle: { color: serColor, width: 2 },
+        areaStyle: chartType === 'line' && yCols.length === 1 ? { color: serColor+'28' } : undefined,
+      };
+
+      // Regressione lineare via ecStat
+      if (showRegression && typeof ecStat !== 'undefined') {
+        const xNum = xData.map(x => parseFloat(x)).filter(x => !isNaN(x));
+        const yNum = yDataArr[si].filter(y => y !== null && !isNaN(y));
+        if (xNum.length >= 2 && xNum.length === yNum.length) {
+          const regData = xNum.map((x,i) => [x, yNum[i]]);
+          const result = ecStat.regression('linear', regData);
+          // Ordina per x crescente
+          const pts = result.points.slice().sort((a,b) => a[0]-b[0]);
+          s.markLine = {
+            symbol: ['none','none'],
+            silent: true,
+            animation: false,
+            lineStyle: { color: serColor, width: 2, type: 'dashed' },
+            label: { show: false },
+            data: [[{ coord: pts[0] }, { coord: pts[pts.length-1] }]],
+          };
+        }
+      }
+      return s;
+    });
+
+    const axisColor = '#555';
+    const option = {
+      backgroundColor: '#ffffff',
+      grid: { top: yCols.length > 1 ? 36 : 20, right: 16, bottom: xLabel ? 48 : 36, left: yLabel ? 64 : 48 },
+      legend: yCols.length > 1 ? { top: 4, textStyle: { color: '#555', fontSize: 10, fontFamily: 'IBM Plex Mono,monospace' } } : undefined,
+      xAxis: {
+        ...(isScatter ? { type:'value', min: 'dataMin', max: 'dataMax', boundaryGap: ['10%','10%'] } : { type:'category', data: xData, boundaryGap: true }),
+        axisLine: { lineStyle: { color: axisColor } },
+        axisLabel: { color: axisColor, fontSize: 10, fontFamily: 'IBM Plex Mono,monospace' },
+        splitLine: { show: showGrid, lineStyle: { color: '#ddd' } },
+        name: xLabel, nameLocation: 'center', nameGap: xLabel ? 30 : 0,
+        nameTextStyle: { color: axisColor, fontSize: 11, fontFamily: 'IBM Plex Mono,monospace' },
+      },
+      yAxis: {
+        type: 'value',
+        axisLine: { lineStyle: { color: axisColor } },
+        axisLabel: { color: axisColor, fontSize: 10, fontFamily: 'IBM Plex Mono,monospace' },
+        splitLine: { show: true, lineStyle: { color: '#eee' } },
+        name: yLabel,
+        nameLocation: 'center',
+        nameGap: yLabel ? 44 : 0,
+        nameRotate: 90,
+        nameTextStyle: { color: axisColor, fontSize: 11, fontFamily: 'IBM Plex Mono,monospace' },
+        boundaryGap: ['0%', '15%'],
+      },
+      series,
+      animation: false,
+    };
+
+    // Label formula regressione via ecStat
+    if (showRegression && typeof ecStat !== 'undefined') {
+      const labels = [];
+      yCols.forEach((yCol, si) => {
+        const xNum = xData.map(x => parseFloat(x)).filter(x => !isNaN(x));
+        const yNum = yDataArr[si].filter(y => y !== null && !isNaN(y));
+        if (xNum.length < 2 || xNum.length !== yNum.length) return;
+        const result = ecStat.regression('linear', xNum.map((x,i) => [x, yNum[i]]));
+        // Calcola R² manualmente (ecStat non lo espone sempre)
+        const yMean = yNum.reduce((a,b)=>a+b,0) / yNum.length;
+        const ssTot = yNum.reduce((s,y)=>s+(y-yMean)**2, 0);
+        const ssRes = xNum.reduce((s,x,i)=>s+(yNum[i]-(result.parameter.gradient*x+result.parameter.intercept))**2, 0);
+        const r2 = ssTot > 0 ? 1 - ssRes/ssTot : 1;
+        labels.push({ text: result.expression + '  R²=' + r2.toFixed(4), color: palette[si % palette.length] });
+      });
+      if (labels.length > 0) {
+        const lineH = 16;
+        const baseBottom = xLabel ? 52 : 36;
+        option.graphic = labels.map((lbl, i) => ({
+          type: 'text', left: 'center', bottom: i * lineH + 6,
+          style: { text: lbl.text, fill: lbl.color, fontSize: 11, fontFamily: 'IBM Plex Mono,monospace' }
+        }));
+        option.grid.bottom = baseBottom + labels.length * lineH + 8;
+      }
+    } // end showRegression
+
+    // Barre di errore per serie — una serie custom per ogni Y con errori
+    const errSeries = [];
+    yCols.forEach((yCol, si) => {
+      const hasErr = errDataArr[si].some(v => v !== null && !isNaN(v));
+      if (!hasErr) return;
+      const serColor = palette[si % palette.length];
+      errSeries.push({
+        type: 'custom',
+        name: `err_${si}`,
+        legendHoverLink: false,
+        showInLegend: false,
+        itemStyle: { color: serColor },
+        renderItem(params, api) {
+          const xVal = api.value(0);
+          const yVal = api.value(1);
+          const err  = api.value(2);
+          if (err === null || isNaN(err) || err === 0) return { type:'group', children:[] };
+          const pt   = api.coord([xVal, yVal]);
+          const ptUp = api.coord([xVal, yVal + err]);
+          const ptDn = api.coord([xVal, yVal - err]);
+          const hw = 5;
+          return {
+            type: 'group',
+            children: [
+              { type:'line', shape:{ x1:pt[0], y1:ptUp[1], x2:pt[0], y2:ptDn[1] }, style:{ stroke:serColor, lineWidth:1.5 } },
+              { type:'line', shape:{ x1:pt[0]-hw, y1:ptUp[1], x2:pt[0]+hw, y2:ptUp[1] }, style:{ stroke:serColor, lineWidth:1.5 } },
+              { type:'line', shape:{ x1:pt[0]-hw, y1:ptDn[1], x2:pt[0]+hw, y2:ptDn[1] }, style:{ stroke:serColor, lineWidth:1.5 } },
+            ]
+          };
+        },
+        data: isScatter
+          ? xData.map((x,i) => [parseFloat(x)||0, yDataArr[si][i]||0, errDataArr[si][i]])
+          : xData.map((x,i) => [i, yDataArr[si][i]||0, errDataArr[si][i]]),
+        z: 10,
+      });
+    });
+    // Barre di errore X (orizzontali, arancio) — scatter e line
+    if (xErrData.length > 0 && xErrData.some(v => v > 0)) {
+      const xErrColor = '#f0a020';
+      yCols.forEach((yCol, si) => {
+        errSeries.push({
+          type: 'custom', name: `xerr_${si}`,
+          legendHoverLink: false, showInLegend: false,
+          itemStyle: { color: xErrColor },
+          renderItem(params, api) {
+            const idx  = api.value(0);
+            const yVal = api.value(1);
+            const xerr = api.value(2);
+            if (!xerr || xerr === 0 || isNaN(xerr)) return { type:'group', children:[] };
+            let pt, ptL, ptR;
+            if (isScatter) {
+              pt  = api.coord([idx, yVal]);
+              ptL = api.coord([idx - xerr, yVal]);
+              ptR = api.coord([idx + xerr, yVal]);
+            } else {
+              // In modalità category, idx è l'indice della categoria
+              // Calcoliamo offset pixel proporzionale all'errore
+              pt  = api.coord([idx, yVal]);
+              // Stima larghezza categoria in pixel
+              const catW = params.coordSys.width / (xData.length || 1);
+              const xNum = parseFloat(xData[idx]) || idx;
+              const xRange = parseFloat(xData[xData.length-1]||1) - parseFloat(xData[0]||0) || 1;
+              const errPx = xerr / xRange * params.coordSys.width;
+              ptL = [pt[0] - errPx, pt[1]];
+              ptR = [pt[0] + errPx, pt[1]];
+            }
+            const hh = 5;
+            return { type:'group', children:[
+              { type:'line', shape:{x1:ptL[0],y1:pt[1],x2:ptR[0],y2:pt[1]}, style:{stroke:xErrColor,lineWidth:1.5} },
+              { type:'line', shape:{x1:ptL[0],y1:pt[1]-hh,x2:ptL[0],y2:pt[1]+hh}, style:{stroke:xErrColor,lineWidth:1.5} },
+              { type:'line', shape:{x1:ptR[0],y1:pt[1]-hh,x2:ptR[0],y2:pt[1]+hh}, style:{stroke:xErrColor,lineWidth:1.5} },
+            ]};
+          },
+          data: isScatter
+            ? xData.map((x,i)=>[parseFloat(x)||0, yDataArr[si][i]||0, xErrData[i]||0])
+            : xData.map((x,i)=>[i, yDataArr[si][i]||0, xErrData[i]||0]),
+          z: 11,
+        });
+      });
+    }
+
+    if (errSeries.length > 0) option.series = [...series, ...errSeries];
+
+    if (xData.length === 0) {
+      option.graphic = [{
+        type: 'text',
+        left: 'center', top: 'middle',
+        style: { text: 'Collega una tabella', fill: '#aaa', fontSize: 12, fontFamily: 'IBM Plex Mono,monospace' }
+      }];
+    }
+
+    entry.chart.setOption(option, true);
+  }
+}
+
+// Nasconde/mostra overlay durante la presentazione
+function hideChartOverlays() {
+  for (const [,e] of _chartOverlays) e.div.style.display = 'none';
+}
+function showChartOverlays() {
+  for (const [,e] of _chartOverlays) e.div.style.display = '';
+}
+
+// ═══ MODULE: body-vectors.js ═══
+// ─── Logica vettori corpo (condivisa tra point_mass e block) ────────────────
+function drawBodyVectors(g, el, cx, cy, anchorOverride) {
+      const p = el.props;
+      if (!p) return;
+
+      const ref     = getRefSystem();
+      const flipY   = ref?.props?.flipY;
+      const g_val   = parseFloat(ref?.props?.gravity) || 0;
+      const m       = parseFloat(p.mass) || 0;
+      const pesoFy  = (g_val > 0 && m > 0) ? (flipY ? +m*g_val : -m*g_val) : 0;
+      const pesoMag = Math.abs(pesoFy);
+      const bodyVisible = p.visible !== false;
+
+      // Forza fune sul corpo (se presente e fune nascosta)
+      const _ropeF = (typeof getRopeForceOnBody === 'function') ? getRopeForceOnBody(el) : null;
+      const _ropeFx = _ropeF ? _ropeF.fx : 0;
+      const _ropeFy = _ropeF ? _ropeF.fy : 0;
+
+      // Tensione Atwood (calcolata prima per escludere dal pulley obliquo)
+      const _atwoodF = (typeof getPulleyForceOnAtwoodBody === 'function') ? getPulleyForceOnAtwoodBody(el) : null;
+      const _atwoodFx = _atwoodF ? _atwoodF.fx : 0;
+      const _atwoodFy = _atwoodF ? _atwoodF.fy : 0;
+
+      // Tensione sistema corpo-carrucola-molla
+      const _bpsF = (typeof getPulleySpringForceOnBody === 'function') ? getPulleySpringForceOnBody(el) : null;
+      const _bpsFx = _bpsF ? _bpsF.fx : 0;
+      const _bpsFy = _bpsF ? _bpsF.fy : 0;
+
+      // Forza carrucola sul corpo (tensione dal corpo appeso) — esclusa per corpi Atwood e bps
+      const _pulleyF = (typeof getPulleyForceOnBody === 'function' && !_atwoodF && !_bpsF) ? getPulleyForceOnBodyCorrect(el) : null;
+      const _pulleyFx = _pulleyF ? _pulleyF.fx : 0;
+      const _pulleyFy = _pulleyF ? _pulleyF.fy : 0;
+
+      // Tensione fune sul corpo appeso (verso l'alto)
+      const _hangingF = (typeof getPulleyForceOnHangingBodyCorrect === 'function') ? getPulleyForceOnHangingBodyCorrect(el) : null;
+      const _hangingFx = _hangingF ? _hangingF.fx : 0;
+      const _hangingFy = _hangingF ? _hangingF.fy : 0;
+
+
+      // ── Raccoglie tutti i magnitudini attivi per trovare il massimo ──────────
+      const mags = [];
+
+      if (p.showV0) {
+        const planeCV0m = getPlaneConstraint(el);
+        if (planeCV0m) {
+          // Se in modalità "si stacca", usa v0x/v0y
+          const v0x_m = parseFloat(p.v0x)||0, v0y_m = parseFloat(p.v0y)||0;
+          const v0xy_m = Math.hypot(v0x_m, v0y_m);
+          const v0s_m  = Math.abs(parseFloat(p.v0s)||0);
+          const mag_m  = p.v0Mode === 'stacca' ? v0xy_m : v0s_m;
+          if (mag_m > 1e-9) mags.push(mag_m);
+          else mags.push(1);
+        } else {
+          const mag = Math.hypot(parseFloat(p.v0x)||0, parseFloat(p.v0y)||0);
+          if (mag > 1e-9) mags.push(mag);
+        }
+      }
+      if (p.showF) {
+        if (pesoMag > 1e-9) mags.push(pesoMag);
+        (p.forces||[]).forEach(f => {
+          const mag = Math.hypot(parseFloat(f.fx)||0, parseFloat(f.fy)||0);
+          if (mag > 1e-9) mags.push(mag);
+        });
+        // Forza elastica molla
+        const springFmag = getSpringForce(el);
+        if (springFmag && Math.abs(springFmag.F) > 1e-9) mags.push(Math.abs(springFmag.F));
+        // Tensione fune estremo libero e carrucola
+        if (typeof getRopeForceOnBody === 'function') {
+          const ropeFmag = getRopeForceOnBody(el);
+          if (ropeFmag) mags.push(Math.hypot(ropeFmag.fx, ropeFmag.fy));
+        }
+        if (Math.abs(_pulleyFx) > 1e-9 || Math.abs(_pulleyFy) > 1e-9) mags.push(Math.hypot(_pulleyFx, _pulleyFy));
+        if (Math.abs(_hangingFy) > 1e-9) mags.push(Math.abs(_hangingFy));
+        if (Math.abs(_atwoodFy) > 1e-9) mags.push(Math.abs(_atwoodFy));
+        if (Math.abs(_bpsFy) > 1e-9) mags.push(Math.abs(_bpsFy));
+      }
+      if (p.showR || p.showA) {
+        const planeC_mags = getPlaneConstraint(el);
+        if (planeC_mags) {
+          // Piano inclinato: usa Fpar per la scala
+          const plane_mags = elements.find(e => e.id === (planeC_mags.aId === el.id ? planeC_mags.bId : planeC_mags.aId));
+          if (plane_mags) {
+            const geo_mags = getPlaneGeometry(plane_mags);
+            const { Fx: Rx_m, Fy: Ry_m } = computeTotalForces(el);
+            const Fpar_mags = Math.abs(Rx_m*geo_mags.dx + Ry_m*geo_mags.dy);
+            if (Fpar_mags > 1e-9) {
+              if (p.showR) mags.push(Fpar_mags);
+              if (p.showA && m > 0) mags.push(Fpar_mags);
+            }
+          }
+        } else {
+          const { Fx: Rx, Fy: Ry } = computeTotalForces(el);
+          const Rmag = Math.hypot(Rx, Ry);
+          if (Rmag > 1e-9) {
+            if (p.showR) mags.push(Rmag);
+            if (p.showA && m > 0) mags.push(Rmag);
+          }
+        }
+      }
+      // N e attrito per scala
+      const constraintCheck = getBodyConstraint(el);
+      if (constraintCheck) {
+        let Fy_app = pesoFy;
+        (p.forces||[]).forEach(f => { Fy_app += parseFloat(f.fy)||0; });
+        const NMag = Math.abs(-Fy_app);
+        if (NMag > 1e-9) mags.push(NMag);
+        const muS = parseFloat(constraintCheck.props?.muS);
+        const muK = parseFloat(constraintCheck.props?.muK);
+        const v0x_val2 = parseFloat(p.v0x) || 0;
+        const isMoving2 = Math.abs(v0x_val2) > 1e-9;
+        if (isMoving2 && !isNaN(muK) && muK > 0 && NMag > 1e-9) {
+          mags.push(muK * NMag);
+        } else if (!isMoving2 && NMag > 1e-9) {
+          let Fx_ext2 = 0;
+          (p.forces||[]).forEach(f => { Fx_ext2 += parseFloat(f.fx)||0; });
+          const fsMax = (!isNaN(muS) && muS > 0) ? muS * NMag : 0;
+          if (Math.abs(Fx_ext2) <= fsMax) {
+            if (Math.abs(Fx_ext2) > 1e-9) mags.push(Math.abs(Fx_ext2));
+          } else {
+            // Scivola → usa muK
+            if (!isNaN(muK) && muK > 0) mags.push(muK * NMag);
+            else if (fsMax > 1e-9) mags.push(fsMax);
+          }
+        }
+      }
+      // Piano inclinato — N e attrito per scala
+      const planeCk = getPlaneConstraint(el);
+      if (planeCk) {
+        const planeEl = elements.find(e => e.id === (planeCk.aId === el.id ? planeCk.bId : planeCk.aId));
+        if (planeEl) {
+          const geo2    = getPlaneGeometry(planeEl);
+          const pesoMagCk = Math.abs(pesoFy);
+          // SVG dot product corretto (con parentesi!)
+          const Pperp2 = pesoMagCk * geo2.ny;
+          const Ppar2  = pesoMagCk * geo2.dy;
+          let Fep = 0, Fpp = 0;
+          (p.forces||[]).forEach(f => {
+            const fx = parseFloat(f.fx)||0, fy_fis = parseFloat(f.fy)||0;
+            Fep += fx * geo2.nx + (-fy_fis) * geo2.ny;
+            Fpp += fx * geo2.dx + (-fy_fis) * geo2.dy;
+          });
+          const NMag2 = Math.abs(Pperp2 + Fep);
+          if (NMag2 > 1e-9) mags.push(NMag2);
+          const muSp = parseFloat(planeCk.props?.muS);
+          const muKp = parseFloat(planeCk.props?.muK);
+          const v0s2 = parseFloat(p.v0s) || 0;
+          const isMovP = Math.abs(v0s2) > 1e-9;
+          if (isMovP && !isNaN(muKp) && muKp > 0) {
+            mags.push(muKp * NMag2);
+          } else if (!isMovP && !isNaN(muSp) && muSp > 0) {
+            const Fpar_tot2 = Ppar2 + Fpp;
+            const fsMax2 = muSp * NMag2;
+            if (Math.abs(Fpar_tot2) <= fsMax2) mags.push(Math.abs(Fpar_tot2));
+            else if (!isNaN(muKp) && muKp > 0) mags.push(muKp * NMag2);
+          }
+        }
+      }
+
+      // Parete — N e attrito per scala
+      const wallCk = getWallConstraint(el);
+      if (wallCk) {
+        let Fx_h = 0;
+        (p.forces||[]).forEach(f => { Fx_h += parseFloat(f.fx)||0; });
+        const NMagW = Math.abs(Fx_h);
+        if (NMagW > 1e-9 && Fx_h < 0) {
+          mags.push(NMagW);
+          const muSw = parseFloat(wallCk.props?.muS);
+          const muKw = parseFloat(wallCk.props?.muK);
+          const v0yw = parseFloat(p.v0y)||0;
+          const isMovW = Math.abs(v0yw) > 1e-9;
+          if (isMovW && !isNaN(muKw) && muKw > 0) mags.push(muKw * NMagW);
+          else if (!isMovW && !isNaN(muSw) && muSw > 0) {
+            const Fy_app_w = pesoFy + (p.forces||[]).reduce((s,f)=>s+(parseFloat(f.fy)||0),0);
+            mags.push(Math.min(Math.abs(Fy_app_w), muSw * NMagW));
+          }
+        }
+      }
+      const MAX_LEN = window._vectorScale || 70;
+      const MIN_LEN = Math.max(10, (window._vectorScale || 70) * 0.2);
+      // Se showV0 e nessun'altra forza, aggiungi un valore minimo per la scala
+      if (p.showV0 && mags.length === 0) mags.push(1);
+      const maxMagLocal = mags.length > 0 ? Math.max(...mags) : 1;
+      // Usa il riferimento fisso pre-calcolato da render.js (basato su slider max)
+      // se presente, altrimenti usa il massimo locale
+      const maxMag = (el._vecMaxMag && el._vecMaxMag > maxMagLocal)
+        ? el._vecMaxMag
+        : maxMagLocal;
+      const scale   = MAX_LEN / maxMag;
+      // Aggiorna _vecMaxMag per uso da parte della molla collegata
+      el._vecMaxMag = maxMag;
+
+      function vecLen(mag) {
+        return Math.max(MIN_LEN, mag * scale);
+      }
+
+      // Disegna freccia da (cx,cy) in direzione fisica (vx,vy)
+      function drawVec(vx, vy, col, label, dashed = false, labelSide = 'auto', ox = cx, oy = cy) {
+        const mag = Math.hypot(vx, vy);
+        if (mag < 1e-9) return;
+        const len = vecLen(mag);
+        drawVecFixed(vx, vy, col, label, dashed, labelSide, ox, oy, len);
+      }
+
+      function drawVecFixed(vx, vy, col, label, dashed = false, labelSide = 'auto', ox = cx, oy = cy, len) {
+        const ref2 = getRefSystem();
+        const ML2=50,W2=340,MR2=24,MB2=50,H2=300,MT2=24;
+        const axisW2=W2-ML2-MR2, axisH2=H2-MB2-MT2;
+        const hX2=Math.max(0.1,parseFloat(ref2?.props?.halfX)||5);
+        const hY2=Math.max(0.1,parseFloat(ref2?.props?.halfY)||5);
+        const sX = axisW2/(2*hX2), sY = axisH2/(2*hY2);
+        const sIso = Math.min(sX, sY);
+        const px_x = vx * sIso;
+        const px_y = flipY ? vy * sIso : -vy * sIso;
+        const pxMag = Math.hypot(px_x, px_y) || 1;
+        const ux = px_x / pxMag, uy = px_y / pxMag;
+        const ex = ox + ux * len;
+        const ey = oy + uy * len;
+        if (dashed) {
+          const dl = svgEl('line', { x1:ox, y1:oy, x2:ex, y2:ey,
+            stroke:col, 'stroke-width':2, 'stroke-dasharray':'5,3', 'pointer-events':'none' });
+          g.appendChild(dl);
+          const ang = Math.atan2(ey-oy, ex-ox);
+          const L=9, Wa=3.5;
+          g.appendChild(svgEl('polygon', { fill:col,
+            points:`${ex},${ey} ${ex-L*Math.cos(ang)+Wa*Math.sin(ang)},${ey-L*Math.sin(ang)-Wa*Math.cos(ang)} ${ex-L*Math.cos(ang)-Wa*Math.sin(ang)},${ey-L*Math.sin(ang)+Wa*Math.cos(ang)}` }));
+        } else {
+          arrow(g, ox, oy, ex, ey, col);
+        }
+        const LOFF = 8;
+        const svgDx = ex - ox, svgDy = ey - oy;
+        const svgMag = Math.hypot(svgDx, svgDy) || 1;
+        // Per vettori prevalentemente verticali: label a lato a metà freccia
+        // Per vettori prevalentemente orizzontali: label oltre la punta
+        let lx, ly, anchor;
+        if (Math.abs(uy) > Math.abs(ux)) {
+          const side = labelSide === 'left' ? -1 : 1;
+          lx = ox + svgDx/2 + side * 10;
+          ly = oy + svgDy/2 + 4;
+          anchor = side > 0 ? 'start' : 'end';
+        } else {
+          lx = ex + (svgDx / svgMag) * LOFF;
+          ly = ey + (svgDy / svgMag) * LOFF;
+          anchor = Math.abs(ux) > 0.5 ? (ux >= 0 ? 'start' : 'end') : 'middle';
+        }
+        text(g, lx, ly + 4, label, col, (window._vectorFontSize || 13)+'px', anchor);
+      }
+
+      // Peso — verso il basso fisico, disegnato in pixel con scaleY
+      function drawPeso(col) {
+        if (pesoMag < 1e-9) return;
+        const len = vecLen(pesoMag);
+        arrow(g, cx, cy, cx, cy + len, col);
+        // Label a destra a metà freccia
+        text(g, cx + 10, cy + len/2 + 4, 'P', col, '13px', 'start');
+      }
+
+      // ── Disegno vettori (solo se corpo visibile) ─────────────────────────
+      if (bodyVisible) {
+        if (p.showV0) {
+          const planeCV0 = getPlaneConstraint(el);
+          if (planeCV0) {
+            const planeV0 = elements.find(e => e.id === (planeCV0.aId === el.id ? planeCV0.bId : planeCV0.aId));
+            let planeNOk = false;
+            if (planeV0) {
+              const geoV0 = getPlaneGeometry(planeV0);
+              const Pperp = pesoFy * geoV0.ny_fis;
+              let Fep = 0;
+              (p.forces||[]).forEach(f => {
+                Fep += (parseFloat(f.fx)||0)*geoV0.nx_fis + (parseFloat(f.fy)||0)*geoV0.ny_fis;
+              });
+              // Considera anche il distacco da v₀
+              const v0x_chk = parseFloat(p.v0x)||0, v0y_chk = parseFloat(p.v0y)||0;
+              const vperp_chk = v0x_chk*geoV0.nx_fis + v0y_chk*geoV0.ny_fis;
+              planeNOk = (Pperp + Fep) < -1e-9 && vperp_chk <= 1e-6;
+            }
+            // Modalità "sul piano" E N valida → disegna v0s lungo ipotenusa
+            if (planeNOk && p.v0Mode !== 'stacca' && planeV0) {
+              const v0s = parseFloat(p.v0s) || 0;
+              if (Math.abs(v0s) > 1e-9) {
+                const geoV0 = getPlaneGeometry(planeV0);
+                // Usa physToPixDir per disegnare correttamente
+                const ref_v = getRefSystem();
+                const sXv=(340-50-24)/(2*Math.max(0.1,parseFloat(ref_v?.props?.halfX)||5));
+                const sYv=(300-50-24)/(2*Math.max(0.1,parseFloat(ref_v?.props?.halfY)||5));
+                const dir = v0s > 0 ? 1 : -1;
+                const sIsoV=Math.min(sXv,sYv);
+                const pxVx = dir*geoV0.dx_fis*sIsoV, pxVy = flipY ? dir*geoV0.dy_fis*sIsoV : -dir*geoV0.dy_fis*sIsoV;
+                const pxMag = Math.hypot(pxVx,pxVy)||1;
+                const len = vecLen(Math.abs(v0s));
+                const ex = cx + (pxVx/pxMag)*len, ey = cy + (pxVy/pxMag)*len;
+                arrow(g, cx, cy, ex, ey, '#60f0a0');
+                const angV0 = Math.atan2(ey-cy, ex-cx);
+                text(g, ex+8*Math.cos(angV0+Math.PI/2), ey+8*Math.sin(angV0+Math.PI/2)-2, 'v₀', '#60f0a0', '13px');
+              }
+            } else {
+              // Modalità "si stacca" o N non valida: disegna v0x/v0y
+              const v0x = parseFloat(p.v0x)||0, v0y = parseFloat(p.v0y)||0;
+              if (Math.hypot(v0x, v0y) > 1e-9) drawVec(v0x, v0y, '#60f0a0', 'v₀');
+            }
+          } else {
+            const v0x = parseFloat(p.v0x)||0, v0y = parseFloat(p.v0y)||0;
+            if (Math.hypot(v0x, v0y) > 1e-9) drawVec(v0x, v0y, '#60f0a0', 'v₀');
+          }
+        }
+
+        if (p.showF) {
+          drawPeso('#ffb347');
+          (p.forces||[]).forEach((f, i) => {
+            drawVec(parseFloat(f.fx)||0, parseFloat(f.fy)||0, '#f06090', f.name || `F${i+1}`);
+          });
+          // Forza elastica molla (se collegato)
+          const springFdraw = getSpringForce(el);
+          if (springFdraw && Math.abs(springFdraw.F) > 1e-9) {
+            drawVec(springFdraw.fx, springFdraw.fy, '#a060f0', 'Fₛ', false, 'left');
+          }
+          // Tensioni dal sistema di funi — usa solver NoSpring per corpi con molla
+          if (typeof getRopeSystemForceOnBody === 'function') {
+            const sysF = getRopeSystemForceOnBody(el);
+            if (sysF) {
+              const { T_left, T_right } = sysF;
+              if (T_left  && T_left  > 1e-9) drawVec(-T_left,  0, '#60a0f0', 'T');
+              if (T_right && T_right > 1e-9) drawVec( T_right, 0, '#60a0f0', 'T');
+            }
+          }
+          // Forza dalla carrucola — parte sempre dal centro del lato verso la carrucola
+          if (Math.abs(_pulleyFx) > 1e-9 || Math.abs(_pulleyFy) > 1e-9) {
+            const pulleyRopePt = (() => {
+              const ropeRel2 = relations.find(r =>
+                r.type === 'rope_body' && (r.aId === el.id || r.bId === el.id) &&
+                r.props?.anchor !== 'hanging'
+              );
+              if (!ropeRel2) return { x: cx, y: cy };
+              const ropeEl2 = elements.find(e => e.id === (ropeRel2.aId === el.id ? ropeRel2.bId : ropeRel2.aId));
+              if (!ropeEl2?._seg1) return { x: cx, y: cy };
+              const seg1Start = ropeEl2._seg1[0];
+              // drawBodyVectors è chiamato in counterG (de-ruotato) → usiamo offset canvas diretto
+              return {
+                x: seg1Start.x - el.x,
+                y: seg1Start.y - el.y
+              };
+            })();
+            drawVec(_pulleyFx, _pulleyFy, '#60a0f0', 'T', false, 'auto', pulleyRopePt.x, pulleyRopePt.y);
+          }
+          // Tensione fune sul corpo appeso — usa seg2End della fune
+          if (Math.abs(_hangingFx) > 1e-9 || Math.abs(_hangingFy) > 1e-9) {
+            // Usa scala del corpo sul piano per coerenza visiva
+            const planeBodyForScale = (() => {
+              const rr2 = relations.find(r => r.type==='rope_body' && (r.aId===el.id||r.bId===el.id) && r.props?.anchor==='hanging');
+              if (!rr2) return null;
+              const rope3 = elements.find(e => e.id===(rr2.aId===el.id?rr2.bId:rr2.aId));
+              if (!rope3) return null;
+              const pr3 = relations.find(r => r.type==='rope_body' && (r.aId===rope3.id||r.bId===rope3.id) && r.props?.anchor!=='hanging');
+              if (!pr3) return null;
+              return elements.find(e => e.id===(pr3.aId===rope3.id?pr3.bId:pr3.aId));
+            })();
+            const scaleRef = planeBodyForScale?._vecMaxMag;
+            const drawVecT = scaleRef
+              ? (vx, vy, col, label, dashed, side, ox, oy) => {
+                  const mag = Math.hypot(vx, vy);
+                  if (mag < 1e-9) return;
+                  const lenT = Math.max(MIN_LEN, mag * MAX_LEN / scaleRef);
+                  drawVecFixed(vx, vy, col, label, dashed, side, ox, oy, lenT);
+                }
+              : drawVec;
+            let _ropeEl3 = null;
+            const hangRopePt = (() => {
+              const ropeRel3 = relations.find(r =>
+                r.type === 'rope_body' && (r.aId === el.id || r.bId === el.id) &&
+                r.props?.anchor === 'hanging'
+              );
+              if (!ropeRel3) return { x: (DEFS[el.type]?.w||30)/2, y: 0 };
+              _ropeEl3 = elements.find(e => e.id === (ropeRel3.aId === el.id ? ropeRel3.bId : ropeRel3.aId));
+              if (!_ropeEl3?._seg2) return { x: (DEFS[el.type]?.w||30)/2, y: 0 };
+              const def3 = DEFS[el.type] || { w: 30, h: 30 };
+              const bodyRot = el._rotation?.angle;
+              if (bodyRot != null && Math.abs(bodyRot) > 1e-6) {
+                // Corpo ruotato — il punto di aggancio fune in coordinate locali del gruppo
+                // (prima della rotazione) è (seg2End.x - el.x, seg2End.y - el.y).
+                // In counterG (rotate(-angle, cx_rot, cy_rot)) questo diventa:
+                const cx_rot = el._rotation.cx || 0;
+                const cy_rot = el._rotation.cy || 0;
+                // Punto locale gruppo (non ruotato): aggancio fune
+                // Per corpo ruotato 90°: el.x = seg2StartX + h/2, seg2End.x = seg2StartX
+                // → punto locale = (-h/2, 0)
+                // In counterG rotate(-90°,0,0): (-h/2, 0) → (0, h/2)
+                // Usiamo formula generale con il punto locale effettivo
+                const seg2End3 = _ropeEl3._seg2[_ropeEl3._seg2.length - 1];
+                // seg2End e el.x sono entrambi in coordinate logiche (senza pan)
+                // Il gruppo SVG è traslato a (el.x + pan), quindi in coordinate locali
+                // del gruppo: seg2End - el.x (il pan si cancella)
+                const px3 = seg2End3.x - el.x;
+                const py3 = seg2End3.y - el.y;
+                return { x: px3, y: py3 };
+              }
+              // Corpo non ruotato: aggancio al centro del bordo superiore
+              return { x: def3.w / 2, y: 0 };
+            })();
+            drawVecT(_hangingFx, _hangingFy, '#60a0f0', 'T', false, 'auto', hangRopePt.x, hangRopePt.y);
+          }
+          // Tensione Atwood (verso l'alto) — parte dal bordo superiore
+          if (Math.abs(_atwoodFx) > 1e-9 || Math.abs(_atwoodFy) > 1e-9) {
+            const def_a = DEFS[el.type] || { w: 30, h: 30 };
+            drawVec(_atwoodFx, _atwoodFy, '#60a0f0', 'T', false, 'auto', def_a.w / 2, 0);
+          }
+          // Tensione corpo-carrucola-molla (verso l'alto)
+          if (Math.abs(_bpsFx) > 1e-9 || Math.abs(_bpsFy) > 1e-9) {
+            // Trova la fune collegata per ottenere seg2End
+            const bpsRopeRel = relations.find(r =>
+              r.type === 'rope_body' && (r.aId === el.id || r.bId === el.id) &&
+              r.props?.anchor === 'hanging'
+            );
+            let bpsAnchorPt = { x: (DEFS[el.type]?.w||30)/2, y: 0 };
+            if (bpsRopeRel && el._rotation?.angle != null && Math.abs(el._rotation.angle) > 1e-6) {
+              const bpsRopeEl = elements.find(e => e.id === (bpsRopeRel.aId === el.id ? bpsRopeRel.bId : bpsRopeRel.aId));
+              if (bpsRopeEl?._seg2) {
+                const bpsSeg2End = bpsRopeEl._seg2[bpsRopeEl._seg2.length - 1];
+                bpsAnchorPt = {
+                  x: bpsSeg2End.x - el.x,
+                  y: bpsSeg2End.y - el.y
+                };
+              }
+            }
+            drawVec(_bpsFx, _bpsFy, '#60a0f0', 'T', false, 'auto', bpsAnchorPt.x, bpsAnchorPt.y);
+          }
+          // Reazione vincolare trasversale molla
+          if (p.showN !== false && springFdraw) {
+            const anchor_sd = springFdraw.spring?.props?.anchor || 'left';
+            const horiz_sd  = anchor_sd === 'left' || anchor_sd === 'right';
+            const floorC_sd = getBodyConstraint(el);
+            const wallC_sd  = getWallConstraint(el);
+            const planeC_sd = getPlaneConstraint(el);
+            if (horiz_sd && !planeC_sd) {
+              // Molla orizzontale: Nₘ verticale
+              // Include forza fune nella componente verticale
+              const Fy_ext_sd = pesoFy + (p.forces||[]).reduce((s,f)=>s+(parseFloat(f.fy)||0),0) + _ropeFy;
+              const floorActive_sd = floorC_sd && (flipY ? Fy_ext_sd < 0 : Fy_ext_sd > 0);
+              const bodyLifted = flipY ? (Fy_ext_sd < -1e-9) : (Fy_ext_sd > 1e-9);
+              if (!floorC_sd || bodyLifted) {
+                const Ftrans = Fy_ext_sd;
+                if (Math.abs(Ftrans) > 1e-9) {
+                  drawVec(0, -Ftrans, '#60f0c0', 'N⊥');
+                }
+              }
+            } else if (!horiz_sd && !planeC_sd && !wallC_sd) {
+              // Molla verticale senza parete: Nₘ orizzontale
+              let FtransX = 0;
+              (p.forces||[]).forEach(f => { FtransX += parseFloat(f.fx)||0; });
+              FtransX += _ropeFx; // forza fune
+              if (Math.abs(FtransX) > 1e-9) {
+                drawVec(-FtransX, 0, '#60f0c0', 'N⊥');
+              }
+            }
+          }
+        }
+
+        if (p.showR) {
+        const planeC2 = getPlaneConstraint(el);
+        if (planeC2) {
+          const plane2 = elements.find(e => e.id === (planeC2.aId === el.id ? planeC2.bId : planeC2.aId));
+          if (plane2) {
+            const geo2     = getPlaneGeometry(plane2);
+            // Verifica N (fisica + distacco v₀) — include molla se sul piano
+            const Pperp_svg2 = pesoFy * geo2.ny_fis;
+            let Fext_perp2 = 0;
+            (p.forces||[]).forEach(f => {
+              Fext_perp2 += (parseFloat(f.fx)||0)*geo2.nx_fis + (parseFloat(f.fy)||0)*geo2.ny_fis;
+            });
+            // Includi forza elastica molla nella componente perpendicolare
+            const springFperp2 = getSpringForce(el);
+            let Fspring_perp2 = 0;
+            if (springFperp2) {
+              Fspring_perp2 = springFperp2.fx * geo2.nx_fis + springFperp2.fy * geo2.ny_fis;
+            }
+            const Nperp2  = Pperp_svg2 + Fext_perp2 + Fspring_perp2;
+            const v0x_r2b = parseFloat(p.v0x)||0, v0y_r2b = parseFloat(p.v0y)||0;
+            const detPl2  = (v0x_r2b*geo2.nx_fis + v0y_r2b*geo2.ny_fis) > 1e-6;
+            const NValid2 = Nperp2 < -1e-9 && !detPl2 && p.v0Mode !== 'stacca';
+
+            if (NValid2) {
+              // N valida: risultante parallela al piano
+              const Ppar_svg = pesoFy * geo2.dy_fis;
+              let Fext_par = 0;
+              (p.forces||[]).forEach(f => {
+                Fext_par += (parseFloat(f.fx)||0)*geo2.dx_fis + (parseFloat(f.fy)||0)*geo2.dy_fis;
+              });
+              const muSp = parseFloat(planeC2.props?.muS), muKp = parseFloat(planeC2.props?.muK);
+              const v0s2 = parseFloat(p.v0s)||0, isMovP = Math.abs(v0s2)>1e-9;
+              const NMag2 = Math.abs(Nperp2);
+              let Fpar_tot = Ppar_svg + Fext_par;
+              // Aggiungi forza elastica molla se presente sul piano
+              const springFpl2 = getSpringForce(el);
+              if (springFpl2) {
+                Fpar_tot += springFpl2.fx * geo2.dx_fis + springFpl2.fy * geo2.dy_fis;
+              }
+              // Aggiungi tensione carrucola su piano
+              if (typeof getPulleyForceOnBodyCorrect === 'function') {
+                const pulleyFpl2 = getPulleyForceOnBodyCorrect(el);
+                if (pulleyFpl2) {
+                  Fpar_tot += pulleyFpl2.fx * geo2.dx_fis + pulleyFpl2.fy * geo2.dy_fis;
+                }
+              }
+              // Aggiungi attrito dal solver carrucola-piano (già calcolato con segno corretto)
+              let pulleyRes2 = null;
+              if (typeof getPulleyForceOnBodyCorrect === 'function') {
+                pulleyRes2 = (() => {
+                  const rr = relations.find(r => r.type==='rope_body' && (r.aId===el.id||r.bId===el.id) && r.props?.anchor!=='hanging');
+                  if (!rr) return null;
+                  const rope2 = elements.find(e => e.id===(rr.aId===el.id?rr.bId:rr.aId));
+                  if (!rope2) return null;
+                  const pr = relations.find(r => r.type==='rope_on_pulley' && (r.aId===rope2.id||r.bId===rope2.id));
+                  if (!pr) return null;
+                  return getPulleySystemResult(rope2);
+                })();
+                if (pulleyRes2?.isOnInclinedPlane && pulleyRes2?.F_attrito) {
+                  Fpar_tot += pulleyRes2.F_attrito;
+                }
+              }
+              // Se il solver carrucola controlla il moto, usa il suo flag
+              const isMovP_bv = pulleyRes2?.isOnInclinedPlane
+                ? !pulleyRes2.attrito_statico
+                : isMovP;
+              if (pulleyRes2?.isOnInclinedPlane) {
+                if (!isMovP_bv && !isNaN(muSp) && muSp > 0) {
+                  // Statico: attrito cancella la forza netta residua
+                  const fs = Math.min(Math.abs(Fpar_tot), muSp * NMag2);
+                  Fpar_tot += Fpar_tot > 0 ? -fs : fs;
+                }
+                // Dinamico: attrito già incluso in F_attrito dal solver
+              } else if (isMovP_bv && !isNaN(muKp) && muKp>0) {
+                Fpar_tot += (v0s2>0?-1:1)*muKp*NMag2;
+              } else if (!isMovP_bv && !isNaN(muSp) && muSp>0) {
+                const fs = Math.min(Math.abs(Fpar_tot), muSp*NMag2);
+                Fpar_tot += Fpar_tot>0?-fs:fs;
+              }
+              if (Math.abs(Fpar_tot) > 1e-9) {
+                // Usa physToPixDir per direzione corretta
+                const ref_r2 = getRefSystem();
+                const sXr2=(340-50-24)/(2*Math.max(0.1,parseFloat(ref_r2?.props?.halfX)||5));
+                const sYr2=(300-50-24)/(2*Math.max(0.1,parseFloat(ref_r2?.props?.halfY)||5));
+                const sIsoR2=Math.min(sXr2,sYr2);
+                const dir = Fpar_tot > 0 ? 1 : -1;
+                const pxVx2 = dir*geo2.dx_fis*sIsoR2, pxVy2 = flipY ? dir*geo2.dy_fis*sIsoR2 : -dir*geo2.dy_fis*sIsoR2;
+                const pxMag2 = Math.hypot(pxVx2,pxVy2)||1;
+                const len = vecLen(Math.abs(Fpar_tot));
+                const ex = cx+(pxVx2/pxMag2)*len, ey = cy+(pxVy2/pxMag2)*len;
+                const dl = svgEl('line',{x1:cx,y1:cy,x2:ex,y2:ey,stroke:'#f0e060','stroke-width':2,'stroke-dasharray':'5,3','pointer-events':'none'});
+                g.appendChild(dl);
+                const ang2=Math.atan2(ey-cy,ex-cx); const L=9,W=3.5;
+                g.appendChild(svgEl('polygon',{fill:'#f0e060',points:`${ex},${ey} ${ex-L*Math.cos(ang2)+W*Math.sin(ang2)},${ey-L*Math.sin(ang2)-W*Math.cos(ang2)} ${ex-L*Math.cos(ang2)-W*Math.sin(ang2)},${ey-L*Math.sin(ang2)+W*Math.cos(ang2)}`}));
+                text(g, ex + 12*Math.cos(ang2), ey + 12*Math.sin(ang2) - 6, 'F', '#f0e060', '13px', 'middle');
+              }
+            } else {
+              // N=0 (si stacca o non valida): risultante libera = peso + forze esterne
+              const { Fx: Rx, Fy: Ry } = computeTotalForces(el);
+              drawVec(Rx, Ry, '#f0e060', 'F', true);
+            }
+          }
+        } else {
+          // Caso pavimento o parete o nessun vincolo
+          const wallC2 = getWallConstraint(el);
+          if (wallC2) {
+            const wallEl2 = elements.find(e => e.id === (wallC2.aId === el.id ? wallC2.bId : wallC2.aId));
+            const flipXW2 = wallEl2?.props?.flipX;
+            let Fx_w = 0;
+            (p.forces||[]).forEach(f => { Fx_w += parseFloat(f.fx)||0; });
+            const pushes2 = flipXW2 ? (Fx_w > 0) : (Fx_w < 0);
+            const NMagW2 = Math.abs(Fx_w);
+            const v0x_r2 = parseFloat(p.v0x)||0;
+            const detW2 = flipXW2 ? (v0x_r2<0) : (v0x_r2>0);
+            if (NMagW2 > 1e-9 && pushes2 && !detW2) {
+              // Con N: risultante è solo verticale
+              const springFW2 = getSpringForce(el);
+              const springFyW2 = springFW2 ? springFW2.fy : 0;
+              const Fy_tot2 = pesoFy + (p.forces||[]).reduce((s,f)=>s+(parseFloat(f.fy)||0),0) + springFyW2;
+              const muSw2 = parseFloat(wallC2.props?.muS), muKw2 = parseFloat(wallC2.props?.muK);
+              const v0y_w2 = parseFloat(p.v0y)||0, isMovW2 = Math.abs(v0y_w2)>1e-9;
+              const fsMaxW2 = (!isNaN(muSw2)&&muSw2>0) ? muSw2*NMagW2 : 0;
+              let Fy_res = Fy_tot2;
+              if (isMovW2 && !isNaN(muKw2) && muKw2>0) {
+                Fy_res += (v0y_w2>0?-1:1)*muKw2*NMagW2;
+              } else if (!isMovW2 && Math.abs(Fy_tot2)<=fsMaxW2) {
+                Fy_res = 0;
+              } else if (!isMovW2 && !isNaN(muKw2) && muKw2>0) {
+                Fy_res += (Fy_tot2>0?-1:1)*muKw2*NMagW2;
+              }
+              if (Math.abs(Fy_res) > 1e-9) {
+                drawVec(0, Fy_res, '#f0e060', 'F', true);
+              }
+            } else {
+              // Senza N (nessuna forza orizzontale): risultante libera = solo peso + forze verticali
+              const { Fx: Rx, Fy: Ry } = computeTotalForces(el);
+              drawVec(Rx, Ry, '#f0e060', 'F', true);
+            }
+          } else {
+            const { Fx: Rx, Fy: Ry } = computeTotalForces(el);
+            drawVec(Rx, Ry, '#f0e060', 'F', true);
+          }
+        }
+      }
+
+      if (p.showA && m > 0) {
+        const planeC3 = getPlaneConstraint(el);
+        if (planeC3) {
+          const plane3 = elements.find(e => e.id === (planeC3.aId === el.id ? planeC3.bId : planeC3.aId));
+          if (plane3) {
+            const geo3 = getPlaneGeometry(plane3);
+            // Verifica N con spazio fisico e distacco v₀ — include molla
+            const Pperp3 = pesoFy * geo3.ny_fis;
+            let Fep3 = 0;
+            (p.forces||[]).forEach(f => {
+              Fep3 += (parseFloat(f.fx)||0)*geo3.nx_fis + (parseFloat(f.fy)||0)*geo3.ny_fis;
+            });
+            const springFp3 = getSpringForce(el);
+            if (springFp3) Fep3 += springFp3.fx * geo3.nx_fis + springFp3.fy * geo3.ny_fis;
+            const v0x_a3 = parseFloat(p.v0x)||0, v0y_a3 = parseFloat(p.v0y)||0;
+            const detPl3 = (v0x_a3*geo3.nx_fis + v0y_a3*geo3.ny_fis) > 1e-6;
+            const NValid3 = (Pperp3 + Fep3) < -1e-9 && !detPl3 && p.v0Mode !== 'stacca';
+            const { Fx: Fx3, Fy: Fy3 } = computeTotalForces(el);
+            if (NValid3) {
+              // Vincolato: a parallela al piano — usa physToPixDir
+              const Fpar3 = Fx3*geo3.dx_fis + Fy3*geo3.dy_fis;
+              const a3 = Fpar3 / m;
+              if (Math.abs(a3) > 1e-9) {
+                const ref_a3 = getRefSystem();
+                const sXa3=(340-50-24)/(2*Math.max(0.1,parseFloat(ref_a3?.props?.halfX)||5));
+                const sYa3=(300-50-24)/(2*Math.max(0.1,parseFloat(ref_a3?.props?.halfY)||5));
+                const sIsoR2=Math.min(sXa3,sYa3);
+                const dir = a3 > 0 ? 1 : -1;
+                const pxAx = dir*geo3.dx_fis*sIsoR2, pxAy = flipY ? dir*geo3.dy_fis*sIsoR2 : -dir*geo3.dy_fis*sIsoR2;
+                const pxAMag = Math.hypot(pxAx,pxAy)||1;
+                const len = vecLen(Math.abs(Fpar3));
+                const ex = cx+(pxAx/pxAMag)*len, ey = cy+(pxAy/pxAMag)*len;
+                arrow(g, cx, cy, ex, ey, '#d060f0');
+                const ang3 = Math.atan2(ey-cy, ex-cx);
+                text(g, ex+8*Math.cos(ang3+Math.PI/2), ey+8*Math.sin(ang3+Math.PI/2)-2, 'a', '#d060f0', '13px');
+              }
+            } else {
+              // N=0 (si stacca): a libera
+              drawVec(Fx3/m, Fy3/m, '#d060f0', 'a');
+            }
+          }
+        } else {
+          // Caso parete: accelerazione è verticale se c'è N, altrimenti libera
+          const wallC3 = getWallConstraint(el);
+          if (wallC3) {
+            const wallEl3 = elements.find(e => e.id === (wallC3.aId === el.id ? wallC3.bId : wallC3.aId));
+            const flipXW3 = wallEl3?.props?.flipX;
+            let Fx_w3 = 0;
+            (p.forces||[]).forEach(f => { Fx_w3 += parseFloat(f.fx)||0; });
+            const pushes3 = flipXW3 ? (Fx_w3>0) : (Fx_w3<0);
+            const NMagW3 = Math.abs(Fx_w3);
+            const v0x_r3 = parseFloat(p.v0x)||0;
+            const detW3 = flipXW3 ? (v0x_r3<0) : (v0x_r3>0);
+            if (NMagW3 > 1e-9 && pushes3 && !detW3) {
+              const springFW3 = getSpringForce(el);
+              const springFyW3 = springFW3 ? springFW3.fy : 0;
+              const Fy_tot3 = pesoFy + (p.forces||[]).reduce((s,f)=>s+(parseFloat(f.fy)||0),0) + springFyW3;
+              const muSw3 = parseFloat(wallC3.props?.muS), muKw3 = parseFloat(wallC3.props?.muK);
+              const v0y_w3 = parseFloat(p.v0y)||0, isMovW3 = Math.abs(v0y_w3)>1e-9;
+              const fsMaxW3 = (!isNaN(muSw3)&&muSw3>0) ? muSw3*NMagW3 : 0;
+              let Fy_res3 = Fy_tot3;
+              if (isMovW3 && !isNaN(muKw3) && muKw3>0) {
+                Fy_res3 += (v0y_w3>0?-1:1)*muKw3*NMagW3;
+              } else if (!isMovW3 && Math.abs(Fy_tot3)<=fsMaxW3) {
+                Fy_res3 = 0;
+              } else if (!isMovW3 && !isNaN(muKw3) && muKw3>0) {
+                Fy_res3 += (Fy_tot3>0?-1:1)*muKw3*NMagW3;
+              }
+              if (Math.abs(Fy_res3) > 1e-9) {
+                drawVec(0, Fy_res3/m, '#d060f0', 'a');
+              }
+            } else {
+              // Nessuna N: accelerazione libera (solo peso + forze verticali)
+              const { Fx, Fy } = computeTotalForces(el);
+              drawVec(Fx/m, Fy/m, '#d060f0', 'a');
+            }
+          } else {
+            const { Fx, Fy } = computeTotalForces(el);
+            drawVec(Fx/m, Fy/m, '#d060f0', 'a');
+          }
+        }
+        }
+      } // fine bodyVisible
+
+      // Reazione vincolare N + attrito — visibili sempre (azione/reazione)
+      // ── Vincolo pavimento orizzontale ────────────────────────────────────
+      const constraint = getBodyConstraint(el);
+      if (constraint) {
+        const muS = parseFloat(constraint.props?.muS);
+        const muK = parseFloat(constraint.props?.muK);
+        const v0x_val = parseFloat(p.v0x) || 0;
+        const isMoving = Math.abs(v0x_val) > 1e-9;
+
+        // Se v₀y > 0 → corpo si stacca → N = 0
+        const v0y_draw = parseFloat(p.v0y) || 0;
+        const detaching_draw = flipY ? (v0y_draw < 0) : (v0y_draw > 0);
+
+        let Fy_app = pesoFy;
+        (p.forces||[]).forEach(f => { Fy_app += parseFloat(f.fy)||0; });
+        Fy_app += _ropeFy; // forza fune
+        // Aggiungi componente verticale della molla (influenza N)
+        const springF_N = getSpringForce(el);
+        if (springF_N) Fy_app += springF_N.fy;
+        const Ny   = detaching_draw ? 0 : -Fy_app;
+        const NMag = Math.abs(Ny);
+        const NUp  = !detaching_draw && (flipY ? (Ny < 0) : (Ny > 0));
+
+        // Punto di ancoraggio: centro corpo se visibile, superficie pavimento se nascosto
+        const floorEl = elements.find(e => e.id === (constraint.aId === el.id ? constraint.bId : constraint.aId));
+        const anchorX = cx;
+        const anchorY = bodyVisible ? cy : (floorEl ? floorEl.y + 10 - el.y : cy);
+
+          if (NUp && NMag > 1e-9 && p.showN !== false) {
+          const lenN = vecLen(NMag);
+          if (bodyVisible) {
+            arrow(g, anchorX, anchorY, anchorX, anchorY - lenN, '#60f0c0');
+            text(g, anchorX, anchorY - lenN - 6, 'N', '#60f0c0', '13px', 'middle');
+          } else {
+            arrow(g, anchorX, anchorY, anchorX, anchorY + lenN, '#60f0c0');
+            text(g, anchorX, anchorY + lenN + 14, '-N', '#60f0c0', '13px', 'middle');
+          }
+        }
+        if (NUp && NMag > 1e-9 && p.showFriction !== false) {
+          let Fx_ext = 0;
+          (p.forces||[]).forEach(f => { Fx_ext += parseFloat(f.fx)||0; });
+          Fx_ext += _ropeFx; // forza fune estremo libero
+          Fx_ext += _pulleyFx; // forza carrucola
+          // Aggiungi forza elastica orizzontale della molla
+          if (springF_N) Fx_ext += springF_N.fx;
+          // Aggiungi tensioni sistema di funi
+          if (typeof getRopeSystemForceOnBody === 'function') {
+            const sysF_fr = getRopeSystemForceOnBody(el);
+            if (sysF_fr) {
+              Fx_ext += sysF_fr.fx;
+            }
+          }
+          const sign = bodyVisible ? 1 : -1;
+
+          // drawVec usa cx,cy internamente — per corpo nascosto disegniamo manualmente
+          const drawVecAnchored = (fxVal, fyVal, col, label) => {
+            const mag = Math.hypot(fxVal, fyVal);
+            if (mag < 1e-9) return;
+            const len = vecLen(mag);
+            const ref_a = getRefSystem();
+            const sXa=(340-50-24)/(2*Math.max(0.1,parseFloat(ref_a?.props?.halfX)||5));
+            const sYa=(300-50-24)/(2*Math.max(0.1,parseFloat(ref_a?.props?.halfY)||5));
+            const sIsoA=Math.min(sXa,sYa);
+            const pxa=fxVal*sIsoA, pya=flipY?fyVal*sIsoA:-fyVal*sIsoA;
+            const pmag=Math.hypot(pxa,pya)||1;
+            const ux2=pxa/pmag, uy2=pya/pmag;
+            const ex2 = anchorX + ux2*len;
+            const ey2 = anchorY + uy2*len;
+            arrow(g, anchorX, anchorY, ex2, ey2, col);
+            const lx2 = ux2 >= 0 ? ex2+6 : ex2-6;
+            text(g, lx2, ey2-5, label, col, (window._vectorFontSize || 13)+'px', ux2>=0?'start':'end');
+          };
+
+          if (isMoving && !isNaN(muK) && muK > 0) {
+            const fk = muK * NMag;
+            const dir = v0x_val > 0 ? -1 : 1;
+            drawVecAnchored(sign * dir * fk, 0, '#f0c060', bodyVisible ? 'fₖ' : '-fₖ');
+          } else if (!isMoving && !isNaN(muS) && muS > 0 && Math.abs(Fx_ext) > 1e-9) {
+            const fsMax = muS * NMag;
+            const fs = Math.min(Math.abs(Fx_ext), fsMax);
+            drawVecAnchored(sign * (Fx_ext > 0 ? -fs : fs), 0, '#f0c060', bodyVisible ? 'fₛ' : '-fₛ');
+          }
+        }
+      }
+
+      // ── Vincolo piano inclinato ───────────────────────────────────────────
+      const planeC = getPlaneConstraint(el);
+      if (planeC) {
+        const plane = elements.find(e => e.id === (planeC.aId === el.id ? planeC.bId : planeC.aId));
+        if (plane) {
+          const geo     = getPlaneGeometry(plane);
+          const Pperp_svg = pesoFy * geo.ny_fis; // fisico
+          const Ppar_svg  = pesoFy * geo.dy_fis; // fisico
+          let Fext_perp = 0, Fext_par = 0;
+          (p.forces||[]).forEach(f => {
+            const fx = parseFloat(f.fx)||0, fy_fis = parseFloat(f.fy)||0;
+            Fext_perp += fx * geo.nx_fis + fy_fis * geo.ny_fis;
+            Fext_par  += fx * geo.dx_fis + fy_fis * geo.dy_fis;
+          });
+          const Nperp  = Pperp_svg + Fext_perp;
+          const NMag   = Math.abs(Nperp);
+          const v0x_dw = parseFloat(p.v0x)||0, v0y_dw = parseFloat(p.v0y)||0;
+          const detachingPlane_draw = (v0x_dw*geo.nx_fis + v0y_dw*geo.ny_fis) > 1e-6;
+          const NValid = NMag > 1e-9 && Nperp < 0 && !detachingPlane_draw;
+
+          // Punto di ancoraggio: anchorOverride se fornito (corpo nascosto su piano),
+          // altrimenti centro corpo se visibile, _contactLocal se nascosto
+          let acx, acy;
+          if (anchorOverride) {
+            acx = anchorOverride.x; acy = anchorOverride.y;
+          } else if (!bodyVisible && el._contactLocal) {
+            acx = el._contactLocal.x; acy = el._contactLocal.y;
+          } else {
+            acx = cx; acy = cy;
+          }
+
+          // Helper: converte direzione fisica in direzione pixel (unitaria)
+          const ref3 = getRefSystem();
+          const ML3=50,W3=340,MR3=24,MB3=50,H3=300,MT3=24;
+          const axisW3=W3-ML3-MR3, axisH3=H3-MB3-MT3;
+          const hX3=Math.max(0.1,parseFloat(ref3?.props?.halfX)||5);
+          const hY3=Math.max(0.1,parseFloat(ref3?.props?.halfY)||5);
+          const sX3=axisW3/(2*hX3), sY3=axisH3/(2*hY3);
+          // Scala isotropica: usa min(sX,sY) per coerenza visiva col piano
+          const sIso3 = Math.min(sX3, sY3);
+          function physToPixDir(vx_f, vy_f) {
+            const px = vx_f * sIso3;
+            const py = flipY ? vy_f * sIso3 : -vy_f * sIso3;
+            const m2 = Math.hypot(px, py) || 1;
+            return { ux: px/m2, uy: py/m2 };
+          }
+
+          if (NValid && p.showN !== false) {
+            const lenN = vecLen(NMag);
+            // N perpendicolare al piano SVG → usa geo.nx, geo.ny (pixel SVG)
+            if (bodyVisible) {
+              const ex = acx + geo.nx * lenN;
+              const ey = acy + geo.ny * lenN;
+              arrow(g, acx, acy, ex, ey, '#60f0c0');
+              const angN = Math.atan2(ey-acy, ex-acx);
+              text(g, ex + 8*Math.cos(angN), ey + 8*Math.sin(angN) + 4, 'N', '#60f0c0', '13px', 'middle');
+            } else {
+              const ex = acx - geo.nx * lenN;
+              const ey = acy - geo.ny * lenN;
+              arrow(g, acx, acy, ex, ey, '#60f0c0');
+              const angN = Math.atan2(ey-acy, ex-acx);
+              text(g, ex + 8*Math.cos(angN), ey + 8*Math.sin(angN) + 4, '-N', '#60f0c0', '13px', 'middle');
+            }
+          }
+
+          if (NValid && p.showFriction !== false) {
+            const muS = parseFloat(planeC.props?.muS);
+            const muK = parseFloat(planeC.props?.muK);
+            const v0s = parseFloat(p.v0s) || 0;
+            const isMoving = Math.abs(v0s) > 1e-9;
+            const sign = bodyVisible ? 1 : -1;
+            const dux = geo.dx, duy = geo.dy;
+
+            // Determina direzione attrito — se c'è carrucola su piano, usa solver
+            let frictionDir = null;
+            if (typeof getPulleySystemResult === 'function') {
+              const pulleyRes_fr = (() => {
+                const rr = relations.find(r => r.type==='rope_body' && (r.aId===el.id||r.bId===el.id) && r.props?.anchor!=='hanging');
+                if (!rr) return null;
+                const rope_fr = elements.find(e => e.id===(rr.aId===el.id?rr.bId:rr.aId));
+                if (!rope_fr) return null;
+                return getPulleySystemResult(rope_fr);
+              })();
+              if (pulleyRes_fr?.isOnInclinedPlane) {
+                // dirMotion: +1 = m1 sale (attrito verso il basso lungo piano = -1)
+                // dirMotion: -1 = m1 scende (attrito verso l'alto lungo piano = +1)
+                const dirMot = pulleyRes_fr.a_piano >= 0 ? 1 : -1;
+                frictionDir = -dirMot; // opposto al moto
+              }
+            }
+
+            // Calcola Fpar_tot inclusa tensione carrucola (per attrito statico)
+            let Fpar_tot_fr = Ppar_svg + Fext_par;
+            if (typeof getPulleyForceOnBodyCorrect === 'function') {
+              const pf_fr = getPulleyForceOnBodyCorrect(el);
+              if (pf_fr) Fpar_tot_fr += pf_fr.fx * geo.dx_fis + pf_fr.fy * geo.dy_fis;
+            }
+
+            if (isMoving && !isNaN(muK) && muK > 0) {
+              const fk = muK * NMag;
+              const dir = frictionDir ?? (v0s > 0 ? -1 : 1);
+              const lenF = vecLen(fk);
+              const ex = acx + sign * dir * dux * lenF;
+              const ey = acy + sign * dir * duy * lenF;
+              arrow(g, acx, acy, ex, ey, '#f0c060');
+              const angF = Math.atan2(ey-acy, ex-acx);
+              text(g, ex + 8*Math.cos(angF+Math.PI/2), ey + 8*Math.sin(angF+Math.PI/2) - 2, bodyVisible ? 'fₖ' : '-fₖ', '#f0c060', '13px');
+            } else if (!isMoving && !isNaN(muS) && muS > 0 && Math.abs(Fpar_tot_fr) > 1e-9) {
+              const fsMax = muS * NMag;
+              const fs = Math.min(Math.abs(Fpar_tot_fr), fsMax);
+              const dir = frictionDir ?? (Fpar_tot_fr > 0 ? -1 : 1);
+              const lenF = vecLen(fs);
+              const ex = acx + sign * dir * dux * lenF;
+              const ey = acy + sign * dir * duy * lenF;
+              arrow(g, acx, acy, ex, ey, '#f0c060');
+              const angF = Math.atan2(ey-acy, ex-acx);
+              text(g, ex + 8*Math.cos(angF+Math.PI/2), ey + 8*Math.sin(angF+Math.PI/2) - 2, bodyVisible ? 'fₛ' : '-fₛ', '#f0c060', '13px');
+            }
+          }
+          // Se N=0 e c'è molla sul piano → N⊥ della molla
+          if (!NValid && p.showN !== false) {
+            const springF_pl_bv = getSpringForce(el);
+            if (springF_pl_bv) {
+              const isOnPlane_bv = relations.some(r =>
+                r.type === 'spring_on_plane' && (r.aId === springF_pl_bv.spring.id || r.bId === springF_pl_bv.spring.id)
+              );
+              if (isOnPlane_bv) {
+                const Fx_tot_bv = springF_pl_bv.fx + (p.forces||[]).reduce((s,f)=>s+(parseFloat(f.fx)||0),0);
+                const Fy_tot_bv = pesoFy + springF_pl_bv.fy + (p.forces||[]).reduce((s,f)=>s+(parseFloat(f.fy)||0),0);
+                const Fperp_bv = Fx_tot_bv * geo.nx_fis + Fy_tot_bv * geo.ny_fis;
+                if (Math.abs(Fperp_bv) > 1e-9) {
+                  const lenN_bv = vecLen(Math.abs(Fperp_bv));
+                  const ex_bv = acx - Math.sign(Fperp_bv) * geo.nx * lenN_bv;
+                  const ey_bv = acy - Math.sign(Fperp_bv) * geo.ny * lenN_bv;
+                  arrow(g, acx, acy, ex_bv, ey_bv, '#60f0c0');
+                  const angN_bv = Math.atan2(ey_bv-acy, ex_bv-acx);
+                  text(g, ex_bv+8*Math.cos(angN_bv), ey_bv+8*Math.sin(angN_bv)+4, 'N⊥', '#60f0c0', '13px', 'middle');
+                }
+              }
+            }
+          }
+        }
+      }
+      const wallC = getWallConstraint(el);
+      if (wallC) {
+        const wallEl  = elements.find(e => e.id === (wallC.aId === el.id ? wallC.bId : wallC.aId));
+        const flipXW  = wallEl?.props?.flipX;
+        const Ndir    = flipXW ? -1 : 1;
+
+        // Punto di ancoraggio: centro corpo se visibile, superficie parete se nascosto
+        // Superficie parete: lx=13 (flipX=false) o lx=0 (flipX=true) in coord locali parete
+        // In coord locali del corpo: wallEl.x + lx - el.x
+        let wAnchorX = cx, wAnchorY = cy;
+        if (!bodyVisible && wallEl) {
+          const wallLx = flipXW ? 0 : 13;
+          wAnchorX = wallEl.x + wallLx - el.x;
+          // Y: mantieni cy (stessa altezza del corpo)
+        }
+
+        let Fx_tot = 0;
+        (p.forces||[]).forEach(f => { Fx_tot += parseFloat(f.fx)||0; });
+        const pushesWall = flipXW ? (Fx_tot > 0) : (Fx_tot < 0);
+        const NMag_w   = Math.abs(Fx_tot);
+        // v₀x nel verso di allontanamento → si stacca → N = 0
+        const v0x_draw = parseFloat(p.v0x) || 0;
+        const detachingWall_draw = flipXW ? (v0x_draw < 0) : (v0x_draw > 0);
+        const NValid_w = NMag_w > 1e-9 && pushesWall && !detachingWall_draw;
+
+        if (NValid_w && p.showN !== false) {
+          const lenN = vecLen(NMag_w);
+          if (bodyVisible) {
+            arrow(g, wAnchorX, wAnchorY, wAnchorX + Ndir * lenN, wAnchorY, '#60f0c0');
+            text(g, wAnchorX + Ndir * (lenN + 8), wAnchorY + 4, 'N', '#60f0c0', '13px', Ndir > 0 ? 'start' : 'end');
+          } else {
+            arrow(g, wAnchorX, wAnchorY, wAnchorX - Ndir * lenN, wAnchorY, '#60f0c0');
+            text(g, wAnchorX - Ndir * (lenN + 8), wAnchorY + 4, '-N', '#60f0c0', '13px', Ndir > 0 ? 'end' : 'start');
+          }
+        }
+
+        if (NValid_w && p.showFriction !== false) {
+          const muS = parseFloat(wallC.props?.muS);
+          const muK = parseFloat(wallC.props?.muK);
+          const v0y_w = parseFloat(p.v0y) || 0;
+          const isMoving_w = Math.abs(v0y_w) > 1e-9;
+          const Fy_tot = pesoFy + (p.forces||[]).reduce((s,f) => s+(parseFloat(f.fy)||0), 0);
+          const sign = bodyVisible ? 1 : -1;
+          const fsMax = (!isNaN(muS) && muS > 0) ? muS * NMag_w : 0;
+
+          if (isMoving_w && !isNaN(muK) && muK > 0) {
+            const fk = muK * NMag_w;
+            const fSvgY = v0y_w > 0 ? 1 : -1;
+            const lenF = vecLen(fk);
+            const eyF = wAnchorY + sign * fSvgY * lenF;
+            arrow(g, wAnchorX, wAnchorY, wAnchorX, eyF, '#f0c060');
+            text(g, wAnchorX, eyF + (sign * fSvgY > 0 ? 14 : -4), bodyVisible ? 'fₖ' : '-fₖ', '#f0c060', '13px', 'middle');
+          } else if (!isMoving_w && Math.abs(Fy_tot) > 1e-9) {
+            const fs = Math.min(Math.abs(Fy_tot), fsMax);
+            if (fs > 1e-9) {
+              const fSvgY = Fy_tot < 0 ? -1 : 1;
+              const lenF = vecLen(fs);
+              const eyF = wAnchorY + sign * fSvgY * lenF;
+              arrow(g, wAnchorX, wAnchorY, wAnchorX, eyF, '#f0c060');
+              text(g, wAnchorX, eyF + (sign * fSvgY > 0 ? 14 : -4), bodyVisible ? 'fₛ' : '-fₛ', '#f0c060', '13px', 'middle');
+            }
+          }
+        }
+        if (!NValid_w && p.showN !== false) {
+          // N parete = 0: se c'è molla verticale, essa fornisce vincolo trasversale in X
+          // N⊥ punta VERSO la parete (trattiene il corpo che vuole allontanarsi)
+          const springCW_bv = getSpringConstraint(el);
+          if (springCW_bv) {
+            const springW_bv = elements.find(e => e.id === (springCW_bv.aId === el.id ? springCW_bv.bId : springCW_bv.aId));
+            if (springW_bv) {
+              const anchorW_bv = springW_bv.props?.anchor || 'left';
+              const vertW_bv = anchorW_bv === 'top' || anchorW_bv === 'bottom';
+              if (vertW_bv && NMag_w > 1e-9) {
+                const lenN = vecLen(NMag_w);
+                // N⊥ verso la parete = direzione opposta a Ndir
+                arrow(g, wAnchorX, wAnchorY, wAnchorX - Ndir * lenN, wAnchorY, '#60f0c0');
+                text(g, wAnchorX - Ndir * (lenN + 8), wAnchorY + 4, 'N⊥', '#60f0c0', '13px', Ndir > 0 ? 'end' : 'start');
+              }
+            }
+          }
+        }
+      }
+    }
+
+// ═══ MODULE: physics.js ═══
+// ─── Riepilogo calcolato ──────────────────────────────────────────────────────
+// Reazione vincolare sul piano inclinato (s in metri dal vertice basso)
+function getPlaneConstraint(el) {
+  return relations.find(r => {
+    if (r.type !== 'body_on_plane') return false;
+    return r.aId === el.id || r.bId === el.id;
+  });
+}
+
+// Geometria piano inclinato per un dato elemento piano
+function getPlaneGeometry(plane) {
+  const ref = getRefSystem();
+  const ML=50,W=340,MR=24,MB=50,H=300,MT=24;
+  const axisW=W-ML-MR, axisH=H-MB-MT;
+  const halfX=Math.max(0.1,parseFloat(ref?.props?.halfX)||5);
+  const halfY=Math.max(0.1,parseFloat(ref?.props?.halfY)||5);
+  const scaleX=ref?axisW/(2*halfX):18;
+  const scaleY=ref?axisH/(2*halfY):18;
+  const scaleIso=Math.min(scaleX,scaleY); // scala isotropica per pixel SVG
+  const d = getInclinedPlaneDims(plane, scaleIso, scaleIso); // pixel isotropici
+  const flipX = plane.props?.flipX;
+  const bPx = Math.max(20, d.basePx);
+  const hPx = Math.max(10, d.heightPx);
+  // In coordinate locali del piano:
+  // flipX=false: basso=(0,hPx), alto=(bPx,0)
+  // flipX=true:  basso=(bPx,hPx), alto=(0,0)
+  const x0 = flipX ? bPx : 0;
+  const y0 = hPx;
+  const x1 = flipX ? 0 : bPx;
+  const y1 = 0;
+  const lenPx = Math.hypot(x1-x0, y1-y0);
+  // Direzione unitaria lungo l'ipotenusa in SVG (dal basso verso l'alto)
+  const dx = (x1-x0)/lenPx, dy = (y1-y0)/lenPx;
+  // Normale perpendicolare all'ipotenusa verso l'esterno del triangolo
+  // Ruota +90°: (dx,dy) → (-dy, dx) — ma questo punta verso l'interno
+  // Ruota -90°: (dx,dy) → (dy, -dx) — punta verso l'esterno (lontano dalla base)
+  // Per flipX=false: dx>0, dy<0 → (dy,-dx) = (-,- ) → alto-sinistra ✓
+  // Per flipX=true:  dx<0, dy<0 → (dy,-dx) = (-,+)... verifica sotto
+  let nx = dy, ny = -dx;
+  if (ny > 0) { nx = -dy; ny = dx; }
+
+  // Direzioni in spazio fisico (per prodotti scalari con forze fisiche)
+  // Con scaleIso isotropico: x_fis = x_px / scaleIso, y_fis = -y_px / scaleIso
+  const dx_fis_raw = (x1-x0) / scaleIso;
+  const dy_fis_raw = -(y1-y0) / scaleIso;
+  const lenFis = Math.hypot(dx_fis_raw, dy_fis_raw) || 1;
+  const dx_fis = dx_fis_raw / lenFis;
+  const dy_fis = dy_fis_raw / lenFis;
+  // Normale fisica: perp a (dx_fis, dy_fis), punta verso l'alto fisico (ny_fis > 0)
+  let nx_fis = -dy_fis, ny_fis = dx_fis;
+  if (ny_fis < 0) { nx_fis = dy_fis; ny_fis = -dx_fis; }
+
+  return {
+    angle: d.angle,
+    scaleX, scaleY,
+    lenPx, lenM: d.length,
+    x0, y0, x1, y1, dx, dy, nx, ny,
+    dx_fis, dy_fis, nx_fis, ny_fis,
+    bPx, hPx, flipX
+  };
+}
+// Vincolo corpo su parete
+function getWallConstraint(el) {
+  return relations.find(r => {
+    if (r.type !== 'body_on_wall') return false;
+    return r.aId === el.id || r.bId === el.id;
+  });
+}
+
+function getWallGeometry(wall) {
+  const ref = getRefSystem();
+  const MB=50, H=300, MT=24;
+  const axisH = H - MB - MT;
+  const halfY = Math.max(0.1, parseFloat(ref?.props?.halfY) || 5);
+  const scaleY = ref ? axisH / (2 * halfY) : 13;
+  const yMin = parseFloat(wall.props?.yMin) ?? 0;
+  const yMax = parseFloat(wall.props?.yMax) ?? 10;
+  const lenPx = Math.max(20, Math.round((yMax - yMin) * scaleY));
+  // La normale alla parete punta verso destra (o sinistra) — sempre orizzontale
+  // La parete ha la superficie a x locale = 20px
+  return { scaleY, lenPx, lenM: yMax - yMin, yMin };
+}
+
+function computeTotalForces(el) {
+  const ref    = getRefSystem();
+  const g      = parseFloat(ref?.props?.gravity) || 0;
+  const flipY  = ref?.props?.flipY;
+  const m      = parseFloat(el.props?.mass) || 0;
+  const pesoFy = (g > 0 && m > 0) ? (flipY ? +m*g : -m*g) : 0;
+
+  let Fx = 0, Fy = pesoFy;
+  for (const f of (el.props?.forces || [])) {
+    Fx += parseFloat(f.fx) || 0;
+    Fy += parseFloat(f.fy) || 0;
+  }
+
+  // ── Forza elastica molla (aggiunta PRIMA dei vincoli per corretto calcolo N) ─
+  const springF_early = getSpringForce(el);
+  let springAdded = false;
+  if (springF_early) {
+    Fx += springF_early.fx;
+    Fy += springF_early.fy;
+    springAdded = true;
+  }
+
+  // ── Forza fune ─────────────────────────────────────────────────────────────
+  if (typeof getRopeForceOnBody === 'function') {
+    const ropeF_early = getRopeForceOnBody(el);
+    if (ropeF_early) {
+      Fx += ropeF_early.fx;
+      Fy += ropeF_early.fy;
+    }
+  }
+
+  // ── Tensioni sistema funi (entrambe estremità collegate) ───────────────────
+  if (typeof getRopeSystemForceOnBody === 'function') {
+    const sysF_early = getRopeSystemForceOnBody(el);
+    if (sysF_early) {
+      // T_left tira verso sinistra, T_right verso destra — netFx già calcolato
+      Fx += sysF_early.fx;
+    }
+  }
+
+  // ── Forza carrucola (tensione dal corpo appeso) — solo per corpo su piano, non Atwood ──
+  if (typeof getPulleyForceOnBody === 'function') {
+    const isAtwoodBody = typeof getPulleyForceOnAtwoodBody === 'function' && getPulleyForceOnAtwoodBody(el);
+    if (!isAtwoodBody) {
+      const pulleyF_early = getPulleyForceOnBodyCorrect(el);
+      if (pulleyF_early) {
+        Fx += pulleyF_early.fx;
+        Fy += pulleyF_early.fy;
+      }
+    }
+  }
+
+  // ── Forza tensione fune sul corpo appeso ───────────────────────────────────
+  if (typeof getPulleyForceOnHangingBodyCorrect === "function") {
+    const hangF_early = getPulleyForceOnHangingBodyCorrect(el);
+    if (hangF_early) {
+      Fx += hangF_early.fx;
+      Fy += hangF_early.fy;
+    }
+  }
+
+  // ── Forza tensione corpo Atwood ────────────────────────────────────────────
+  if (typeof getPulleyForceOnAtwoodBody === 'function') {
+    const atwoodF_early = getPulleyForceOnAtwoodBody(el);
+    if (atwoodF_early) { Fx += atwoodF_early.fx; Fy += atwoodF_early.fy; }
+  }
+
+  // ── Forza tensione sistema corpo-carrucola-molla ───────────────────────────
+  if (typeof getPulleySpringForceOnBody === 'function') {
+    const bpsF_early = getPulleySpringForceOnBody(el);
+    if (bpsF_early) { Fx += bpsF_early.fx; Fy += bpsF_early.fy; }
+  }
+
+  // ── Vincolo pavimento orizzontale ──────────────────────────────────────────
+  const floorC = getBodyConstraint(el);
+  let Ny = 0, friction = null;
+  if (floorC) {
+    const v0y_floor = parseFloat(el.props?.v0y) || 0;
+    const detaching = flipY ? (v0y_floor < 0) : (v0y_floor > 0);
+    if (!detaching) {
+      Ny = -Fy;
+      const NUp = flipY ? (Ny < 0) : (Ny > 0);
+      if (NUp || Math.abs(Ny) < 1e-9) {
+        Fy += Ny; // azzera Fy (equilibrio verticale)
+      }
+    }
+  }
+
+  // ── Vincolo piano inclinato ────────────────────────────────────────────────
+  const planeC = getPlaneConstraint(el);
+  let planeN = null;
+  if (planeC) {
+    const plane = elements.find(e => e.id === (planeC.aId === el.id ? planeC.bId : planeC.aId));
+    if (plane) {
+      const geo     = getPlaneGeometry(plane);
+      const pesoMag = Math.abs(pesoFy);
+      // In SVG: peso punta sempre verso il basso (cy+), indipendentemente da flipY
+      // Proiezioni nel spazio fisico
+      // Peso fisico: (0, pesoFy) dove pesoFy = -m*g (flipY=false) o +m*g (flipY=true)
+      const Pperp_fis = 0 * geo.nx_fis + pesoFy * geo.ny_fis;
+      const Ppar_fis  = 0 * geo.dx_fis + pesoFy * geo.dy_fis;
+      let Fext_par = 0, Fext_perp = 0;
+      for (const f of (el.props?.forces || [])) {
+        const fx = parseFloat(f.fx)||0, fy_fis = parseFloat(f.fy)||0;
+        // Proietta nello spazio fisico (dx_fis, dy_fis, nx_fis, ny_fis)
+        Fext_par  += fx * geo.dx_fis + fy_fis * geo.dy_fis;
+        Fext_perp += fx * geo.nx_fis + fy_fis * geo.ny_fis;
+      }
+      const Nperp  = Pperp_fis + Fext_perp;
+      const NMag   = Math.abs(Nperp);
+      // Se v₀ ha componente perpendicolare al piano verso l'esterno → si stacca → N = 0
+      const v0x_pl = parseFloat(el.props?.v0x) || 0;
+      const v0y_pl = parseFloat(el.props?.v0y) || 0;
+      const vperp_pl = v0x_pl * geo.nx_fis + v0y_pl * geo.ny_fis;
+      const detachingPlane = vperp_pl > 1e-6;
+      const NValid = NMag > 1e-9 && Nperp < 0 && !detachingPlane;
+
+      // Includi forza elastica nella componente parallela
+      let Fspring_par = 0;
+      if (springAdded && springF_early) {
+        Fspring_par = springF_early.fx * geo.dx_fis + springF_early.fy * geo.dy_fis;
+      }
+      // Includi forza carrucola nella componente parallela
+      let Fpulley_par = 0;
+      let pulleyResult = null;
+      if (typeof getPulleyForceOnBodyCorrect === 'function') {
+        const pf = getPulleyForceOnBodyCorrect(el);
+        if (pf) {
+          Fpulley_par = (pf.fx||0) * geo.dx_fis + (pf.fy||0) * geo.dy_fis;
+          // Recupera risultato completo per flag attrito_statico
+          if (typeof getPulleySystemResult === 'function') {
+            const ropeRel2 = relations.find(r =>
+              r.type === 'rope_body' && (r.aId === el.id || r.bId === el.id) && r.props?.anchor !== 'hanging'
+            );
+            const ropeEl2 = ropeRel2 ? elements.find(e =>
+              e.id === (ropeRel2.aId === el.id ? ropeRel2.bId : ropeRel2.aId) && e.type === 'rope'
+            ) : null;
+            if (ropeEl2) pulleyResult = getPulleySystemResult(ropeEl2);
+          }
+        }
+      }
+      const Fpar_tot_fis = Ppar_fis + Fext_par + Fspring_par + Fpulley_par;
+      planeN = { NMag, NValid, geo, Ppar: Ppar_fis, Fext_par };
+      if (NValid) {
+        // N sul corpo: direzione nx_fis, ny_fis (nello spazio fisico)
+        Fx += NMag * geo.nx_fis;
+        Fy += NMag * geo.ny_fis;
+        const muS = parseFloat(planeC.props?.muS);
+        const muK = parseFloat(planeC.props?.muK);
+        const v0s = parseFloat(el.props?.v0s) || 0;
+        // Se il sistema carrucola determina moto, sovrascriviamo isMoving
+        let isMoving = Math.abs(v0s) > 1e-9;
+        if (pulleyResult !== null) {
+          // pulleyResult.attrito_statico=true → statico, false → dinamico
+          if (!pulleyResult.attrito_statico) isMoving = true;
+          else isMoving = false;
+        }
+        const Fpar_tot = Fpar_tot_fis;
+
+        if (isMoving) {
+          if (!isNaN(muK) && muK > 0) {
+            const fk = muK * NMag;
+            // Direzione: da v0s se disponibile, altrimenti da solvePulleySystem
+            let dir;
+            if (Math.abs(v0s) > 1e-9) {
+              dir = v0s > 0 ? -1 : 1;
+            } else if (pulleyResult) {
+              // a_piano > 0 → corpo sale → attrito verso il basso → dir=-1
+              dir = (pulleyResult.a_piano || 0) >= 0 ? -1 : 1;
+            } else {
+              dir = Fpar_tot_fis > 0 ? 1 : -1;
+            }
+            Fx += dir * fk * geo.dx_fis;
+            Fy += dir * fk * geo.dy_fis;
+            planeN.friction = { type: 'dynamic', value: fk };
+          }
+        } else {
+          const fsMax = (!isNaN(muS) && muS > 0) ? muS * NMag : 0;
+          if (Math.abs(Fpar_tot) <= fsMax) {
+            const dir = Fpar_tot > 0 ? -1 : 1;
+            Fx += dir * Math.abs(Fpar_tot) * geo.dx_fis;
+            Fy += dir * Math.abs(Fpar_tot) * geo.dy_fis;
+            planeN.friction = { type: 'static', value: Math.abs(Fpar_tot), max: fsMax, sliding: false };
+          } else {
+            if (!isNaN(muK) && muK > 0) {
+              const fk = muK * NMag;
+              const dir = Fpar_tot > 0 ? 1 : -1;
+              Fx += (-dir) * fk * geo.dx_fis;
+              Fy += (-dir) * fk * geo.dy_fis;
+              planeN.friction = { type: 'dynamic', value: fk, sliding: true };
+            } else {
+              // Nessun muK → attrito statico si oppone fino al max, corpo scivola senza attrito din.
+              planeN.friction = { type: 'static', value: fsMax, max: fsMax, sliding: true };
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // ── Forza elastica molla (già aggiunta all'inizio) ─────────────────────────
+  if (!springAdded) {
+    const springF_ctf = getSpringForce(el);
+    if (springF_ctf) {
+      Fx += springF_ctf.fx;
+      Fy += springF_ctf.fy;
+    }
+  }
+
+  // ── Vincolo trasversale molla ──────────────────────────────────────────────
+  // Molla orizzontale azzera Fy se: nessun altro vincolo, oppure pavimento con N=0
+  // Molla verticale azzera Fx se: nessun altro vincolo (parete gestisce il caso N>0)
+  {
+    const springF_tr = springAdded ? springF_early : getSpringForce(el);
+    if (springF_tr) {
+      const anchor_tr = springF_tr.spring.props?.anchor || 'left';
+      const horiz_tr  = anchor_tr === 'left' || anchor_tr === 'right';
+      const hasFloor  = !!floorC;
+      const hasWall   = !!getWallConstraint(el);
+      const hasPlane  = !!getPlaneConstraint(el);
+      // Controlla prima se è molla sul piano (ha priorità sull'anchor)
+      const springOnPlane_tr = relations.some(r =>
+        r.type === 'spring_on_plane' && (r.aId === springF_tr.spring.id || r.bId === springF_tr.spring.id)
+      );
+
+      if (springOnPlane_tr && hasPlane) {
+        // Molla sul piano: se N=0 (corpo si solleva), azzera componente perp. al piano
+        if (planeN && !planeN.NValid) {
+          const geo_tr = planeN.geo;
+          const Fperp_tr = Fx * geo_tr.nx_fis + Fy * geo_tr.ny_fis;
+          Fx -= Fperp_tr * geo_tr.nx_fis;
+          Fy -= Fperp_tr * geo_tr.ny_fis;
+        }
+      } else if (horiz_tr) {
+        // Molla orizzontale: vincolo trasversale in Y
+        const NUp_tr = flipY ? (Ny < 0) : (Ny > 0);
+        if (!hasFloor && !hasPlane) {
+          Fy = 0;
+        } else if (hasFloor && !NUp_tr) {
+          Fy = 0;
+        }
+      } else if (hasPlane) {
+        // Molla sul piano (caso generico): già gestito sopra
+      } else {
+        // Molla verticale: vincolo trasversale in X
+        if (!hasWall && !hasPlane) {
+          Fx = 0;
+        }
+      }
+    }
+  }
+
+  // ── Attrito pavimento (calcolato dopo la forza elastica) ───────────────────
+  if (floorC && Math.abs(Ny) >= 0) {
+    const NMag = Math.abs(Ny);
+    if (NMag > 1e-9) {
+      const muS = parseFloat(floorC.props?.muS);
+      const muK = parseFloat(floorC.props?.muK);
+      const v0x = parseFloat(el.props?.v0x) || 0;
+      const isMoving = Math.abs(v0x) > 1e-9;
+      if (isMoving && !isNaN(muK) && muK > 0) {
+        const fk = muK * NMag;
+        Fx += (v0x > 0 ? -1 : 1) * fk;
+        friction = { type: 'dynamic', value: fk };
+      } else if (!isMoving && !isNaN(muS) && muS > 0) {
+        const fsMax = muS * NMag;
+        const fs = Math.min(Math.abs(Fx), fsMax);
+        Fx += (Fx > 0 ? -1 : Fx < 0 ? 1 : 0) * fs;
+        friction = { type: 'static', value: fs, max: fsMax };
+      }
+    }
+  }
+
+  return { Fx, Fy, m, flipY, Ny, friction, planeN };
+}
+
+// Aggiunge il vincolo parete a computeTotalForces
+function computeTotalForcesWithWall(el) {
+  let { Fx, Fy, m, flipY, Ny, friction, planeN } = computeTotalForces(el);
+
+  const wallC = getWallConstraint(el);
+  if (!wallC) return { Fx, Fy, m, flipY, Ny, friction, planeN, wallN: null };
+
+  const wall = elements.find(e => e.id === (wallC.aId === el.id ? wallC.bId : wallC.aId));
+  if (!wall) return { Fx, Fy, m, flipY, Ny, friction, planeN, wallN: null };
+
+  const flipXW = wall.props?.flipX;
+  const pushesWall = flipXW ? (Fx > 0) : (Fx < 0);
+  const NMag = Math.abs(Fx);
+
+  // Se v₀x è nel verso di allontanamento → corpo si stacca → N = 0
+  const v0x_w = parseFloat(el.props?.v0x) || 0;
+  const detachingWall = flipXW ? (v0x_w < 0) : (v0x_w > 0);
+
+  const NValid = NMag > 1e-9 && pushesWall && !detachingWall;
+
+  let wallN = null;
+  if (NValid) {
+    // N bilancia la componente orizzontale che spinge sulla parete
+    Fx = flipXW ? Fx - NMag : Fx + NMag; // → 0
+    const muS = parseFloat(wallC.props?.muS);
+    const muK = parseFloat(wallC.props?.muK);
+    const v0y_w = parseFloat(el.props?.v0y) || 0;
+    const isMoving = Math.abs(v0y_w) > 1e-9;
+    const fsMax = (!isNaN(muS) && muS > 0) ? muS * NMag : 0;
+    const Fy_app = Fy;
+
+    wallN = { NMag, NValid: true, flipXW };
+    if (isMoving) {
+      if (!isNaN(muK) && muK > 0) {
+        const fk = muK * NMag;
+        Fy += (v0y_w > 0 ? -1 : 1) * fk;
+        wallN.friction = { type: 'dynamic', value: fk };
+      }
+    } else {
+      if (Math.abs(Fy_app) <= fsMax) {
+        Fy = 0;
+        wallN.friction = { type: 'static', value: Math.abs(Fy_app), max: fsMax, sliding: false };
+      } else {
+        if (!isNaN(muK) && muK > 0) {
+          const fk = muK * NMag;
+          Fy += (Fy_app > 0 ? -1 : 1) * fk;
+          wallN.friction = { type: 'dynamic', value: fk, sliding: true };
+        } else {
+          wallN.friction = { type: 'static', value: fsMax, max: fsMax, sliding: true };
+        }
+      }
+    }
+  } else {
+    // N=0 (corpo non spinge la parete o si stacca)
+    // Se c'è una molla verticale agganciata, essa fornisce il vincolo trasversale in X
+    const springCW = getSpringConstraint(el);
+    if (springCW) {
+      const springW = elements.find(e => e.id === (springCW.aId === el.id ? springCW.bId : springCW.aId));
+      if (springW) {
+        const anchorW = springW.props?.anchor || 'left';
+        const vertW = anchorW === 'top' || anchorW === 'bottom';
+        if (vertW) Fx = 0; // molla verticale azzera Fx (vincolo trasversale)
+      }
+    }
+  }
+  return { Fx, Fy, m, flipY, Ny, friction, planeN, wallN };
+}
+
+// Restituisce la forza elastica che la molla esercita sul corpo (in fisico)
+function getSpringForce(el) {
+  const springC = getSpringConstraint(el);
+  if (!springC) return null;
+  const spring = elements.find(e => e.id === (springC.aId === el.id ? springC.bId : springC.aId));
+  if (!spring) return null;
+  const L0 = parseFloat(spring.props?.L0);
+  if (isNaN(L0) || L0 <= 0) return null;
+
+  // In parallelo usa k_eq = Σkᵢ, altrimenti k singolo
+  let k;
+  if (spring._inParallel) {
+    const grp = parallelGroup(spring.id);
+    k = grp.reduce((sum, s) => sum + (parseFloat(s.props?.k) || 0), 0);
+  } else {
+    k = parseFloat(spring.props?.k);
+  }
+  if (isNaN(k) || k <= 0) return null;
+
+  const Lc = parseFloat(spring.props?._L_calc);
+  const dx = isNaN(Lc) ? 0 : Lc - L0;
+  const F  = k * dx;
+
+  const anchor = spring.props?.anchor || 'left';
+  const ref = getRefSystem();
+  const flipY = ref?.props?.flipY;
+
+  let fx = 0, fy = 0;
+
+  // Se la molla è sul piano inclinato, la forza è parallela al piano
+  const planeSpringRelGSF = relations.find(r =>
+    r.type === 'spring_on_plane' && (r.aId === spring.id || r.bId === spring.id)
+  );
+  if (planeSpringRelGSF && spring._planeDxFis != null) {
+    // La direzione della forza elastica sul corpo: dir=-1 → forza verso l'alto del piano (spinge via dalla parete)
+    // Indipendentemente da flipX: anchor=left → parete in basso → dir=-1
+    //                             anchor=right → parete in alto → dir=+1
+    const needsFlip_gsf = (anchor === 'right');
+    const dir = needsFlip_gsf ? 1 : -1;
+    fx = dir * F * spring._planeDxFis;
+    fy = dir * F * spring._planeDyFis;
+  } else {
+    if (anchor === 'left')   { fx = -F;  fy = 0; }
+    if (anchor === 'right')  { fx = +F;  fy = 0; }
+    if (anchor === 'top')    { fy = flipY ? -F : +F;  fx = 0; }
+    if (anchor === 'bottom') { fy = flipY ? +F : -F;  fx = 0; }
+  }
+
+  return { fx, fy, F, dx, spring };
+}
+
+function getBodyConstraint(el) {
+  return relations.find(r => {
+    if (r.type !== 'body_on_floor') return false;
+    const isBody = r.aId === el.id || r.bId === el.id;
+    if (!isBody) return false;
+    const h = parseFloat(r.props?.height);
+    return isNaN(h) || h === 0;
+  });
+}
+
+// Flood-fill per trovare tutte le molle di un gruppo parallelo
+function parallelGroup(startId) {
+  const visited = new Set(), queue = [startId];
+  const existIds = new Set(elements.map(e => e.id));
+  while (queue.length) {
+    const sid = queue.shift();
+    if (visited.has(sid)) continue;
+    if (!existIds.has(sid)) continue; // ignora elementi eliminati
+    visited.add(sid);
+    for (const r of relations) {
+      if (r.type !== 'spring_spring' || r.props?.layout !== 'parallel') continue;
+      if (!existIds.has(r.aId) || !existIds.has(r.bId)) continue; // ignora relazioni orfane
+      if (r.aId === sid && !visited.has(r.bId)) queue.push(r.bId);
+      if (r.bId === sid && !visited.has(r.aId)) queue.push(r.aId);
+    }
+  }
+  return [...visited].map(id => elements.find(e => e.id === id)).filter(Boolean);
+}
+
+function getSpringConstraint(el) {
+  return relations.find(r => {
+    if (r.type !== 'spring_body') return false;
+    return r.aId === el.id || r.bId === el.id;
+  });
+}
+
+// Trova molle collegate a questa in parallelo o serie
+function getSpringSpringRelations(springId) {
+  return relations.filter(r => r.type === 'spring_spring' && (r.aId === springId || r.bId === springId));
+}
+
+// Restituisce le molle in parallelo con questa
+function getParallelSprings(springId) {
+  return getSpringSpringRelations(springId)
+    .filter(r => r.props?.layout === 'parallel')
+    .map(r => elements.find(e => e.id === (r.aId === springId ? r.bId : r.aId)))
+    .filter(Boolean);
+}
+
+// Restituisce la molla "master" di un gruppo parallelo (quella con x/y più a sinistra/alta)
+function getParallelMaster(springId) {
+  const sp = elements.find(e => e.id === springId);
+  if (!sp) return null;
+  const peers = getParallelSprings(springId);
+  if (!peers.length) return null;
+  const all = [sp, ...peers];
+  // La master è quella con y minore (più in alto) per anchor=top
+  const anchor = sp.props?.anchor || 'left';
+  if (anchor === 'top' || anchor === 'bottom')
+    return all.reduce((a, b) => a.x < b.x ? a : b); // la più a sinistra
+  return all.reduce((a, b) => a.y < b.y ? a : b); // la più in alto
+}
+
+function buildRiepilogo(body, el) {
+  body.innerHTML = '';
+  const p     = el.props;
+  const ref   = getRefSystem();
+  const g     = parseFloat(ref?.props?.gravity) || 0;
+  const flipY = ref?.props?.flipY;
+  const m     = parseFloat(p.mass);
+  const hasM  = !isNaN(m) && m > 0;
+
+  const fmt  = v => (v===''||v===undefined||isNaN(parseFloat(v))) ? '—' : parseFloat(v).toFixed(3);
+  const fmtN = v => isNaN(v) ? '—' : v.toFixed(3);
+
+  function sectionTitle(txt, col) {
+    const d = document.createElement('div');
+    d.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;
+      font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+      color:${col||'var(--muted)'};margin-bottom:6px`;
+    d.textContent = txt;
+    return d;
+  }
+
+  // ── Peso ──────────────────────────────────────────────────────────────────
+  if (g > 0 && hasM) {
+    const P = flipY ? +m*g : -m*g;
+    body.appendChild(makeReadonlyField('Peso P', fmtN(P), 'N'));
+    addSep(body);
+  }
+
+  // ── Velocità iniziale ──────────────────────────────────────────────────────
+  const v0x = parseFloat(p.v0x), v0y = parseFloat(p.v0y);
+  const v0mod = (!isNaN(v0x)&&!isNaN(v0y)) ? Math.hypot(v0x,v0y) : NaN;
+  body.appendChild(makeReadonlyField('v₀x',  fmt(p.v0x), 'm/s'));
+  body.appendChild(makeReadonlyField('v₀y',  fmt(p.v0y), 'm/s'));
+  body.appendChild(makeReadonlyField('|v₀|', fmtN(v0mod), 'm/s'));
+  addSep(body);
+
+  // ── Calcolo completo con N e attrito ──────────────────────────────────────
+  const constraint = getBodyConstraint(el);
+  const pesoFy = (g > 0 && hasM) ? (flipY ? +m*g : -m*g) : 0;
+  let Fx_ext = 0, Fy_ext = pesoFy;
+  for (const f of (p.forces||[])) {
+    Fx_ext += parseFloat(f.fx)||0;
+    Fy_ext += parseFloat(f.fy)||0;
+  }
+
+  // Includi la forza della fune in Fx_ext/Fy_ext
+  let Fx_rope_rp = 0, Fy_rope_rp = 0;
+  if (typeof getRopeForceOnBody === 'function') {
+    const ropeF_rp = getRopeForceOnBody(el);
+    if (ropeF_rp) {
+      Fx_rope_rp = ropeF_rp.fx;
+      Fy_rope_rp = ropeF_rp.fy;
+      Fx_ext += Fx_rope_rp;
+      Fy_ext += Fy_rope_rp;
+    }
+  }
+
+  // Includi tensioni sistema funi in Fx_ext
+  if (typeof getRopeSystemForceOnBody === 'function') {
+    const sysF_rp = getRopeSystemForceOnBody(el);
+    if (sysF_rp) {
+      Fx_ext += sysF_rp.fx;
+    }
+  }
+
+  // Includi forza dalla carrucola — solo per corpo su piano, non Atwood
+  if (typeof getPulleyForceOnBody === 'function') {
+    const isAtwoodBody2 = typeof getPulleyForceOnAtwoodBody === 'function' && getPulleyForceOnAtwoodBody(el);
+    if (!isAtwoodBody2) {
+      const pulleyF = getPulleyForceOnBodyCorrect(el);
+      if (pulleyF) {
+        Fx_ext += pulleyF.fx;
+        Fy_ext += pulleyF.fy;
+      }
+    }
+  }
+
+  // Includi tensione fune sul corpo appeso
+  if (typeof getPulleyForceOnHangingBodyCorrect === "function") {
+    const hangF = getPulleyForceOnHangingBodyCorrect(el);
+    if (hangF) {
+      Fx_ext += hangF.fx;
+      Fy_ext += hangF.fy;
+    }
+  }
+
+  // Includi forza tensione corpo Atwood
+  if (typeof getPulleyForceOnAtwoodBody === 'function') {
+    const atwoodF = getPulleyForceOnAtwoodBody(el);
+    if (atwoodF) { Fx_ext += atwoodF.fx; Fy_ext += atwoodF.fy; }
+  }
+
+  // Includi forza tensione sistema corpo-carrucola-molla
+  if (typeof getPulleySpringForceOnBody === 'function') {
+    const bpsF = getPulleySpringForceOnBody(el);
+    if (bpsF) { Fx_ext += bpsF.fx; Fy_ext += bpsF.fy; }
+  }
+
+  // Includi la forza elastica in Fx_ext/Fy_ext per il calcolo corretto di N e attrito
+  const springF_rp = getSpringForce(el);
+  let Fx_spring_rp = 0, Fy_spring_rp = 0;
+  if (springF_rp) {
+    const anchor_rp0 = springF_rp.spring.props?.anchor || 'left';
+    const horiz_rp0  = anchor_rp0 === 'left' || anchor_rp0 === 'right';
+    const isOnPlane_rp0 = relations.some(r =>
+      r.type === 'spring_on_plane' && (r.aId === springF_rp.spring.id || r.bId === springF_rp.spring.id)
+    );
+    if (isOnPlane_rp0) {
+      // Molla sul piano: includi entrambe le componenti
+      Fx_spring_rp = springF_rp.fx;
+      Fy_spring_rp = springF_rp.fy;
+      Fx_ext += Fx_spring_rp;
+      Fy_ext += Fy_spring_rp;
+    } else if (horiz_rp0 && constraint) {
+      // Molla orizzontale + pavimento: molla contribuisce a Fx
+      Fx_spring_rp = springF_rp.fx;
+      Fx_ext += Fx_spring_rp;
+    } else if (!horiz_rp0) {
+      // Molla verticale: contribuisce a Fy (influenza N pavimento se presente)
+      Fy_spring_rp = springF_rp.fy;
+      Fy_ext += Fy_spring_rp;
+    }
+  }
+
+  let Fx = Fx_ext, Fy = Fy_ext;
+
+  if (constraint) {
+    // Se v₀y > 0 il corpo si stacca → N = 0, no attrito
+    const v0y_rp = parseFloat(p.v0y) || 0;
+    const detaching_rp = flipY ? (v0y_rp < 0) : (v0y_rp > 0);
+
+    // ── Reazione vincolare N ────────────────────────────────────────────────
+    const Ny_raw  = detaching_rp ? 0 : -Fy_ext;
+    const NMag    = Math.abs(Ny_raw);
+    const NPointsUp = !detaching_rp && (flipY ? (Ny_raw < 0) : (Ny_raw > 0));
+
+    addSep(body);
+    body.appendChild(sectionTitle('Reazione vincolare', '#60f0c0'));
+
+    if (detaching_rp) {
+      const w = document.createElement('div'); w.className='prop-hint';
+      w.style.color='#ffb347';
+      w.textContent='⚠ v₀y > 0: corpo si stacca dal pavimento → N = 0.';
+      body.appendChild(w);
+    } else if (NMag < 1e-9) {
+      body.appendChild(makeReadonlyField('N', '0', 'N'));
+      const h = document.createElement('div'); h.className='prop-hint';
+      h.textContent='Forze verticali già bilanciate.'; body.appendChild(h);
+    } else if (NPointsUp) {
+      body.appendChild(makeReadonlyField('N', fmtN(NMag), 'N'));
+      Fy += Ny_raw; // Fy → 0
+    } else {
+      const w = document.createElement('div'); w.className='prop-hint';
+      w.style.color='#ffb347';
+      w.textContent='⚠ Forza risultante verso l\'alto: corpo si stacca.';
+      body.appendChild(w);
+    }
+
+    // ── Attrito ─────────────────────────────────────────────────────────────
+    const muS = parseFloat(constraint.props?.muS);
+    const muK = parseFloat(constraint.props?.muK);
+    const isMoving = Math.abs(v0x) > 1e-9;
+
+    if (NPointsUp && NMag > 1e-9 && (!isNaN(muS) || !isNaN(muK))) {
+      addSep(body);
+      body.appendChild(sectionTitle('Attrito', '#f0c060'));
+
+      if (!isNaN(muS) && muS > 0) {
+        const fsMax = muS * NMag;
+        body.appendChild(makeReadonlyField('f_s,max (μₛ·N)', fmtN(fsMax), 'N'));
+
+        if (!isMoving) {
+          // Attrito statico effettivo
+          const fs = Math.min(Math.abs(Fx_ext), fsMax);
+          const sign = Fx_ext > 0 ? -1 : (Fx_ext < 0 ? 1 : 0);
+          const sliding = Math.abs(Fx_ext) > fsMax;
+          body.appendChild(makeReadonlyField('f_s (statico)', fmtN(fs), 'N'));
+          Fx += sign * fs;
+          const stBadge = document.createElement('div');
+          stBadge.style.cssText = `padding:4px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;
+            font-size:9px;font-weight:600;display:inline-block;margin-top:4px;
+            border:1px solid ${sliding?'#f06060':'#60f060'};
+            background:${sliding?'rgba(240,96,96,0.1)':'rgba(96,240,96,0.1)'};
+            color:${sliding?'#f06060':'#60f060'}`;
+          stBadge.textContent = sliding ? '⟹ Scivola (f_s > f_s,max)' : '⟹ Non scivola (corpo fermo)';
+          body.appendChild(stBadge);
+        }
+      }
+
+      if (!isNaN(muK) && muK > 0) {
+        const fk = muK * NMag;
+        body.appendChild(makeReadonlyField('f_k (dinamico μₖ·N)', fmtN(fk), 'N'));
+
+        if (isMoving) {
+          const sign = v0x > 0 ? -1 : 1;
+          Fx += sign * fk;
+          const dir = v0x > 0 ? '← (opposta a v₀x > 0)' : '→ (opposta a v₀x < 0)';
+          const dHint = document.createElement('div');
+          dHint.className = 'prop-hint'; dHint.textContent = dir;
+          body.appendChild(dHint);
+        }
+      }
+    }
+    addSep(body);
+  }
+
+  // ── Piano inclinato ────────────────────────────────────────────────────────
+  const planeC = getPlaneConstraint(el);
+  if (planeC) {
+    const plane = elements.find(e => e.id === (planeC.aId === el.id ? planeC.bId : planeC.aId));
+    if (plane) {
+      const geo     = getPlaneGeometry(plane);
+      const pesoFy2 = (g > 0 && hasM) ? (flipY ? +m*g : -m*g) : 0;
+      const Ppar_svg  = pesoFy2 * geo.dy_fis;  // fisico
+      const Pperp_svg = pesoFy2 * geo.ny_fis;  // fisico
+      let Fext_par = 0, Fext_perp = 0;
+      for (const f of (p.forces||[])) {
+        const fx = parseFloat(f.fx)||0, fy_fis = parseFloat(f.fy)||0;
+        Fext_par  += fx * geo.dx_fis + fy_fis * geo.dy_fis;
+        Fext_perp += fx * geo.nx_fis + fy_fis * geo.ny_fis;
+      }
+      const Nperp  = Pperp_svg + Fext_perp;
+      const NMag   = Math.abs(Nperp);
+      const v0x_rp = parseFloat(p.v0x)||0, v0y_rp2 = parseFloat(p.v0y)||0;
+      const detachingPlane_rp = (v0x_rp*geo.nx_fis + v0y_rp2*geo.ny_fis) > 1e-6;
+      const NValid = NMag > 1e-9 && Nperp < 0 && !detachingPlane_rp;
+
+      // Includi forza elastica nella componente parallela
+      const springF_plane_rp = getSpringForce(el);
+      let Fspring_par_rp = 0;
+      if (springF_plane_rp) {
+        Fspring_par_rp = springF_plane_rp.fx * geo.dx_fis + springF_plane_rp.fy * geo.dy_fis;
+      }
+
+      // Includi tensione carrucola nella componente parallela
+      let FT_par_rp = 0, T_val_rp = 0;
+      if (typeof getPulleyForceOnBodyCorrect === 'function') {
+        const pulleyF_rp = getPulleyForceOnBodyCorrect(el);
+        if (pulleyF_rp) {
+          FT_par_rp = pulleyF_rp.fx * geo.dx_fis + pulleyF_rp.fy * geo.dy_fis;
+          T_val_rp = pulleyF_rp.T || 0;
+        }
+      }
+
+      const Fpar_tot = Ppar_svg + Fext_par + Fspring_par_rp + FT_par_rp;
+
+      addSep(body);
+      body.appendChild(sectionTitle(`Piano inclinato θ=${geo.angle.toFixed(1)}°`, '#60f0c0'));
+      body.appendChild(makeReadonlyField('P∥ (peso lungo piano)', fmtN(Math.abs(Ppar_svg)), 'N'));
+      body.appendChild(makeReadonlyField('P⊥ (peso perp. piano)', fmtN(Math.abs(Pperp_svg)), 'N'));
+      if (T_val_rp > 1e-9) {
+        body.appendChild(makeReadonlyField('T∥ (tensione lungo piano)', fmtN(Math.abs(FT_par_rp)), 'N'));
+      }
+
+      // Proiezioni forze esterne (se presenti)
+      if ((p.forces||[]).length > 0) {
+        addSep(body);
+        body.appendChild(sectionTitle('Forze esterne proiettate', '#f06090'));
+        // Singole forze
+        for (const f of (p.forces||[])) {
+          const fx = parseFloat(f.fx)||0, fy_fis = parseFloat(f.fy)||0;
+          const fpar  = fx * geo.dx_fis + fy_fis * geo.dy_fis;
+          const fperp = fx * geo.nx_fis + fy_fis * geo.ny_fis;
+          const fname = f.name || 'F';
+          body.appendChild(makeReadonlyField(`${fname}∥`, fmtN(fpar), 'N'));
+          body.appendChild(makeReadonlyField(`${fname}⊥`, fmtN(fperp), 'N'));
+        }
+        // Totale forze esterne
+        if ((p.forces||[]).length > 1) {
+          addSep(body);
+          body.appendChild(makeReadonlyField('ΣFext∥', fmtN(Fext_par), 'N'));
+          body.appendChild(makeReadonlyField('ΣFext⊥', fmtN(Fext_perp), 'N'));
+        }
+        addSep(body);
+        // Totale lungo il piano (peso + forze esterne)
+        body.appendChild(sectionTitle('Totale sul piano', '#f0e060'));
+        body.appendChild(makeReadonlyField('F∥ tot (P∥ + ΣFext∥)', fmtN(Fpar_tot), 'N'));
+        body.appendChild(makeReadonlyField('F⊥ tot (P⊥ + ΣFext⊥)', fmtN(Nperp), 'N'));
+      }
+
+      if (detachingPlane_rp) {
+        const w = document.createElement('div'); w.className='prop-hint';
+        w.style.color='#ffb347';
+        w.textContent='⚠ v₀ si allontana dal piano (v⊥ > 0) → N = 0.';
+        body.appendChild(w);
+      } else if (NValid) {
+        body.appendChild(makeReadonlyField('N (reazione)', fmtN(NMag), 'N'));
+        Fx += NMag * geo.nx_fis;
+        Fy += NMag * geo.ny_fis;
+
+        const muS = parseFloat(planeC.props?.muS);
+        const muK = parseFloat(planeC.props?.muK);
+        const v0s = parseFloat(p.v0s) || 0;
+        const isMoving = Math.abs(v0s) > 1e-9;
+
+        if (!isNaN(muS) || !isNaN(muK)) {
+          addSep(body);
+          body.appendChild(sectionTitle('Attrito (piano)', '#f0c060'));
+          const fsMax = (!isNaN(muS) && muS > 0) ? muS * NMag : 0;
+          if (fsMax > 0) body.appendChild(makeReadonlyField('f_s,max (μₛ·N)', fmtN(fsMax), 'N'));
+
+          if (isMoving) {
+            // Attrito dinamico — direzione opposta a v0s
+            if (!isNaN(muK) && muK > 0) {
+              const fk = muK * NMag;
+              const dir = v0s > 0 ? -1 : 1;
+              body.appendChild(makeReadonlyField('f_k (dinamico μₖ·N)', fmtN(fk), 'N'));
+              const dirHint = document.createElement('div');
+              dirHint.className = 'prop-hint';
+              dirHint.textContent = dir > 0 ? '↑ verso il vertice (opposta a discesa)' : '↓ verso la base (opposta a salita)';
+              body.appendChild(dirHint);
+              Fx += dir * fk * geo.dx_fis;
+              Fy += dir * fk * geo.dy_fis;
+            }
+          } else {
+            // Sistema fermo o moto tendente → usa solver se disponibile
+            // per determinare la direzione del moto tendente
+            let dirMotion_panel = Fpar_tot > 0 ? 1 : -1; // default senza tensione
+            if (typeof getPulleyForceOnBodyCorrect === 'function') {
+              const pulleyRes_panel = getPulleyForceOnBodyCorrect(el);
+              if (pulleyRes_panel) {
+                // Con tensione: direzione moto tendente dal solver
+                const FT_par_panel = pulleyRes_panel.fx * geo.dx_fis + pulleyRes_panel.fy * geo.dy_fis;
+                const Fpar_with_T = Fpar_tot + FT_par_panel;
+                dirMotion_panel = Fpar_with_T >= 0 ? 1 : -1;
+              }
+            }
+            const Fpar_check = Math.abs(Fpar_tot + (typeof getPulleyForceOnBodyCorrect === 'function' ? 
+              (() => { const pf = getPulleyForceOnBodyCorrect(el); return pf ? pf.fx*geo.dx_fis+pf.fy*geo.dy_fis : 0; })() : 0));
+            const sliding = Fpar_check > fsMax;
+            if (!sliding) {
+            if (!sliding) {
+              // Attrito statico bilancia
+              const fs = Math.abs(Fpar_tot);
+              body.appendChild(makeReadonlyField('f_s (statico)', fmtN(fs), 'N'));
+              const dir = Fpar_tot > 0 ? -1 : 1;
+              Fx += dir * fs * geo.dx_fis;
+              Fy += dir * fs * geo.dy_fis;
+              const badge = document.createElement('div');
+              badge.style.cssText = `padding:4px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;
+                font-size:9px;font-weight:600;display:inline-block;margin-top:4px;
+                border:1px solid #60f060;background:rgba(96,240,96,0.1);color:#60f060`;
+              badge.textContent = '⟹ Non scivola (a = 0)';
+              body.appendChild(badge);
+            } else {
+              // Scivola → attrito dinamico opposto al moto tendente
+              body.appendChild(makeReadonlyField('f_s,max superato — scivola', '', ''));
+              if (!isNaN(muK) && muK > 0) {
+                const fk = muK * NMag;
+                body.appendChild(makeReadonlyField('f_k (dinamico μₖ·N)', fmtN(fk), 'N'));
+                const dirHint2 = document.createElement('div');
+                dirHint2.className = 'prop-hint';
+                dirHint2.textContent = dirMotion_panel > 0 ? '↓ verso la base (opposta a salita)' : '↑ verso il vertice (opposta a discesa)';
+                body.appendChild(dirHint2);
+                // Attrito opposto al moto tendente
+                Fx += (-dirMotion_panel) * fk * geo.dx_fis;
+                Fy += (-dirMotion_panel) * fk * geo.dy_fis;
+              }
+              const badge = document.createElement('div');
+              badge.style.cssText = `padding:4px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;
+                font-size:9px;font-weight:600;display:inline-block;margin-top:4px;
+                border:1px solid #f06060;background:rgba(240,96,96,0.1);color:#f06060`;
+              badge.textContent = '⟹ Scivola (f_s > f_s,max)';
+              body.appendChild(badge);
+            }
+          }
+        }
+
+        // Equilibrio lungo il piano (include tensione)
+        addSep(body);
+        const eqPar = Math.abs(Fpar_tot) < 1e-6;
+        const badge2 = document.createElement('div');
+        badge2.style.cssText = `padding:5px 4px;border-radius:5px;text-align:center;
+          font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;
+          border:1px solid ${eqPar?'#60f060':'#f06060'};
+          background:${eqPar?'rgba(96,240,96,0.1)':'rgba(240,96,96,0.1)'};
+          color:${eqPar?'#60f060':'#f06060'}`;
+        badge2.textContent = 'Eq. lungo piano' + (eqPar ? ' ✓' : ' ✗');
+        body.appendChild(badge2);
+        if (T_val_rp > 1e-9) {
+          body.appendChild(makeReadonlyField('T (tensione fune)', fmtN(T_val_rp), 'N'));
+        }
+      } else {
+        const w = document.createElement('div'); w.className='prop-hint';
+        w.style.color='#ffb347';
+        w.textContent='⚠ Forza risultante perp. positiva: corpo si stacca dal piano.';
+        body.appendChild(w);
+        // Se c'è molla sul piano, essa fornisce N⊥ perpendicolare al piano
+        const springF_pl_rp = getSpringForce(el);
+        if (springF_pl_rp) {
+          const isOnPlane_rp = relations.some(r =>
+            r.type === 'spring_on_plane' && (r.aId === springF_pl_rp.spring.id || r.bId === springF_pl_rp.spring.id)
+          );
+          if (isOnPlane_rp) {
+            const Fperp_rp = Fx * geo.nx_fis + Fy * geo.ny_fis;
+            if (Math.abs(Fperp_rp) > 1e-9) {
+              body.appendChild(makeReadonlyField('N⊥ (reazione molla)', fmtN(-Fperp_rp), 'N'));
+              Fx -= Fperp_rp * geo.nx_fis;
+              Fy -= Fperp_rp * geo.ny_fis;
+            }
+          }
+        }
+      }
+      addSep(body);
+    }
+  }
+
+  // ── Parete verticale ──────────────────────────────────────────────────────
+  const wallC = getWallConstraint(el);
+  if (wallC) {
+    const wallEl = elements.find(e => e.id === (wallC.aId === el.id ? wallC.bId : wallC.aId));
+    const flipXW = wallEl?.props?.flipX;
+    const pushesWall = flipXW ? (Fx > 0) : (Fx < 0);
+    const NMag_w  = Math.abs(Fx);
+    const v0x_rp_w = parseFloat(p.v0x) || 0;
+    const detachingWall_rp = flipXW ? (v0x_rp_w < 0) : (v0x_rp_w > 0);
+    const NValid_w = NMag_w > 1e-9 && pushesWall && !detachingWall_rp;
+
+    addSep(body);
+    body.appendChild(sectionTitle('Parete verticale', '#60f0c0'));
+
+    if (detachingWall_rp) {
+      const ww = document.createElement('div'); ww.className='prop-hint';
+      ww.style.color='#ffb347';
+      ww.textContent='⚠ v₀x nel verso di allontanamento: corpo si stacca → N = 0.';
+      body.appendChild(ww);
+    } else if (NValid_w) {
+      body.appendChild(makeReadonlyField('N (orizzontale)', fmtN(NMag_w), 'N'));
+      Fx = flipXW ? Fx - NMag_w : Fx + NMag_w; // → 0
+
+      const muS = parseFloat(wallC.props?.muS);
+      const muK = parseFloat(wallC.props?.muK);
+      const v0y_w = parseFloat(p.v0y) || 0;
+      const isMoving_w = Math.abs(v0y_w) > 1e-9;
+      const fsMax = (!isNaN(muS) && muS > 0) ? muS * NMag_w : 0;
+      const Fy_app = Fy;
+
+      if (!isNaN(muS) || !isNaN(muK)) {
+        addSep(body);
+        body.appendChild(sectionTitle('Attrito (parete)', '#f0c060'));
+        if (fsMax > 0) body.appendChild(makeReadonlyField('f_s,max (μₛ·N)', fmtN(fsMax), 'N'));
+
+        if (isMoving_w) {
+          if (!isNaN(muK) && muK > 0) {
+            const fk = muK * NMag_w;
+            body.appendChild(makeReadonlyField('f_k (μₖ·N)', fmtN(fk), 'N'));
+            Fy += (v0y_w > 0 ? -1 : 1) * fk;
+          }
+        } else {
+          const sliding = Math.abs(Fy_app) > fsMax;
+          if (!sliding) {
+            body.appendChild(makeReadonlyField('f_s (statico)', fmtN(Math.abs(Fy_app)), 'N'));
+            Fy = 0;
+            const badge = document.createElement('div');
+            badge.style.cssText = `padding:4px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;
+              font-size:9px;font-weight:600;display:inline-block;margin-top:4px;
+              border:1px solid #60f060;background:rgba(96,240,96,0.1);color:#60f060`;
+            badge.textContent = '⟹ Non scivola (a = 0)';
+            body.appendChild(badge);
+          } else {
+            body.appendChild(makeReadonlyField('Scivola lungo la parete', '', ''));
+            if (!isNaN(muK) && muK > 0) {
+              const fk = muK * NMag_w;
+              body.appendChild(makeReadonlyField('f_k (μₖ·N)', fmtN(fk), 'N'));
+              Fy += (Fy_app > 0 ? -1 : 1) * fk;
+            }
+            const badge = document.createElement('div');
+            badge.style.cssText = `padding:4px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;
+              font-size:9px;font-weight:600;display:inline-block;margin-top:4px;
+              border:1px solid #f06060;background:rgba(240,96,96,0.1);color:#f06060`;
+            badge.textContent = Fy_app < 0 ? '⟹ Scivola verso il basso' : '⟹ Scivola verso l\'alto';
+            body.appendChild(badge);
+          }
+        }
+      }
+    } else {
+      const w = document.createElement('div'); w.className='prop-hint';
+      w.style.color='#ffb347';
+      w.textContent='⚠ Nessuna forza che spinge il corpo contro la parete → N = 0.';
+      body.appendChild(w);
+      // Se c'è molla verticale, essa fornisce il vincolo trasversale in X
+      const springCW_rp = getSpringConstraint(el);
+      if (springCW_rp) {
+        const springW_rp = elements.find(e => e.id === (springCW_rp.aId === el.id ? springCW_rp.bId : springCW_rp.aId));
+        if (springW_rp) {
+          const anchorW_rp = springW_rp.props?.anchor || 'left';
+          const vertW_rp = anchorW_rp === 'top' || anchorW_rp === 'bottom';
+          if (vertW_rp && Math.abs(Fx) > 1e-9) {
+            body.appendChild(makeReadonlyField('N⊥ (reazione molla)', fmtN(-Fx), 'N'));
+            Fx = 0;
+          }
+        }
+      }
+    }
+
+    // Equilibrio
+    if (NValid_w) {
+      addSep(body);
+      const eqH = Math.abs(Fx) < 1e-6;
+      const eqV = Math.abs(Fy) < 1e-6;
+      const badgeRow = document.createElement('div');
+      badgeRow.style.cssText = 'display:flex;gap:8px;margin-bottom:4px';
+      function mkBadge(label, ok) {
+        const b = document.createElement('div');
+        b.style.cssText = `flex:1;text-align:center;padding:5px 4px;border-radius:5px;
+          font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;
+          border:1px solid ${ok?'#60f060':'#f06060'};
+          background:${ok?'rgba(96,240,96,0.1)':'rgba(240,96,96,0.1)'};
+          color:${ok?'#60f060':'#f06060'}`;
+        b.textContent = label + (ok ? ' ✓' : ' ✗');
+        return b;
+      }
+      badgeRow.appendChild(mkBadge('Eq. oriz.', eqH));
+      badgeRow.appendChild(mkBadge('Eq. vert.', eqV));
+      body.appendChild(badgeRow);
+    }
+    addSep(body);
+  }
+
+  // ── Molla ──────────────────────────────────────────────────────────────────
+  const springF = getSpringForce(el);
+  if (springF) {
+    const { fx: sfx, fy: sfy, F: sF, dx: sDx } = springF;
+    const anchor_rp = springF.spring.props?.anchor || 'left';
+    const horiz_rp  = anchor_rp === 'left' || anchor_rp === 'right';
+    addSep(body);
+    body.appendChild(sectionTitle('Forza elastica molla', '#a060f0'));
+    body.appendChild(makeReadonlyField('Δx', fmtN(sDx), 'm'));
+    body.appendChild(makeReadonlyField('F elastica', fmtN(sF), 'N'));
+    body.appendChild(makeReadonlyField('Fx molla', fmtN(sfx), 'N'));
+    body.appendChild(makeReadonlyField('Fy molla', fmtN(sfy), 'N'));
+    // Non riaggiungere se già inclusa in Fx_ext/Fy_ext o nel piano
+    const springOnPlane_rp = relations.some(r =>
+      r.type === 'spring_on_plane' && (r.aId === springF.spring.id || r.bId === springF.spring.id)
+    );
+    const alreadyInExt = (horiz_rp && constraint && Fx_spring_rp !== 0) ||
+                         (!horiz_rp && Fy_spring_rp !== 0) ||
+                         springOnPlane_rp;
+    if (!alreadyInExt) {
+      Fx += sfx; Fy += sfy;
+    }
+
+    // Reazione vincolare trasversale molla
+    const hasFloorC = !!getBodyConstraint(el);
+    const hasWallC  = !!getWallConstraint(el);
+    const hasPlaneC = !!getPlaneConstraint(el);
+    if (horiz_rp) {
+      // Molla orizzontale: vincolo trasversale in Y
+      // Azzera Fy se: nessun pavimento/piano, oppure pavimento con N=0
+      const Ny_rp2 = constraint ? -(Fy_ext) : 0;
+      const NPointsUp_rp = flipY ? (Ny_rp2 < 0) : (Ny_rp2 > 0);
+      const floorActive = hasFloorC && NPointsUp_rp;
+      if (!floorActive && !hasPlaneC && Math.abs(Fy) > 1e-9) {
+        body.appendChild(makeReadonlyField('N⊥ (reazione molla)', fmtN(-Fy), 'N'));
+        Fy = 0;
+      }
+    } else {
+      // Molla verticale: vincolo trasversale in X
+      // Azzera Fx se: nessuna parete/piano
+      if (!hasWallC && !hasPlaneC && Math.abs(Fx) > 1e-9) {
+        body.appendChild(makeReadonlyField('N⊥ (reazione molla)', fmtN(-Fx), 'N'));
+        Fx = 0;
+      }
+    }
+    addSep(body);
+  }
+
+  // ── Forza fune ─────────────────────────────────────────────────────────────
+  if (typeof getRopeForceOnBody === 'function') {
+    const ropeF_show = getRopeForceOnBody(el);
+    if (ropeF_show) {
+      addSep(body);
+      body.appendChild(sectionTitle('Tensione fune', '#c8f060'));
+      body.appendChild(makeReadonlyField('Fx fune', fmtN(ropeF_show.fx), 'N'));
+      body.appendChild(makeReadonlyField('Fy fune', fmtN(ropeF_show.fy), 'N'));
+      body.appendChild(makeReadonlyField('|T|', fmtN(Math.hypot(ropeF_show.fx, ropeF_show.fy)), 'N'));
+    }
+  }
+
+  // ── Sistema di funi (entrambe estremità collegate) ─────────────────────────
+  if (typeof getRopeSystemForceOnBody === 'function') {
+    const sysF = getRopeSystemForceOnBody(el);
+    if (sysF) {
+      addSep(body);
+      body.appendChild(sectionTitle('Sistema funi', '#c8f060'));
+      body.appendChild(makeReadonlyField('a sistema', fmtN(sysF.a), 'm/s²'));
+      if (sysF.T_left  != null && sysF.T_left  > 1e-9) body.appendChild(makeReadonlyField('T sinistra', fmtN(sysF.T_left),  'N'));
+      if (sysF.T_right != null && sysF.T_right > 1e-9) body.appendChild(makeReadonlyField('T destra',   fmtN(sysF.T_right), 'N'));
+    }
+  }
+
+  // ── Tensione fune corpo appeso ────────────────────────────────────────────
+  if (typeof getPulleyForceOnHangingBodyCorrect === 'function') {
+    const hangF_panel = getPulleyForceOnHangingBodyCorrect(el);
+    if (hangF_panel && hangF_panel.T > 1e-9) {
+      addSep(body);
+      body.appendChild(sectionTitle('Tensione fune', '#60a0f0'));
+      body.appendChild(makeReadonlyField('T (verso l\'alto)', fmtN(hangF_panel.T), 'N'));
+    }
+  }
+
+  // ── Forza risultante totale ────────────────────────────────────────────────
+  const Fmod   = Math.hypot(Fx, Fy);
+  const Fangle = Math.atan2(Fy, Fx) * 180 / Math.PI;
+  // Salva su el.props per display
+  el.props._Fx    = parseFloat(Fx.toFixed(4));
+  el.props._Fy    = parseFloat(Fy.toFixed(4));
+  el.props._F_mag = parseFloat(Fmod.toFixed(4));
+  body.appendChild(sectionTitle('Forza risultante'));
+  body.appendChild(makeReadonlyField('Fx_tot', fmtN(Fx),     'N'));
+  body.appendChild(makeReadonlyField('Fy_tot', fmtN(Fy),     'N'));
+  body.appendChild(makeReadonlyField('|F|',    fmtN(Fmod),   'N'));
+  body.appendChild(makeReadonlyField('θ_F',    fmtN(Fangle), '°'));
+  addSep(body);
+
+  // ── Equilibrio ─────────────────────────────────────────────────────────────
+  if (constraint || getWallConstraint(el)) {
+    const eqV = Math.abs(Fy) < 1e-6;
+    const eqH = Math.abs(Fx) < 1e-6;
+    // Distacco pavimento
+    const v0y_eq = parseFloat(p.v0y) || 0;
+    const detach_floor = constraint && (flipY ? (v0y_eq < 0) : (v0y_eq > 0));
+    // Distacco parete
+    const wallC_eq = getWallConstraint(el);
+    const wallEl_eq = wallC_eq && elements.find(e => e.id === (wallC_eq.aId === el.id ? wallC_eq.bId : wallC_eq.aId));
+    const flipXW_eq = wallEl_eq?.props?.flipX;
+    const v0x_eq = parseFloat(p.v0x) || 0;
+    const detach_wall = wallC_eq && (flipXW_eq ? (v0x_eq < 0) : (v0x_eq > 0));
+    // Distacco piano
+    const planeC_eq = getPlaneConstraint(el);
+    const planeEl_eq = planeC_eq && elements.find(e => e.id === (planeC_eq.aId === el.id ? planeC_eq.bId : planeC_eq.aId));
+    const geo_eq = planeEl_eq ? getPlaneGeometry(planeEl_eq) : null;
+    const v0x_peq = parseFloat(p.v0x)||0, v0y_peq = parseFloat(p.v0y)||0;
+    const detach_plane = geo_eq && (v0x_peq*geo_eq.nx_fis + v0y_peq*geo_eq.ny_fis) > 1e-6;
+    const detach_any = detach_floor || detach_wall || detach_plane;
+
+    const badge = document.createElement('div');
+    badge.style.cssText = 'display:flex;gap:8px;margin-bottom:8px';
+    function makeBadge(label, ok) {
+      const b = document.createElement('div');
+      b.style.cssText = `flex:1;text-align:center;padding:5px 4px;border-radius:5px;
+        font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;
+        border:1px solid ${ok?'#60f060':'#f06060'};
+        background:${ok?'rgba(96,240,96,0.1)':'rgba(240,96,96,0.1)'};
+        color:${ok?'#60f060':'#f06060'}`;
+      b.textContent = label + (ok ? ' ✓' : ' ✗');
+      return b;
+    }
+    badge.appendChild(makeBadge('Eq. vert.', eqV));
+    badge.appendChild(makeBadge('Eq. oriz.', eqH));
+    body.appendChild(badge);
+    if (detach_any) {
+      const h = document.createElement('div'); h.className = 'prop-hint';
+      h.style.color = '#ffb347';
+      h.textContent = detach_floor ? '(corpo in volo libero — N pavimento = 0)'
+                    : detach_wall  ? '(corpo si stacca dalla parete — N parete = 0)'
+                    : '(corpo si stacca dal piano — N piano = 0)';
+      body.appendChild(h);
+    }
+    addSep(body);
+  }
+
+  // ── Accelerazione risultante ───────────────────────────────────────────────
+  if (hasM) {
+    const ax = Fx/m, ay = Fy/m;
+    const amod = Math.hypot(ax, ay);
+    const aang = Math.atan2(ay, ax) * 180 / Math.PI;
+    // Salva su el.props per display
+    el.props._ax    = parseFloat(ax.toFixed(4));
+    el.props._ay    = parseFloat(ay.toFixed(4));
+    el.props._a_mag = parseFloat(amod.toFixed(4));
+    body.appendChild(makeReadonlyField('ax',  fmtN(ax),   'm/s²'));
+    body.appendChild(makeReadonlyField('ay',  fmtN(ay),   'm/s²'));
+    body.appendChild(makeReadonlyField('|a|', fmtN(amod), 'm/s²'));
+    body.appendChild(makeReadonlyField('θ_a', fmtN(aang), '°'));
+  } else {
+    const hint = document.createElement('div');
+    hint.className = 'prop-hint';
+    hint.textContent = 'Imposta la massa per calcolare l\'accelerazione.';
+    body.appendChild(hint);
+  }
+}
+
+}
+
+// ═══ MODULE: spring-wall.js ═══
+// ─── Molla verticale su parete ────────────────────────────────────────────────
+// Gestisce il vincolo spring_on_wall (molla verticale ancorata alla parete)
+// e la coesistenza spring_body + body_on_wall
+
+// ── Posizionamento molla su parete in confirmRelation ─────────────────────────
+function applySpringOnWall(springEl, wallEl, props) {
+  const yAnchor = parseFloat(props.yAnchor) || 0;
+  const yMin_w = parseFloat(wallEl.props?.yMin) ?? 0;
+  const yMax_w = parseFloat(wallEl.props?.yMax) ?? 10;
+  const ref_sw = getRefSystem();
+  const MB_sw=50, H_sw=300, MT_sw=24;
+  const hY_sw = Math.max(0.1, parseFloat(ref_sw?.props?.halfY)||5);
+  const scaleY_sw = ref_sw ? (H_sw-MB_sw-MT_sw)/(2*hY_sw) : 13;
+  const lenM_sw = yMax_w - yMin_w;
+  const geo_sw = getWallGeometry(wallEl);
+  const lenPx_sw = geo_sw.lenPx;
+
+  // Converti yAnchor in pixel dalla cima della parete (SVG y)
+  const sRel_sw = yAnchor - yMin_w;
+  const sPx_sw  = (sRel_sw / lenM_sw) * lenPx_sw;
+  const yPx_sw  = wallEl.y + lenPx_sw - sPx_sw; // SVG y del punto di ancoraggio
+
+  const flipXw = wallEl.props?.flipX;
+  const hPx_sw = springEl._hPx || 80;
+  const anchor_sw = springEl.props?.anchor || 'top';
+
+  // X: molla adiacente alla parete
+  if (!flipXw) {
+    // Parete a sinistra (linea a x=13): molla a destra
+    springEl.x = wallEl.x + 13 - 8; // bordo sinistro della molla vicino alla linea
+  } else {
+    // Parete a destra: molla a sinistra
+    springEl.x = wallEl.x - 32; // bbox molla verticale è largo 32px
+  }
+
+  // Y: parete della molla al punto di ancoraggio
+  if (anchor_sw === 'top') {
+    // Parete in alto → springEl.y + 8 = yPx_sw
+    springEl.y = yPx_sw - 8;
+  } else {
+    // Parete in basso → springEl.y + hPx - 8 = yPx_sw
+    springEl.y = yPx_sw - hPx_sw + 8;
+  }
+}
+
+// ── Posizionamento corpo su parete con molla ──────────────────────────────────
+function applyBodyOnWallWithSpring(body, bodyDef, wall, spring, floorRel, scaleY) {
+  // X dal vincolo parete (come body_on_wall)
+  const flipXw = wall.props?.flipX;
+  if (!flipXw) {
+    body.x = wall.x + 13;
+  } else {
+    body.x = wall.x - bodyDef.w;
+  }
+  // Y dalla molla (come spring_body verticale)
+  // già gestita da applyRelationPositions nel blocco spring_body
+}
+
+// ── Calcolo F_net con attrito verticale (per molla verticale su parete) ────────
+// Restituisce la forza netta che allunga/comprime la molla tenendo conto
+// dell'attrito della parete verticale
+function calcSpringFnetWithWall(sp, bodyEl, anchor, Fext, pesoFy) {
+  let F2 = 0;
+  if (anchor === 'top') {
+    F2 = -(pesoFy + Fext); // Fext = Σfy
+  } else if (anchor === 'bottom') {
+    F2 = +(pesoFy + Fext);
+  } else if (anchor === 'left') {
+    F2 = Fext;
+  } else {
+    F2 = -Fext;
+  }
+
+  // Per molla verticale (top/bottom): se il corpo è su una parete con attrito,
+  // l'attrito verticale si oppone allo scorrimento verticale del corpo
+  const isVert = anchor === 'top' || anchor === 'bottom';
+  if (isVert) {
+    const wallRelF = relations.find(r =>
+      r.type === 'body_on_wall' && (r.aId === bodyEl.id || r.bId === bodyEl.id)
+    );
+    if (wallRelF) {
+      const wallEl2 = elements.find(e =>
+        e.id === (wallRelF.aId === bodyEl.id ? wallRelF.bId : wallRelF.aId)
+      );
+      if (wallEl2) {
+        const muS = parseFloat(wallRelF.props?.muS);
+        const muK = parseFloat(wallRelF.props?.muK);
+        // N dalla parete verticale = forze orizzontali sul corpo
+        // Per ora assumiamo N data da forze esterne orizzontali
+        const ref_w = getRefSystem();
+        const g_w = parseFloat(ref_w?.props?.gravity) || 0;
+        const m_w = parseFloat(bodyEl.props?.mass) || 0;
+        let Fh = 0; // forze orizzontali sul corpo
+        (bodyEl.props?.forces || []).forEach(f => { Fh += parseFloat(f.fx) || 0; });
+        const Nw = Math.abs(Fh); // N dalla parete = componente orizzontale
+        const v0y2 = parseFloat(bodyEl.props?.v0y) || 0;
+        const isMoving2 = Math.abs(v0y2) > 1e-9;
+
+        if (Nw > 1e-9) {
+          if (!isMoving2 && !isNaN(muS) && muS > 0) {
+            const fsMax = muS * Nw;
+            if (Math.abs(F2) <= fsMax) {
+              F2 = 0; // attrito statico bilancia → molla a riposo
+            } else {
+              const fk = (!isNaN(muK) && muK > 0) ? muK * Nw : fsMax;
+              F2 = F2 - Math.sign(F2) * fk;
+            }
+          } else if (isMoving2 && !isNaN(muK) && muK > 0) {
+            const fk = muK * Nw;
+            F2 = F2 - Math.sign(v0y2) * fk;
+          }
+        }
+      }
+    }
+  }
+  return F2;
+}
+
+// ═══ MODULE: spring-plane.js ═══
+// ─── Molla parallela al piano inclinato ───────────────────────────────────────
+// Gestisce il vincolo spring_on_plane (molla parallela al piano inclinato)
+// Per flipX=false: anchor='left' → parete in basso, anchor='right' → parete in alto
+// Per flipX=true:  anchor='left' → parete in alto, anchor='right' → parete in basso
+
+// ── Posiziona la molla sul piano inclinato ────────────────────────────────────
+function applySpringOnPlane(springEl, planeEl, props) {
+  const geo = getPlaneGeometry(planeEl);
+  const sAnchor = parseFloat(props.sAnchor) || 0;
+  const sAnchorClamped = Math.max(0, Math.min(geo.lenM, sAnchor));
+
+  // Punto parete in pixel SVG (coordinate canvas assolute)
+  const sPx = (sAnchorClamped / geo.lenM) * geo.lenPx;
+  const wx  = planeEl.x + geo.x0 + geo.dx * sPx;
+  const wy  = planeEl.y + geo.y0 + geo.dy * sPx;
+
+  const wPx = springEl._wPx || 80;
+  const hPx = springEl._hPx || 32;
+  const anchor = springEl.props?.anchor || 'left';
+  const flipX = geo.flipX;
+
+  // Per flipX=false: muro a sx per anchor=left (x=8)
+  // Per flipX=true:  draw invertito → muro a dx per anchor=left (x=wPx-8)
+  const localAnchorX = flipX
+    ? (anchor === 'left' ? wPx - 8 : 8)
+    : (anchor === 'left' ? 8 : wPx - 8);
+  // Per entrambi i casi: bordo inferiore sulla superficie (localAnchorY=hPx)
+  const localAnchorY = hPx;
+
+  springEl.x = wx - localAnchorX;
+  springEl.y = wy - localAnchorY;
+
+  // Metadati per altri moduli
+  springEl._planeAnchorX = wx;
+  springEl._planeAnchorY = wy;
+  springEl._planeFlipX   = flipX;
+  // Segno della direzione libera: +1 = estremo libero nella direzione geo.dx/dy
+  //                                -1 = estremo libero nella direzione opposta
+  // flipX=false, anchor=left: parete in basso, libero verso l'alto (dir=+1)
+  // flipX=false, anchor=right: parete in alto, libero verso il basso (dir=-1)
+  // flipX=true,  anchor=left: parete in basso, libero verso l'alto (dir=+1) 
+  // flipX=true,  anchor=right: parete in alto, libero verso il basso (dir=-1)
+  springEl._planeFreeSign = anchor === 'left' ? 1 : -1;
+  springEl._planeDxFis   = geo.dx_fis;
+  springEl._planeDyFis   = geo.dy_fis;
+  springEl._planeNxFis   = geo.nx_fis;
+  springEl._planeNyFis   = geo.ny_fis;
+}
+
+// ── Calcola F_net parallela al piano (per _L_calc) ────────────────────────────
+// Tiene conto di: peso proiettato, forze esterne proiettate, attrito piano
+function calcSpringFnetOnPlane(sp, bodyEl) {
+  const planeRel = relations.find(r =>
+    r.type === 'body_on_plane' && (r.aId === bodyEl.id || r.bId === bodyEl.id)
+  );
+  if (!planeRel) return 0;
+
+  const planeEl = elements.find(e =>
+    e.id === (planeRel.aId === bodyEl.id ? planeRel.bId : planeRel.aId)
+  );
+  if (!planeEl) return 0;
+
+  const geo = getPlaneGeometry(planeEl);
+  const ref = getRefSystem();
+  const g   = parseFloat(ref?.props?.gravity) || 0;
+  const m   = parseFloat(bodyEl.props?.mass) || 0;
+  const pesoFy = (g > 0 && m > 0) ? -m * g : 0;
+
+  // Proiezioni del peso sul piano
+  const Ppar  = pesoFy * geo.dy_fis;  // componente parallela
+  const Pperp = pesoFy * geo.ny_fis;  // componente perpendicolare
+
+  // Proiezioni forze esterne
+  let Fext_par = 0, Fext_perp = 0;
+  (bodyEl.props?.forces || []).forEach(f => {
+    const fx = parseFloat(f.fx) || 0;
+    const fy = parseFloat(f.fy) || 0;
+    Fext_par  += fx * geo.dx_fis + fy * geo.dy_fis;
+    Fext_perp += fx * geo.nx_fis + fy * geo.ny_fis;
+  });
+  // Aggiungi forza fune estremo libero
+  if (typeof getRopeForceOnBody === 'function') {
+    const ropeF_sp = getRopeForceOnBody(bodyEl);
+    if (ropeF_sp) {
+      Fext_par  += ropeF_sp.fx * geo.dx_fis + ropeF_sp.fy * geo.dy_fis;
+      Fext_perp += ropeF_sp.fx * geo.nx_fis + ropeF_sp.fy * geo.ny_fis;
+    }
+  }
+  // Aggiungi tensioni sistema di funi
+  if (typeof getRopeSystemForceOnBody === 'function') {
+    const sysF_sp = getRopeSystemForceOnBody(bodyEl);
+    if (sysF_sp) {
+      const netFx = sysF_sp.fx;
+      Fext_par  += netFx * geo.dx_fis;
+      Fext_perp += netFx * geo.nx_fis;
+    }
+  }
+
+  // Forza perpendicolare totale → N
+  const Nperp = Pperp + Fext_perp;
+  const NMag  = Math.abs(Nperp);
+  // N valida solo se preme sul piano (Nperp < 0 in fisica con ny_fis > 0)
+  const NValid = Nperp < -1e-9;
+
+  // Forza parallela totale (peso + esterne) → forza che la molla deve bilanciare
+  const Fpar_tot = Ppar + Fext_par;
+
+  // Segno della forza elastica dipende da anchor
+  // anchor=left → parete in basso → corpo comprime scendendo → F_spring > 0 = compressione
+  // anchor=right → parete in alto → corpo allunga scendendo → F_spring < 0 = allungamento
+  const anchor = sp.props?.anchor || 'left';
+  const geo_fnet = getPlaneGeometry(planeEl);
+  let F_spring = Fpar_tot;
+  // Solo anchor=right inverte il segno (indipendentemente da flipX)
+  const needsFlip = (anchor === 'right');
+  if (needsFlip) F_spring = -Fpar_tot;
+
+  if (NValid) {
+    const muS = parseFloat(planeRel.props?.muS);
+    const muK = parseFloat(planeRel.props?.muK);
+    const v0s = parseFloat(bodyEl.props?.v0s) || 0;
+    const isMoving = Math.abs(v0s) > 1e-9;
+    const fsMax = (!isNaN(muS) && muS > 0) ? muS * NMag : 0;
+
+    if (!isMoving && !isNaN(muS) && muS > 0) {
+      if (Math.abs(F_spring) <= fsMax) {
+        F_spring = 0; // attrito statico bilancia → molla a riposo
+      } else {
+        const fk = (!isNaN(muK) && muK > 0) ? muK * NMag : fsMax;
+        F_spring = F_spring - Math.sign(F_spring) * fk;
+      }
+    } else if (isMoving && !isNaN(muK) && muK > 0) {
+      const fk = muK * NMag;
+      F_spring = F_spring - Math.sign(v0s) * fk;
+    }
+  }
+
+  return F_spring;
+}
+
+// ── Aggiorna posizione e rotazione molla sul piano ad ogni render ─────────────
+function updateSpringOnPlanePosition(springEl) {
+  const rel = relations.find(r =>
+    r.type === 'spring_on_plane' && (r.aId === springEl.id || r.bId === springEl.id)
+  );
+  if (!rel) {
+    // Non è sul piano — rimuovi rotazione piano se presente
+    if (springEl._onPlane) { springEl._rotation = null; springEl._onPlane = false; }
+    return;
+  }
+  const planeEl = elements.find(e =>
+    e.id === (rel.aId === springEl.id ? rel.bId : rel.aId)
+  );
+  if (!planeEl) return;
+
+  applySpringOnPlane(springEl, planeEl, rel.props);
+  springEl._onPlane = true;
+
+  // Applica rotazione: angolo del piano in gradi SVG
+  const geo = getPlaneGeometry(planeEl);
+  const angleRad = Math.atan2(geo.dy, geo.dx);
+  const angleDeg = geo.flipX
+    ? (angleRad * 180 / Math.PI) + 180
+    : angleRad * 180 / Math.PI;
+
+  const wPx = springEl._wPx || 80;
+  const hPx = springEl._hPx || 32;
+  const anchor_sp = springEl.props?.anchor || 'left';
+  const flipX_sp = geo.flipX;
+
+  // cx: punto orizzontale di aggancio parete
+  const cx = flipX_sp
+    ? (anchor_sp === 'left' ? wPx - 8 : 8)
+    : (anchor_sp === 'left' ? 8 : wPx - 8);
+  // cy: per entrambi i casi ruotiamo attorno al bordo che tocca il piano
+  // flipX=false → bordo inferiore (hPx), flipX=true → bordo inferiore (hPx) dopo il +180°
+  const cy = hPx;
+
+  springEl._rotation = { angle: angleDeg, cx, cy };
+}
+
+// ═══ MODULE: spring-plane-flipx.js ═══
+// ─── Molla sul piano inclinato flipX=true ─────────────────────────────────────
+function positionBodyOnFlipXPlane(body, bodyDef, spring, geo2, anchor2, getZig2) {
+  const wPx2 = spring._wPx || 80;
+  const hPx2 = spring._hPx || 32;
+
+  const pwx = spring._planeAnchorX ?? spring.x + (anchor2 === 'left' ? wPx2 - 8 : 8);
+  const pwy = spring._planeAnchorY ?? spring.y + hPx2;
+
+  const {zig: zigFree, tA: tAFree, tF: tFFree} = getZig2(spring);
+  const springLenPx = tAFree + zigFree + tFFree + (anchor2 === 'right' ? 6 : 0);
+
+  // Usa il segno precomputato da applySpringOnPlane
+  const dir2 = spring._planeFreeSign ?? (anchor2 === 'left' ? 1 : -1);
+  const freeX = pwx + dir2 * geo2.dx * springLenPx;
+  const freeY = pwy + dir2 * geo2.dy * springLenPx;
+
+  if (body.type === 'rect_body') {
+    const W2 = bodyDef.w, H2 = bodyDef.h;
+    const angleRad2 = Math.atan2(geo2.dy, geo2.dx);
+    const angleDeg2 = angleRad2 * 180 / Math.PI;
+    const lcx2 = anchor2 === 'left' ? 0 : W2;
+    const lcy2 = H2;
+    const rx2 = lcx2 * Math.cos(angleRad2) - lcy2 * Math.sin(angleRad2);
+    const ry2 = lcx2 * Math.sin(angleRad2) + lcy2 * Math.cos(angleRad2);
+    // Per flipX=true la normale punta nella direzione opposta — sposta il corpo sulla superficie
+    const normalOffset = geo2.flipX ? H2 : 0;
+    const nox = normalOffset * geo2.nx;
+    const noy = normalOffset * geo2.ny;
+    body.x = freeX - rx2 + nox + dir2 * geo2.dx * (H2 * 0.265);
+    body.y = freeY - ry2 + noy + dir2 * geo2.dy * (H2 * 0.265);
+    //console.log('[FLIPX] freeX='+freeX.toFixed(1)+' freeY='+freeY.toFixed(1)+' rx2='+rx2.toFixed(1)+' ry2='+ry2.toFixed(1)+' nox='+nox.toFixed(1)+' noy='+noy.toFixed(1)+' body.x='+body.x.toFixed(1)+' body.y='+body.y.toFixed(1));
+    body._rotation = { angle: angleDeg2, cx: 0, cy: 0 };
+    body._contactLocal = { x: W2 / 2, y: H2 };
+  } else {
+    const shiftX = geo2.nx * bodyDef.h / 2;
+    const shiftY = geo2.ny * bodyDef.h / 2;
+    body.x = freeX - bodyDef.w / 2 + shiftX;
+    body.y = freeY - bodyDef.h / 2 + shiftY;
+    body._rotation = null;
+  }
+
+  return { freeX, freeY };
+}
+
+// ═══ MODULE: rope.js ═══
+// ─── Fune come elemento ────────────────────────────────────────────────────────
+// La fune è un elemento con due estremità, ognuna collegabile a un corpo.
+// Si allunga dinamicamente per coprire la distanza tra i corpi collegati.
+
+// Calcola punto di aggancio della fune sul corpo
+// rect_body: lato rivolto verso l'altro punto; altri: centro
+function getRopeAttachPoint(body, targetX, targetY) {
+  const def = DEFS[body.type];
+  const cx = body.x + def.w / 2;
+  const cy = body.y + def.h / 2;
+
+  if (body.type === 'rect_body') {
+    const dx = targetX - cx, dy = targetY - cy;
+    const W = def.w / 2, H = def.h / 2;
+    if (Math.abs(dx) < 1e-6 && Math.abs(dy) < 1e-6) return { x: cx, y: cy };
+    const scaleX = Math.abs(dx) > 1e-6 ? W / Math.abs(dx) : Infinity;
+    const scaleY = Math.abs(dy) > 1e-6 ? H / Math.abs(dy) : Infinity;
+    const scale  = Math.min(scaleX, scaleY);
+    return { x: cx + dx * scale, y: cy + dy * scale };
+  }
+  return { x: cx, y: cy };
+}
+
+// Versione raw: calcola angolo forza senza dipendere da getRopeFreeEnd
+function getRopeForceEffectRaw(ropeEl, freeEnd) {
+  const F   = parseFloat(ropeEl.props?.forceF) || 0;
+  const ang = parseFloat(ropeEl.props?.forceAngle) || 0;
+  if (Math.abs(F) < 1e-9) return null;
+  const angRad = ang * Math.PI / 180;
+  return { F, angRad };
+}
+
+// Aggiorna posizione e dimensioni della fune in base ai corpi collegati
+function updateRopePosition(ropeEl) {
+  const leftRel  = relations.find(r => r.type === 'rope_body' && 
+    (r.aId === ropeEl.id || r.bId === ropeEl.id) && 
+    (r.props?.anchor === 'left' || !r.props?.anchor));
+  const rightRel = relations.find(r => r.type === 'rope_body' && 
+    (r.aId === ropeEl.id || r.bId === ropeEl.id) && 
+    r.props?.anchor === 'right');
+  const hangingRel = relations.find(r => r.type === 'rope_body' &&
+    (r.aId === ropeEl.id || r.bId === ropeEl.id) &&
+    r.props?.anchor === 'hanging');
+  const hangingLeftRel = relations.find(r => r.type === 'rope_body' &&
+    (r.aId === ropeEl.id || r.bId === ropeEl.id) &&
+    r.props?.anchor === 'hanging_left');
+  const hangingRightRel = relations.find(r => r.type === 'rope_body' &&
+    (r.aId === ropeEl.id || r.bId === ropeEl.id) &&
+    r.props?.anchor === 'hanging_right');
+
+  // Controlla se la fune è agganciata a una carrucola
+  const pulleyRel = relations.find(r => r.type === 'rope_on_pulley' &&
+    (r.aId === ropeEl.id || r.bId === ropeEl.id));
+  const pulleyEl = pulleyRel
+    ? elements.find(e => e.id === (pulleyRel.aId === ropeEl.id ? pulleyRel.bId : pulleyRel.aId)) || null
+    : null;
+  const pulleySide = pulleyRel?.props?.side || 'left';
+
+  // Se la carrucola non esiste più (relazione orfana), esci
+  if (pulleyRel && !pulleyEl) return;
+
+  const leftBody       = leftRel        ? elements.find(e => e.id === (leftRel.aId        === ropeEl.id ? leftRel.bId        : leftRel.aId))        || null : null;
+  const rightBody      = rightRel       ? elements.find(e => e.id === (rightRel.aId       === ropeEl.id ? rightRel.bId       : rightRel.aId))       || null : null;
+  const hangingBody    = hangingRel     ? elements.find(e => e.id === (hangingRel.aId     === ropeEl.id ? hangingRel.bId     : hangingRel.aId))     || null : null;
+  const hangingLeftBody  = hangingLeftRel  ? elements.find(e => e.id === (hangingLeftRel.aId  === ropeEl.id ? hangingLeftRel.bId  : hangingLeftRel.aId))  || null : null;
+  const hangingRightBody = hangingRightRel ? elements.find(e => e.id === (hangingRightRel.aId === ropeEl.id ? hangingRightRel.bId : hangingRightRel.aId)) || null : null;
+
+  // Guard: se qualche corpo trovato non ha type, esci
+  if ((leftBody && !leftBody.type) || (rightBody && !rightBody.type) ||
+      (hangingBody && !hangingBody.type) || (hangingLeftBody && !hangingLeftBody.type) ||
+      (hangingRightBody && !hangingRightBody.type)) return;
+
+  // Controlla se c'è una molla agganciata
+  const ropeSpringRelEarly = relations.find(r2 =>
+    r2 && r2.type === 'rope_spring' && (r2.aId === ropeEl.id || r2.bId === ropeEl.id)
+  );
+  const hasSpring = !!ropeSpringRelEarly;
+
+  if (!leftBody && !rightBody && !hangingBody && !hangingLeftBody && !hangingRightBody && !hasSpring) return;
+
+  // ── Caso Atwood: due corpi appesi ai lati della carrucola ─────────────────
+  // Riconosce: hanging_left+hanging_right, hanging+hanging_left, hanging+hanging_right
+  const atwoodLeft  = hangingLeftBody  || (hangingBody && !hangingRightBody ? null : hangingBody);
+  const atwoodRight = hangingRightBody || null;
+  const isAtwood = pulleyEl && (
+    (hangingLeftBody && hangingRightBody) ||
+    (hangingBody && hangingLeftBody) ||
+    (hangingBody && hangingRightBody)
+  );
+  // Determina i due corpi Atwood
+  let atwoodBodyL = hangingLeftBody  || (hangingBody && hangingRightBody ? hangingBody : null);
+  let atwoodBodyR = hangingRightBody || null;
+
+  if (pulleyEl && isAtwood) {
+    const pulleyW = pulleyEl._wPx || 60;
+    const pulleyH = pulleyEl._hPx || 70;
+    const anchor  = pulleyEl.props?.anchor || 'top';
+    let pCX, pCY;
+    if (anchor === 'top') {
+      pCX = pulleyEl.x + pulleyW / 2;
+      pCY = pulleyEl.y + pulleyH - 20;
+    } else {
+      pCX = pulleyEl.x + pulleyW / 2;
+      pCY = pulleyEl.y + 20;
+    }
+    const r = 20;
+
+    // Trova il pavimento per posizionare i corpi
+    const pulleyFloorRel = relations.find(r2 =>
+      r2.type === 'pulley_on_floor' && (r2.aId === pulleyEl.id || r2.bId === pulleyEl.id)
+    );
+    const floorEl2 = pulleyFloorRel
+      ? elements.find(e => e.id === (pulleyFloorRel.aId === pulleyEl.id ? pulleyFloorRel.bId : pulleyFloorRel.aId))
+      : null;
+    const floorSurfaceY = floorEl2 ? floorEl2.y + 10 : pCY + 300;
+
+    // Punto ore 9 (sinistra) → corpo sinistro
+    const leftAttachX = pCX - r;
+    const leftAttachY = pCY;
+    // Punto ore 3 (destra) → corpo destro
+    const rightAttachX = pCX + r;
+    const rightAttachY = pCY;
+
+    // Posiziona corpo sinistro — più in alto
+    const segLeft = [];
+    if (atwoodBodyL) {
+      const defL = DEFS[atwoodBodyL.type] || { w: 30, h: 30 };
+      atwoodBodyL.x = leftAttachX - defL.w / 2;
+      atwoodBodyL.y = pCY + (floorSurfaceY - pCY) * 0.35 - defL.h / 2;
+      segLeft.push({ x: leftAttachX, y: leftAttachY });
+      segLeft.push({ x: leftAttachX, y: atwoodBodyL.y });
+    } else {
+      segLeft.push({ x: leftAttachX, y: leftAttachY });
+      segLeft.push({ x: leftAttachX, y: leftAttachY + 60 });
+    }
+
+    // Posiziona corpo destro — più in basso
+    const segRight = [];
+    if (atwoodBodyR) {
+      const defR = DEFS[atwoodBodyR.type] || { w: 30, h: 30 };
+      atwoodBodyR.x = rightAttachX - defR.w / 2;
+      atwoodBodyR.y = pCY + (floorSurfaceY - pCY) * 0.65 - defR.h / 2;
+      segRight.push({ x: rightAttachX, y: rightAttachY });
+      segRight.push({ x: rightAttachX, y: atwoodBodyR.y });
+    } else {
+      segRight.push({ x: rightAttachX, y: rightAttachY });
+      segRight.push({ x: rightAttachX, y: rightAttachY + 150 });
+    }
+
+    ropeEl._seg1 = segLeft;
+    ropeEl._seg2 = segRight;
+    ropeEl._isAtwood = true;
+    ropeEl._pulleyPath = null;
+
+    const allPts = [...segLeft, ...segRight];
+    const allX = allPts.map(p => p.x);
+    const allY = allPts.map(p => p.y);
+    ropeEl._lx = segLeft[0].x; ropeEl._ly = segLeft[0].y;
+    ropeEl._rx = segRight[0].x; ropeEl._ry = segRight[0].y;
+    ropeEl.x = Math.min(...allX) - 4;
+    ropeEl.y = Math.min(...allY) - 4;
+    ropeEl._wPx = Math.max(...allX) - Math.min(...allX) + 8;
+    ropeEl._hPx = Math.max(...allY) - Math.min(...allY) + 8;
+    return;
+  }
+
+  // Caso speciale: fune agganciata a carrucola
+  if (pulleyEl && pulleyRel) {
+    const pulleyW = pulleyEl._wPx || 60;
+    const pulleyH = pulleyEl._hPx || 70;
+    const anchor = pulleyEl.props?.anchor || 'top';
+
+    // Centro della ruota della carrucola
+    let pCX, pCY;
+    if (anchor === 'top') {
+      pCX = pulleyEl.x + pulleyW / 2;
+      pCY = pulleyEl.y + pulleyH - 20;
+    } else if (anchor === 'bottom') {
+      pCX = pulleyEl.x + pulleyW / 2;
+      pCY = pulleyEl.y + 20;
+    } else if (anchor === 'vertex') {
+      // Centro = metà del bounding box dinamico
+      pCX = pulleyEl.x + (pulleyEl._wPx || 60) / 2;
+      pCY = pulleyEl.y + (pulleyEl._hPx || 60) / 2;
+    } else {
+      pCX = pulleyEl.x + pulleyW / 2;
+      pCY = pulleyEl.y + pulleyH / 2;
+    }
+
+    const r = (anchor === 'vertex' && pulleyEl._rEff) ? pulleyEl._rEff : 20;
+    const body = leftBody || rightBody;
+
+    // Controlla se la carrucola è su un piano inclinato
+    const planeRel2 = relations.find(r2 =>
+      r2.type === 'pulley_on_plane' && (r2.aId === pulleyEl.id || r2.bId === pulleyEl.id)
+    );
+    const planeEl2 = planeRel2
+      ? elements.find(e => e.id === (planeRel2.aId === pulleyEl.id ? planeRel2.bId : planeRel2.aId))
+      : null;
+
+    // Segmento 1: corpo/molla → carrucola
+    let seg1Start = null, seg1End = null;
+    if (body) {
+      const def = DEFS[body.type];
+      const bodyCX = body.x + def.w / 2;
+      const bodyCY = body.y + def.h / 2;
+
+      if (planeEl2) {
+        // Carrucola su piano inclinato
+        const geo2 = getPlaneGeometry(planeEl2);
+        const dx_svg = geo2.dx;
+        const dy_svg = geo2.dy;
+        const halfW = def.w / 2, halfH = def.h / 2;
+
+        // Centro visivo reale del corpo ruotato
+        const angleRad2 = (body._rotation?.angle || 0) * Math.PI / 180;
+        const cosA = Math.cos(angleRad2), sinA = Math.sin(angleRad2);
+        const realCX = body.x + halfW * cosA - halfH * sinA;
+        const realCY = body.y + halfW * sinA + halfH * cosA;
+
+        // Normale al piano (verso l'esterno = verso l'alto del piano)
+        const nx_svg = geo2.nx;
+        const ny_svg = geo2.ny;
+
+        const nx2 = geo2.nx;
+        const ny2 = geo2.ny;
+
+        // r_eff = halfH del corpo (metà lato corto) per fune parallela al piano
+        const r_eff = pulleyEl._rEff || halfH;
+        ropeEl._pulleyR = r_eff;
+
+        // Punto di aggancio fune: lato opposto al contatto col piano
+        // _contactLocal è il punto locale di contatto (verso il piano)
+        // Il lato verso la carrucola è il centro del lato opposto
+        // Il lato verso la carrucola è il lato corto destro (x=W, y=H/2)
+        // oppure sinistro (x=0, y=H/2) — scegliamo quello più vicino alla carrucola
+        const cand1 = {
+          x: body.x + def.w * cosA - (def.h/2) * sinA,
+          y: body.y + def.w * sinA + (def.h/2) * cosA
+        };
+        const cand2 = {
+          x: body.x + 0 * cosA - (def.h/2) * sinA,
+          y: body.y + 0 * sinA + (def.h/2) * cosA
+        };
+        const dd1 = (cand1.x-pCX)**2 + (cand1.y-pCY)**2;
+        const dd2 = (cand2.x-pCX)**2 + (cand2.y-pCY)**2;
+        seg1Start = dd1 < dd2 ? cand1 : cand2;
+
+        // seg1End: punto sulla ruota nella direzione della normale
+        seg1End = {
+          x: pCX + nx2 * r_eff,
+          y: pCY + ny2 * r_eff
+        };
+      } else {
+        // Carrucola normale → angolo 45°
+        let bodyAttachX, bodyAttachY;
+        if (body.type === 'rect_body') {
+          bodyAttachX = pCX < bodyCX ? body.x : body.x + def.w;
+          bodyAttachY = bodyCY;
+        } else {
+          bodyAttachX = bodyCX; bodyAttachY = bodyCY;
+        }
+        const bodyIsRight = bodyAttachX > pCX;
+        const angleRad = bodyIsRight ? -Math.PI / 4 : -3 * Math.PI / 4;
+        const attachX = pCX + Math.cos(angleRad) * r;
+        const attachY = pCY + Math.sin(angleRad) * r;
+        seg1Start = { x: bodyAttachX, y: bodyAttachY };
+        seg1End   = { x: attachX, y: attachY };
+      }
+    }
+
+    // Cerca molla agganciata alla fune (rope_spring)
+    const ropeSpringRel = relations.find(r2 =>
+      r2.type === 'rope_spring' && (r2.aId === ropeEl.id || r2.bId === ropeEl.id)
+    );
+    const springEl = ropeSpringRel
+      ? elements.find(e => e.id === (ropeSpringRel.aId === ropeEl.id ? ropeSpringRel.bId : ropeSpringRel.aId))
+      : null;
+
+    // Se c'è molla su piano inclinato e carrucola su piano → seg1 dalla molla alla carrucola
+    if (!body && springEl && planeEl2) {
+      const springOnPlaneRel2 = relations.find(r2 =>
+        r2.type === 'spring_on_plane' && (r2.aId === springEl.id || r2.bId === springEl.id)
+      );
+      if (springOnPlaneRel2) {
+        const springW = springEl._wPx || 32;
+        const springH2 = springEl._hPx || 32;
+        const r_eff = springH2 / 2;
+        pulleyEl._rEff = r_eff;
+        ropeEl._pulleyR = r_eff;
+
+        const rot = springEl._rotation || { angle: 0, cx: 0, cy: 0 };
+        const angleRad_sp = rot.angle * Math.PI / 180;
+        const cosA_sp = Math.cos(angleRad_sp), sinA_sp = Math.sin(angleRad_sp);
+        const pivotX = rot.cx, pivotY = rot.cy;
+
+        let localFreeX = springEl._planeFlipX ? 6 : (springW - 6);
+        let localFreeY = springH2 / 2;
+        const dxLocal = localFreeX - pivotX;
+        const dyLocal = localFreeY - pivotY;
+        const freeEndX = springEl.x + pivotX + dxLocal * cosA_sp - dyLocal * sinA_sp;
+        const freeEndY = springEl.y + pivotY + dxLocal * sinA_sp + dyLocal * cosA_sp;
+        seg1Start = { x: freeEndX, y: freeEndY };
+
+        const geo2 = getPlaneGeometry(planeEl2);
+        seg1End = { x: pCX + geo2.nx * r_eff, y: pCY + geo2.ny * r_eff };
+
+        // seg2: carrucola → corpo appeso (verticale)
+        const seg2StartX = pCX + r_eff;
+        const seg2StartY = pCY;
+        const seg2Start_sop = { x: seg2StartX, y: seg2StartY };
+
+        if (hangingBody) {
+          const defH = DEFS[hangingBody.type] || { w: 30, h: 30 };
+          hangingBody._rotation = { angle: 90, cx: 0, cy: 0 };
+
+          // Corpo scende quando la molla si allunga
+          const k_sop = parseFloat(springEl.props?.k);
+          const L0_sop = parseFloat(springEl.props?.L0);
+          const Lc_sop = parseFloat(springEl.props?._L_calc);
+          const ref_sop = getRefSystem();
+          const axisH_sop = 300 - 50 - 24;
+          const hY_sop = Math.max(0.1, parseFloat(ref_sop?.props?.halfY) || 5);
+          const sY_sop = axisH_sop / (2 * hY_sop);
+          const visScale_sop = Math.max(1, parseFloat(springEl.props?.visScale) || 5);
+          let dxPx_sop = 0;
+          if (!isNaN(k_sop) && k_sop > 0 && !isNaN(L0_sop) && !isNaN(Lc_sop)) {
+            dxPx_sop = (Lc_sop - L0_sop) * sY_sop * visScale_sop;
+          }
+
+          hangingBody.x = seg2StartX + defH.h / 2;
+          hangingBody.y = seg2StartY + 60 + dxPx_sop;
+          const seg2End_sop = { x: seg2StartX, y: hangingBody.y };
+
+          ropeEl._seg1 = [seg1Start, seg1End];
+          ropeEl._seg2 = [seg2Start_sop, seg2End_sop];
+        } else {
+          // Nessun corpo — seg2 corto verso il basso per mostrare la fune
+          const seg2End_sop = { x: seg2StartX, y: seg2StartY + 60 };
+          ropeEl._seg1 = [seg1Start, seg1End];
+          ropeEl._seg2 = [seg2Start_sop, seg2End_sop];
+        }
+
+        ropeEl._isPlane = true;
+        ropeEl._pulleyCX = pCX;
+        ropeEl._pulleyCY = pCY;
+        ropeEl._pulleyPath = null;
+
+        const allPts2 = [seg1Start, seg1End, seg2Start_sop];
+        if (hangingBody) allPts2.push({ x: seg2StartX, y: hangingBody.y });
+        const allX2 = allPts2.map(p => p.x);
+        const allY2 = allPts2.map(p => p.y);
+        ropeEl.x = Math.min(...allX2) - 4;
+        ropeEl.y = Math.min(...allY2) - 4;
+        ropeEl._wPx = Math.max(...allX2) - Math.min(...allX2) + 8;
+        ropeEl._hPx = Math.max(...allY2) - Math.min(...allY2) + 8;
+        ropeEl._lx = seg1Start.x; ropeEl._ly = seg1Start.y;
+        ropeEl._rx = seg2StartX; ropeEl._ry = seg2StartY;
+        return;
+      }
+    }
+
+    // Cerca molla agganciata alla fune (rope_spring)    // Segmento 2: tratto verticale
+    let hangAttachX;
+    if (planeEl2 && body) {
+      const r_hang = (DEFS[body.type]?.h || 32) / 2;
+      const flipX_hang = getPlaneGeometry(planeEl2).flipX;
+      hangAttachX = flipX_hang ? pCX - r_hang : pCX + r_hang;
+    } else if (planeEl2 && springEl) {
+      const r_hang = pulleyEl._rEff || 16;
+      const flipX_hang = getPlaneGeometry(planeEl2).flipX;
+      hangAttachX = flipX_hang ? pCX - r_hang : pCX + r_hang;
+    } else if (planeEl2 && hangingBody) {
+      // Fune corpo appeso con carrucola su piano
+      const r_hang = pulleyEl._rEff || 16;
+      const flipX_hang = getPlaneGeometry(planeEl2).flipX;
+      hangAttachX = flipX_hang ? pCX - r_hang : pCX + r_hang;
+    } else if (body) {
+      const bodyCX_h = body.x + (DEFS[body.type]?.w || 30) / 2;
+      hangAttachX = bodyCX_h < pCX ? pCX + r : pCX - r;
+    } else {
+      hangAttachX = pulleySide === 'left' ? pCX - r : pCX + r;
+    }
+    const hangAttachY = pCY;
+    const planeR_eff = planeEl2 ? (pulleyEl._rEff || (body ? (DEFS[body.type]?.h || 32) / 2 : 16)) : r;
+    // Per carrucola su piano: seg2Start = lato opposto alla normale (dove esce la fune verticale)
+    // seg1End = pC + nx*r_eff (lato dove arriva la fune dal piano)
+    // seg2Start = pC - nx*r_eff (lato opposto, dove esce verticalmente)
+    let seg2Start;
+    if (planeEl2 && body) {
+      const geo_s2 = getPlaneGeometry(planeEl2);
+      seg2Start = {
+        x: geo_s2.flipX ? pCX - planeR_eff : pCX + planeR_eff,
+        y: pCY
+      };
+    } else if (planeEl2 && hangingBody) {
+      const geo_s2h = getPlaneGeometry(planeEl2);
+      seg2Start = {
+        x: geo_s2h.flipX ? pCX - planeR_eff : pCX + planeR_eff,
+        y: pCY
+      };
+    } else {
+      seg2Start = { x: hangAttachX, y: hangAttachY };
+    }
+    // Se c'è sia springEl che hangingBody, vanno su lati opposti
+    if (springEl && hangingBody) {
+      // Lato molla: determinato da side
+      const springAttachX = pulleySide === 'left' ? pCX - r : pCX + r;
+      const springAttachY = pCY;
+      // Lato corpo: opposto
+      const bodyAttachX2 = pulleySide === 'left' ? pCX + r : pCX - r;
+      const bodyAttachY2 = pCY;
+
+      // Posiziona molla — tieni fissa la base (parete), sposta l'estremo libero in alto
+      const springW = springEl._wPx || 32;
+      const springH = springEl._hPx || 80;
+      const anchor_sp2 = springEl.props?.anchor || 'bottom';
+      springEl.x = springAttachX - springW / 2;
+
+      // Calcola Δx in pixel
+      const k_sp2 = parseFloat(springEl.props?.k);
+      const L0_sp2 = parseFloat(springEl.props?.L0);
+      const Lc_sp2 = parseFloat(springEl.props?._L_calc);
+      const ref_sp2 = getRefSystem();
+      const axisH_sp2 = 300 - 50 - 24;
+      const hY_sp2 = Math.max(0.1, parseFloat(ref_sp2?.props?.halfY) || 5);
+      const sY_sp2 = axisH_sp2 / (2 * hY_sp2);
+      const visScale_sp2 = Math.max(1, parseFloat(springEl.props?.visScale) || 5);
+      let dxPx_sp2 = 0;
+      if (!isNaN(k_sp2) && k_sp2 > 0 && !isNaN(L0_sp2) && !isNaN(Lc_sp2)) {
+        dxPx_sp2 = (Lc_sp2 - L0_sp2) * sY_sp2 * visScale_sp2;
+      }
+
+      if (anchor_sp2 === 'bottom') {
+        // Parete in basso fissa, estremo libero in alto
+        // Base (parete) a: springAttachY + 60 + springH (fisso)
+        // Estremo libero (springEl.y): base - springH_corrente - dxPx
+        const baseY_fixed = springAttachY + 60 + springH;
+        springEl.y = baseY_fixed - springH - dxPx_sp2;
+      } else {
+        springEl.y = springAttachY + 20;
+      }
+
+      // Posiziona corpo appeso — scende di Δx rispetto alla posizione di riposo
+      const defH2 = (hangingBody && hangingBody.type) ? (DEFS[hangingBody.type] || { w: 30, h: 30 }) : { w: 30, h: 30 };
+      if (!hangingBody) return;
+      hangingBody.x = bodyAttachX2 - defH2.w / 2;
+      const baseBodyY = bodyAttachY2 + (200 - defH2.h); // posizione a riposo
+      // Calcola Δx in pixel dalla molla (se k e L0 impostati)
+      const k_bps = parseFloat(springEl.props?.k);
+      const L0_bps = parseFloat(springEl.props?.L0);
+      const Lc_bps = parseFloat(springEl.props?._L_calc);
+      const ref_bps2 = getRefSystem();
+      const axisH_bps = 300 - 50 - 24;
+      const hY_bps = Math.max(0.1, parseFloat(ref_bps2?.props?.halfY) || 5);
+      const sY_bps = axisH_bps / (2 * hY_bps);
+      const visScale_bps = Math.max(1, parseFloat(springEl.props?.visScale) || 5);
+      let dxPx_bps = 0;
+      if (!isNaN(k_bps) && k_bps > 0 && !isNaN(L0_bps) && !isNaN(Lc_bps)) {
+        dxPx_bps = (Lc_bps - L0_bps) * sY_bps * visScale_bps;
+      }
+      hangingBody.y = baseBodyY + dxPx_bps;
+
+      // Segmenti
+      // Estremo libero della molla = springEl.y (bordo superiore con anchor=bottom)
+      const springFreeY = (anchor_sp2 === 'bottom') ? springEl.y : springEl.y + springH;
+      const segSpring = [
+        { x: springAttachX, y: springAttachY },
+        { x: springAttachX, y: springFreeY }
+      ];
+      const segBody = [
+        { x: bodyAttachX2, y: bodyAttachY2 },
+        { x: bodyAttachX2, y: hangingBody.y }
+      ];
+
+      ropeEl._seg1 = segBody;   // corpo = seg1
+      ropeEl._seg2 = segSpring; // molla = seg2
+      ropeEl._isAtwood = false;
+      ropeEl._pulleyPath = null;
+
+      const allPts = [...segSpring, ...segBody];
+      const allX = allPts.map(p => p.x);
+      const allY = allPts.map(p => p.y);
+      ropeEl._lx = segBody[0].x; ropeEl._ly = segBody[0].y;
+      ropeEl._rx = segSpring[0].x; ropeEl._ry = segSpring[0].y;
+      ropeEl.x = Math.min(...allX) - 4;
+      ropeEl.y = Math.min(...allY) - 4;
+      ropeEl._wPx = Math.max(...allX) - Math.min(...allX) + 8;
+      ropeEl._hPx = Math.max(...allY) - Math.min(...allY) + 8;
+      return;
+    }
+
+    if (!planeEl2 || !body) {
+      seg2Start = { x: hangAttachX, y: hangAttachY };
+    }
+    let seg2End;
+
+    if (hangingBody) {
+      // Corpo appeso sotto la carrucola
+      const defH = (hangingBody.type && DEFS[hangingBody.type]) ? DEFS[hangingBody.type] : { w: 30, h: 30 };
+      hangingBody.x = hangAttachX - defH.w / 2;
+
+      if (planeEl2) {
+        // Carrucola su piano → corpo appeso ruotato 90°
+        const ropeLen = 60;
+        hangingBody.x = seg2Start.x + defH.h / 2;
+        hangingBody.y = seg2Start.y + ropeLen;
+        hangingBody._rotation = { angle: 90, cx: 0, cy: 0 };
+        seg2End = { x: seg2Start.x, y: hangingBody.y };
+      } else {
+        const pulleyFloorRel = relations.find(r2 =>
+          r2.type === 'pulley_on_floor' && (r2.aId === pulleyEl.id || r2.bId === pulleyEl.id)
+        );
+        const floorEl2 = pulleyFloorRel
+          ? elements.find(e => e.id === (pulleyFloorRel.aId === pulleyEl.id ? pulleyFloorRel.bId : pulleyFloorRel.aId))
+          : null;
+        if (floorEl2) {
+          hangingBody.y = floorEl2.y + 10 - defH.h - 40;
+        } else {
+          // Posizione base
+          let baseY = hangAttachY + (200 - defH.h);
+          // Se c'è una molla sull'altra fune della stessa carrucola, il corpo si sposta
+          const pulleyRel_hb = relations.find(r2 =>
+            r2.type === 'rope_on_pulley' && (r2.aId === ropeEl.id || r2.bId === ropeEl.id)
+          );
+          if (pulleyRel_hb) {
+            const pulleyId_hb = pulleyRel_hb.aId === ropeEl.id ? pulleyRel_hb.bId : pulleyRel_hb.aId;
+            const otherRopes_hb = relations.filter(r2 =>
+              r2.type === 'rope_on_pulley' && r2.id !== pulleyRel_hb.id &&
+              (r2.aId === pulleyId_hb || r2.bId === pulleyId_hb)
+            );
+            for (const orr_hb of otherRopes_hb) {
+              const otherRopeId_hb = orr_hb.aId === pulleyId_hb ? orr_hb.bId : orr_hb.aId;
+              const springRel_hb = relations.find(r2 =>
+                r2.type === 'rope_spring' && (r2.aId === otherRopeId_hb || r2.bId === otherRopeId_hb)
+              );
+              if (springRel_hb) {
+                const springEl_hb = elements.find(e =>
+                  e.id === (springRel_hb.aId === otherRopeId_hb ? springRel_hb.bId : springRel_hb.aId)
+                );
+                if (springEl_hb) {
+                  const k_hb = parseFloat(springEl_hb.props?.k);
+                  const L0_hb = parseFloat(springEl_hb.props?.L0);
+                  const Lc_hb = parseFloat(springEl_hb.props?._L_calc);
+                  const ref_hb = getRefSystem();
+                  const axisH_hb = 300 - 50 - 24;
+                  const hY_hb = Math.max(0.1, parseFloat(ref_hb?.props?.halfY) || 5);
+                  const sY_hb = axisH_hb / (2 * hY_hb);
+                  const visScale_hb = Math.max(1, parseFloat(springEl_hb.props?.visScale) || 5);
+                  if (!isNaN(k_hb) && k_hb > 0 && !isNaN(L0_hb) && !isNaN(Lc_hb)) {
+                    const dxPx_hb = (Lc_hb - L0_hb) * sY_hb * visScale_hb;
+                    baseY += dxPx_hb; // molla si allunga → corpo scende
+                  }
+                }
+                break;
+              }
+            }
+          }
+          hangingBody.y = baseY;
+        }
+      }
+      if (!planeEl2) {
+        seg2End = { x: hangAttachX, y: hangingBody.y };
+      }
+
+      // Se c'è molla sotto il corpo appeso (rope_spring), allineala
+      if (springEl) {
+        const springW = springEl._wPx || 32;
+        springEl.x = hangAttachX - springW / 2;
+        // La molla si aggancia al bordo inferiore del corpo
+        // il posizionamento Y è gestito da spring_body — non tocchiamo springEl.y
+      }
+
+    } else if (springEl) {
+      // Fune → molla direttamente (senza corpo intermedio)
+
+      // Controlla se la molla è su piano inclinato
+      const springOnPlaneRel = relations.find(r2 =>
+        r2.type === 'spring_on_plane' && (r2.aId === springEl.id || r2.bId === springEl.id)
+      );
+
+      if (springOnPlaneRel) {
+        const springW = springEl._wPx || 32;
+        const anchor_sop = springEl.props?.anchor || 'left';
+        const springCY = springEl.y + (springEl._hPx || 32) / 2;
+
+        let freeEndX, freeEndY;
+        if (springEl._planeFlipX) {
+          // Estremo libero a sinistra
+          freeEndX = springEl.x;
+          freeEndY = springCY;
+        } else {
+          // Estremo libero a destra
+          freeEndX = springEl.x + springW;
+          freeEndY = springCY;
+        }
+        seg2End = { x: freeEndX, y: freeEndY };
+      } else {
+        // Molla non su piano — logica esistente
+        const springW = springEl._wPx || 32;
+        const springH = springEl._hPx || 80;
+        const anchor_sp = springEl.props?.anchor || 'bottom';
+        springEl.x = hangAttachX - springW / 2;
+
+        if (anchor_sp === 'bottom') {
+          const k_sp = parseFloat(springEl.props?.k);
+          const L0_sp = parseFloat(springEl.props?.L0);
+          const Lc_sp = parseFloat(springEl.props?._L_calc);
+          const ref_sp = getRefSystem();
+          const axisH_sp = 300 - 50 - 24;
+          const hY_sp = Math.max(0.1, parseFloat(ref_sp?.props?.halfY) || 5);
+          const sY_sp = axisH_sp / (2 * hY_sp);
+          const visScale_sp = Math.max(1, parseFloat(springEl.props?.visScale) || 5);
+          let dxPx_sp = 0;
+          if (!isNaN(k_sp) && k_sp > 0 && !isNaN(L0_sp) && !isNaN(Lc_sp)) {
+            dxPx_sp = (Lc_sp - L0_sp) * sY_sp * visScale_sp;
+          }
+          const baseY_sp = hangAttachY + 60 + springH;
+          springEl.y = baseY_sp - springH - dxPx_sp;
+          seg2End = { x: hangAttachX, y: springEl.y };
+        } else {
+          springEl.y = hangAttachY + 20;
+          seg2End = { x: hangAttachX, y: springEl.y + springH };
+        }
+      }
+
+    } else {
+      seg2End = { x: hangAttachX, y: hangAttachY + 60 };
+    }
+
+    // Salva segmenti per il disegno
+    ropeEl._seg1 = seg1Start && seg1End ? [seg1Start, seg1End] : null;
+    ropeEl._seg2 = [seg2Start, seg2End];
+    ropeEl._isPlane = !!planeEl2;
+    ropeEl._pulleyCX = planeEl2 ? pCX : null;
+    ropeEl._pulleyCY = planeEl2 ? pCY : null;
+    ropeEl._pulleyPath = null;
+
+    // Bounding box
+    const allPts = [seg2Start, seg2End];
+    if (seg1Start) { allPts.push(seg1Start); allPts.push(seg1End); }
+    const allX = allPts.map(p => p.x);
+    const allY = allPts.map(p => p.y);
+    ropeEl._lx = seg1Start?.x ?? seg2Start.x;
+    ropeEl._ly = seg1Start?.y ?? seg2Start.y;
+    ropeEl._rx = seg2End.x;
+    ropeEl._ry = seg2End.y;
+    ropeEl.x = Math.min(...allX) - 4;
+    ropeEl.y = Math.min(...allY) - 4;
+    ropeEl._wPx = Math.max(...allX) - Math.min(...allX) + 8;
+    ropeEl._hPx = Math.max(...allY) - Math.min(...allY) + 8;
+    return;
+  }
+
+  // Lunghezza fisica della fune in px (usa L se impostata, altrimenti default)
+  const ropeDefaultLen = DEFS['rope'].w; // 120px
+
+  // ── Caso rope_spring senza carrucola ─────────────────────────────────────
+  const ropeSpringRelDirect = relations.find(r2 =>
+    r2.type === 'rope_spring' && (r2.aId === ropeEl.id || r2.bId === ropeEl.id)
+  );
+  const springElDirect = ropeSpringRelDirect
+    ? elements.find(e => e.id === (ropeSpringRelDirect.aId === ropeEl.id ? ropeSpringRelDirect.bId : ropeSpringRelDirect.aId))
+    : null;
+
+  if (springElDirect && !pulleyEl) {
+    const springW = springElDirect._wPx || 32;
+    const springH = springElDirect._hPx || 80;
+    const anchor_sp = springElDirect.props?.anchor || 'bottom';
+    // Estremo libero della molla
+    const freeX = springElDirect.x + springW / 2;
+    const freeY = (anchor_sp === 'bottom') ? springElDirect.y : springElDirect.y + springH;
+
+    // Aggancia la fune all'estremo libero della molla
+    // L'altro estremo è il corpo collegato (hanging o left/right)
+    const connBody = hangingBody || leftBody || rightBody;
+    if (connBody) {
+      const def = (connBody.type && DEFS[connBody.type]) ? DEFS[connBody.type] : { w: 30, h: 30 };
+      // Corpo sopra la molla — centrato sull'X della molla
+      connBody.x = freeX - def.w / 2;
+      connBody.y = freeY - def.h - 60;
+      ropeEl._lx = freeX; ropeEl._ly = connBody.y + def.h;
+      ropeEl._rx = freeX; ropeEl._ry = freeY;
+      ropeEl.x = freeX - 4;
+      ropeEl.y = connBody.y + def.h;
+      ropeEl._wPx = 8;
+      ropeEl._hPx = freeY - (connBody.y + def.h);
+    } else {
+      // Solo fune → molla, nessun corpo
+      ropeEl._lx = freeX; ropeEl._ly = freeY - 60;
+      ropeEl._rx = freeX; ropeEl._ry = freeY;
+      ropeEl.x = freeX - 4; ropeEl.y = freeY - 60;
+      ropeEl._wPx = 8; ropeEl._hPx = 60;
+    }
+    return;
+  }
+
+  let lx, ly, rx, ry;
+
+  if (leftBody && rightBody) {
+    // Entrambe le estremità collegate
+    const defL = DEFS[leftBody.type];
+    const defR = DEFS[rightBody.type];
+    const lcx = leftBody.x + defL.w / 2, lcy = leftBody.y + defL.h / 2;
+    const rcx = rightBody.x + defR.w / 2, rcy = rightBody.y + defR.h / 2;
+    const pL = getRopeAttachPoint(leftBody,  rcx, rcy);
+    const pR = getRopeAttachPoint(rightBody, lcx, lcy);
+    lx = pL.x; ly = pL.y; rx = pR.x; ry = pR.y;
+
+  } else if (leftBody) {
+    const def = DEFS[leftBody.type];
+    const forceEffect = getRopeForceEffectRaw(ropeEl, 'right');
+    const ref = getRefSystem();
+    const flipY = ref?.props?.flipY;
+
+    if (forceEffect) {
+      const angSVG = flipY ? forceEffect.angRad : -forceEffect.angRad;
+      const dirX = Math.cos(angSVG);
+
+      // Punto di aggancio: centro del lato sinistro o destro del corpo
+      // dipende solo dalla componente orizzontale della forza
+      if (leftBody.type === 'rect_body') {
+        lx = dirX >= 0 ? leftBody.x + def.w : leftBody.x;
+        ly = leftBody.y + def.h / 2;
+      } else {
+        lx = leftBody.x + def.w / 2;
+        ly = leftBody.y + def.h / 2;
+      }
+      rx = lx + Math.cos(angSVG) * ropeDefaultLen;
+      ry = ly + Math.sin(angSVG) * ropeDefaultLen;
+    } else {
+      lx = leftBody.type === 'rect_body' ? leftBody.x + def.w : leftBody.x + def.w / 2;
+      ly = leftBody.y + def.h / 2;
+      rx = lx + ropeDefaultLen; ry = ly;
+    }
+
+  } else {
+    const def = DEFS[rightBody.type];
+    const forceEffect = getRopeForceEffectRaw(ropeEl, 'left');
+    const ref = getRefSystem();
+    const flipY = ref?.props?.flipY;
+
+    if (forceEffect) {
+      const angSVG = flipY ? forceEffect.angRad : -forceEffect.angRad;
+      const dirX = Math.cos(angSVG);
+
+      // Punto di aggancio: centro del lato del corpo nella direzione della forza
+      if (rightBody.type === 'rect_body') {
+        rx = dirX >= 0 ? rightBody.x + def.w : rightBody.x;
+        ry = rightBody.y + def.h / 2;
+      } else {
+        rx = rightBody.x + def.w / 2;
+        ry = rightBody.y + def.h / 2;
+      }
+      lx = rx + Math.cos(angSVG) * ropeDefaultLen;
+      ly = ry + Math.sin(angSVG) * ropeDefaultLen;
+    } else {
+      rx = rightBody.type === 'rect_body' ? rightBody.x : rightBody.x + def.w / 2;
+      ry = rightBody.y + def.h / 2;
+      lx = rx - ropeDefaultLen; ly = ry;
+    }
+  }
+
+  ropeEl._lx = lx; ropeEl._ly = ly;
+  ropeEl._rx = rx; ropeEl._ry = ry;
+
+  const x0 = Math.min(lx, rx), y0 = Math.min(ly, ry);
+  const x1 = Math.max(lx, rx), y1 = Math.max(ly, ry);
+  ropeEl.x = x0 - 4;
+  ropeEl.y = y0 - 4;
+  ropeEl._wPx = (x1 - x0) + 8;
+  ropeEl._hPx = (y1 - y0) + 8;
+}
+
+// Draw della fune — sovrascrive il draw di default di defs.js
+function drawRopeElement(g, el) {
+  const col = '#c8f060';
+
+  // Caso Atwood: due segmenti verticali
+  if (el._isAtwood && el._seg1 && el._seg2) {
+    const drawSeg = (pts) => {
+      if (!pts || pts.length < 2) return;
+      const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      ln.setAttribute('x1', pts[0].x - el.x); ln.setAttribute('y1', pts[0].y - el.y);
+      ln.setAttribute('x2', pts[1].x - el.x); ln.setAttribute('y2', pts[1].y - el.y);
+      ln.setAttribute('stroke', col); ln.setAttribute('stroke-width', '2');
+      ln.setAttribute('stroke-dasharray', '6,3');
+      g.appendChild(ln);
+      // Pallino in fondo
+      const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', pts[1].x - el.x); c.setAttribute('cy', pts[1].y - el.y);
+      c.setAttribute('r', 3); c.setAttribute('fill', col);
+      g.appendChild(c);
+    };
+    drawSeg(el._seg1); // sinistro
+    drawSeg(el._seg2); // destro
+    return;
+  }
+
+  // Caso carrucola con piano: due segmenti + arco sulla ruota
+  if (el._seg2 && !el._isAtwood) {
+    const drawSeg = (pts) => {
+      if (!pts || pts.length < 2) return;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        ln.setAttribute('x1', pts[i].x - el.x);
+        ln.setAttribute('y1', pts[i].y - el.y);
+        ln.setAttribute('x2', pts[i+1].x - el.x);
+        ln.setAttribute('y2', pts[i+1].y - el.y);
+        ln.setAttribute('stroke', col);
+        ln.setAttribute('stroke-width', '2');
+        ln.setAttribute('stroke-dasharray', '6,3');
+        g.appendChild(ln);
+      }
+    };
+    drawSeg(el._seg1);
+    drawSeg(el._seg2);
+
+    // Se carrucola su piano, disegna arco attorno alla ruota tra seg1End e seg2Start
+    if (el._isPlane && el._seg1 && el._seg2 && el._pulleyCX != null) {
+      const p1 = el._seg1[el._seg1.length - 1]; // seg1End
+      const p2 = el._seg2[0];                    // seg2Start
+      const cx = el._pulleyCX, cy = el._pulleyCY;
+      const r2 = el._pulleyR || 20;
+      const d1 = Math.hypot(p1.x-cx, p1.y-cy);
+      const d2 = Math.hypot(p2.x-cx, p2.y-cy);
+      const a1 = Math.atan2(p1.y - cy, p1.x - cx);
+      const a2 = Math.atan2(p2.y - cy, p2.x - cx);
+      const x1s = (p1.x - el.x).toFixed(1), y1s = (p1.y - el.y).toFixed(1);
+      const x2s = (p2.x - el.x).toFixed(1), y2s = (p2.y - el.y).toFixed(1);
+      let da = a2 - a1;
+      if (da < -Math.PI) da += 2 * Math.PI;
+      if (da > Math.PI) da -= 2 * Math.PI;
+      // Per carrucola su piano: sweep orario (1), arco corto (0)
+      const sweep = el._isPlane ? 1 : (da > 0 ? 1 : 0);
+      const largeArc = 0;
+      const arc = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      arc.setAttribute('d', `M ${x1s},${y1s} A ${r2},${r2} 0 ${largeArc},${sweep} ${x2s},${y2s}`);
+      arc.setAttribute('stroke', col);
+      arc.setAttribute('stroke-width', '2');
+      arc.setAttribute('stroke-dasharray', '6,3');
+      arc.setAttribute('fill', 'none');
+      g.appendChild(arc);
+    }
+
+    // Pallini alle estremità
+    const endpoints = [];
+    if (el._seg1) endpoints.push(el._seg1[0]);
+    endpoints.push(el._seg2[el._seg2.length - 1]);
+    endpoints.forEach(p => {
+      const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', p.x - el.x); c.setAttribute('cy', p.y - el.y);
+      c.setAttribute('r', 3); c.setAttribute('fill', col);
+      g.appendChild(c);
+    });
+    return;
+  }
+
+  // Caso polilinea (legacy)
+  if (el._pulleyPath && el._pulleyPath.length > 1) {
+    const pts = el._pulleyPath.map(p => `${p.x - el.x},${p.y - el.y}`).join(' ');
+    const pl = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+    pl.setAttribute('points', pts);
+    pl.setAttribute('stroke', col);
+    pl.setAttribute('stroke-width', '2');
+    pl.setAttribute('stroke-dasharray', '6,3');
+    pl.setAttribute('fill', 'none');
+    g.appendChild(pl);
+    [el._pulleyPath[0], el._pulleyPath[el._pulleyPath.length - 1]].forEach(p => {
+      const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', p.x - el.x); c.setAttribute('cy', p.y - el.y);
+      c.setAttribute('r', 3); c.setAttribute('fill', col);
+      g.appendChild(c);
+    });
+    return;
+  }
+
+  // Caso normale: linea singola
+  const lx = el._lx ?? 0;
+  const ly = el._ly ?? 10;
+  const rx = el._rx ?? (el._wPx || 120);
+  const ry = el._ry ?? 10;
+  const x1 = lx - el.x, y1 = ly - el.y;
+  const x2 = rx - el.x, y2 = ry - el.y;
+  const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  ln.setAttribute('x1', x1); ln.setAttribute('y1', y1);
+  ln.setAttribute('x2', x2); ln.setAttribute('y2', y2);
+  ln.setAttribute('stroke', col);
+  ln.setAttribute('stroke-width', '2');
+  ln.setAttribute('stroke-dasharray', '6,3');
+  g.appendChild(ln);
+  [{ x: x1, y: y1 }, { x: x2, y: y2 }].forEach(p => {
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', p.x); c.setAttribute('cy', p.y);
+    c.setAttribute('r', 3); c.setAttribute('fill', col);
+    g.appendChild(c);
+  });
+}
+
+// Calcola tensione della fune
+function getRopeTension(rel) {
+  const ropeEl = elements.find(e => e.id === rel.aId && e.type === 'rope') ||
+                 elements.find(e => e.id === rel.bId && e.type === 'rope');
+  if (!ropeEl || !ropeEl._lx) return null;
+
+  const dist = Math.hypot(ropeEl._rx - ropeEl._lx, ropeEl._ry - ropeEl._ly);
+  const L    = parseFloat(ropeEl.props?.length) || dist;
+  const taut = dist >= L - 1e-3;
+  if (!taut) return { T: 0, taut: false };
+
+  const dx_px = (ropeEl._rx - ropeEl._lx) / (dist || 1);
+  const dy_px = (ropeEl._ry - ropeEl._ly) / (dist || 1);
+  const ref = getRefSystem();
+  const dx_fis = dx_px;
+  const dy_fis = ref?.props?.flipY ? dy_px : -dy_px;
+
+  return { T: 0, taut, dx_fis, dy_fis };
+}
+
+// ── Controlla se la fune ha un estremo libero ─────────────────────────────────
+function getRopeFreeEnd(ropeEl) {
+  const leftRel  = relations.find(r => r.type === 'rope_body' &&
+    (r.aId === ropeEl.id || r.bId === ropeEl.id) &&
+    (r.props?.anchor === 'left' || !r.props?.anchor));
+  const rightRel = relations.find(r => r.type === 'rope_body' &&
+    (r.aId === ropeEl.id || r.bId === ropeEl.id) &&
+    r.props?.anchor === 'right');
+
+  const hasLeft  = !!leftRel;
+  const hasRight = !!rightRel;
+
+  if (!hasLeft && !hasRight) return null; // nessun corpo
+  if (hasLeft && hasRight)   return null; // nessun estremo libero
+  if (hasLeft)  return 'right'; // sinistra collegata → destra libera
+  if (hasRight) return 'left';  // destra collegata → sinistra libera
+}
+
+// ── Calcola direzione e tensione dalla forza applicata all'estremo libero ──────
+// Restituisce { angleRad, T, fx_on_body, fy_on_body, dx, dy }
+// fx/fy_on_body è la forza che la fune trasmette al corpo (direzione opposta alla fune)
+function getRopeForceEffect(ropeEl) {
+  const freeEnd = getRopeFreeEnd(ropeEl);
+  if (!freeEnd) return null;
+
+  const F   = parseFloat(ropeEl.props?.forceF) || 0;
+  const ang = parseFloat(ropeEl.props?.forceAngle) || 0; // gradi, convenzione fisica
+  if (Math.abs(F) < 1e-9) return null;
+
+  // Angolo in radianti — convenzione: 0°=destra, 90°=alto (fisica)
+  const ref = getRefSystem();
+  const flipY = ref?.props?.flipY;
+  const angRad = ang * Math.PI / 180;
+
+  // Direzione fisica della forza applicata
+  const fx_fis =  F * Math.cos(angRad);
+  const fy_fis =  F * Math.sin(angRad);
+
+  // La fune si orienta nella direzione della forza
+  // (tesa solo se la forza tira, cioè si allontana dall'estremo collegato)
+  // dx,dy: direzione dall'estremo collegato verso l'estremo libero (in fisico)
+  // La forza applicata all'estremo libero tira nella sua direzione
+  // → la fune va nella direzione della forza
+  const len = Math.hypot(fx_fis, fy_fis);
+  const dx_fis = fx_fis / len; // direzione fune (verso estremo libero)
+  const dy_fis = fy_fis / len;
+
+  // Forza sul corpo: tensione T nella direzione opposta (verso estremo libero)
+  // Il corpo viene tirato nella direzione della fune
+  const T = F; // fune inestensibile: T = F applicata
+  const fx_body = T * dx_fis;
+  const fy_body = T * dy_fis;
+
+  // Angolo SVG (y invertita) per il draw
+  const angSVG = flipY ? angRad : -angRad;
+
+  return { F, angRad, angSVG, T, fx_body, fy_body, dx_fis, dy_fis, freeEnd };
+}
+
+// ── Forza che la fune trasmette al corpo collegato ─────────────────────────────
+// Restituisce { fx, fy } in unità fisiche, oppure null
+function getRopeForceOnBody(bodyEl) {
+  // Trova tutte le funi collegate al corpo
+  const ropeRels = relations.filter(r =>
+    r.type === 'rope_body' && (r.aId === bodyEl.id || r.bId === bodyEl.id)
+  );
+  if (!ropeRels.length) return null;
+
+  let fx_tot = 0, fy_tot = 0;
+  let hasForce = false;
+
+  for (const rel of ropeRels) {
+    const ropeEl = elements.find(e => e.id === (rel.aId === bodyEl.id ? rel.bId : rel.aId));
+    if (!ropeEl || ropeEl.type !== 'rope') continue;
+
+    const F   = parseFloat(ropeEl.props?.forceF) || 0;
+    const ang = parseFloat(ropeEl.props?.forceAngle) || 0;
+    if (Math.abs(F) < 1e-9) continue;
+
+    // Controlla se questo corpo è sull'estremo collegato (non libero)
+    const freeEnd = getRopeFreeEnd(ropeEl);
+    if (!freeEnd) continue; // entrambi collegati → tensione da calcolare diversamente
+
+    // La forza trasmessa al corpo è nella direzione della fune (dal corpo verso l'estremo libero)
+    // Direzione fisica: angolo della forza applicata all'estremo libero
+    const angRad = ang * Math.PI / 180;
+    const fx = F * Math.cos(angRad);
+    const fy = F * Math.sin(angRad);
+
+    fx_tot += fx;
+    fy_tot += fy;
+    hasForce = true;
+  }
+
+  if (!hasForce) return null;
+  return { fx: fx_tot, fy: fy_tot };
+}
+
+// ── Forza che la carrucola trasmette al corpo sul piano ────────────────────────
+// Trova se il corpo è collegato a una fune che passa su una carrucola
+// e calcola la tensione dal corpo appeso: T = m_hanging * g
+// Restituisce { fx, fy } in N, oppure null
+function getPulleyForceOnBody(bodyEl) {
+  if (!bodyEl || !bodyEl.type) return null;
+  const ref = getRefSystem();
+  const g = Math.abs(parseFloat(ref?.props?.gravity) || 9.81);
+
+  // Trova funi collegate a questo corpo (non hanging)
+  const ropeRels = relations.filter(r =>
+    r && r.type === 'rope_body' &&
+    (r.aId === bodyEl.id || r.bId === bodyEl.id) &&
+    r.props?.anchor !== 'hanging'
+  );
+  if (!ropeRels.length) return null;
+
+  let fx_tot = 0, fy_tot = 0;
+  let hasForce = false;
+
+  for (const rel of ropeRels) {
+    const ropeEl = elements.find(e => e.id === (rel.aId === bodyEl.id ? rel.bId : rel.aId));
+    if (!ropeEl || ropeEl.type !== 'rope') continue;
+
+    // Controlla se questa fune ha una carrucola
+    const pulleyRel = relations.find(r =>
+      r && r.type === 'rope_on_pulley' && (r.aId === ropeEl.id || r.bId === ropeEl.id)
+    );
+    if (!pulleyRel) continue;
+
+    // Trova il corpo appeso (anchor=hanging)
+    const hangingRel = relations.find(r =>
+      r && r.type === 'rope_body' &&
+      (r.aId === ropeEl.id || r.bId === ropeEl.id) &&
+      r.props?.anchor === 'hanging'
+    );
+    if (!hangingRel) continue;
+
+    const hangingBody = elements.find(e =>
+      e.id === (hangingRel.aId === ropeEl.id ? hangingRel.bId : hangingRel.aId)
+    );
+    if (!hangingBody || !hangingBody.type) { console.warn('[PFB] hangingBody null/invalid', hangingRel); continue; }
+
+    const m_hanging = parseFloat(hangingBody.props?.mass) || 0;
+    if (m_hanging <= 0) continue;
+
+    const T = m_hanging * g;
+    const flipY3 = ref?.props?.flipY;
+
+    let T_fx, T_fy;
+
+    // Usa _seg1 se disponibile (direzione reale della fune)
+    if (ropeEl._seg1 && ropeEl._seg1.length === 2) {
+      const p1 = ropeEl._seg1[0]; // punto sul corpo
+      const p2 = ropeEl._seg1[1]; // punto sulla carrucola
+      const dx_px = p2.x - p1.x;
+      const dy_px = p2.y - p1.y;
+      const dist = Math.hypot(dx_px, dy_px);
+      if (dist < 1e-6) continue;
+      T_fx = T * (dx_px / dist);
+      T_fy = T * (flipY3 ? (dy_px / dist) : (-dy_px / dist));
+    } else {
+      // Fallback: direzione dal corpo alla carrucola
+      const pulleyEl3 = elements.find(e =>
+        e.id === (pulleyRel.aId === ropeEl.id ? pulleyRel.bId : pulleyRel.aId)
+      );
+      if (!pulleyEl3) continue;
+      const defBody = DEFS ? (DEFS[bodyEl.type] || { w: 30, h: 30 }) : { w: 30, h: 30 };
+      const bodyCX3 = bodyEl.x + defBody.w / 2;
+      const bodyCY3 = bodyEl.y + defBody.h / 2;
+      const pCX3 = pulleyEl3.x + (pulleyEl3._wPx || 60) / 2;
+      const pCY3 = pulleyEl3.y + (pulleyEl3._hPx || 70) / 2;
+      const dx = pCX3 - bodyCX3, dy = pCY3 - bodyCY3;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 1e-6) continue;
+      T_fx = T * (dx / dist);
+      T_fy = T * (flipY3 ? (dy / dist) : (-dy / dist));
+    }
+
+    fx_tot += T_fx;
+    fy_tot += T_fy;
+    hasForce = true;
+  }
+
+  if (!hasForce) return null;
+  return { fx: fx_tot, fy: fy_tot };
+}
+
+// ── Forza sulla carrucola trasmessa al corpo APPESO (hanging) ─────────────────
+// Il corpo appeso sente T verso l'alto = m_hanging * g in equilibrio
+// ma nel pannello vogliamo mostrare T come forza vincolare sulla fune
+function getPulleyForceOnHangingBody(bodyEl) {
+  // Trova se questo corpo è agganciato con anchor=hanging
+  const hangingRel = relations.find(r =>
+    r.type === 'rope_body' &&
+    (r.aId === bodyEl.id || r.bId === bodyEl.id) &&
+    r.props?.anchor === 'hanging'
+  );
+  if (!hangingRel) return null;
+
+  const ropeEl = elements.find(e =>
+    e.id === (hangingRel.aId === bodyEl.id ? hangingRel.bId : hangingRel.aId)
+  );
+  if (!ropeEl || ropeEl.type !== 'rope') return null;
+
+  // Verifica che la fune abbia una carrucola
+  const pulleyRel = relations.find(r =>
+    r.type === 'rope_on_pulley' && (r.aId === ropeEl.id || r.bId === ropeEl.id)
+  );
+  if (!pulleyRel) return null;
+
+  const ref = getRefSystem();
+  const g = Math.abs(parseFloat(ref?.props?.gravity) || 9.81);
+  const m = parseFloat(bodyEl.props?.mass) || 0;
+  if (m <= 0) return null;
+
+  // T = m*g verso l'alto (bilancia il peso)
+  const T = m * g;
+  const flipY = ref?.props?.flipY;
+  // Verso l'alto in fisica: fy = +T (flipY false → fy positivo = su)
+  return { fx: 0, fy: flipY ? -T : T };
+}
+
+// ═══ MODULE: rope-system.js ═══
+// ─── Sistema di corpi collegati da funi ───────────────────────────────────────
+
+function findRopeChains() {
+  const fullRopes = elements.filter(el => {
+    if (el.type !== 'rope') return false;
+    const L = relations.find(r => r.type==='rope_body' && (r.aId===el.id||r.bId===el.id) && (r.props?.anchor==='left'||!r.props?.anchor));
+    const R = relations.find(r => r.type==='rope_body' && (r.aId===el.id||r.bId===el.id) && r.props?.anchor==='right');
+    return L && R;
+  });
+  if (!fullRopes.length) return [];
+
+  const graph = {};
+  for (const rope of fullRopes) {
+    const LR = relations.find(r => r.type==='rope_body' && (r.aId===rope.id||r.bId===rope.id) && (r.props?.anchor==='left'||!r.props?.anchor));
+    const RR = relations.find(r => r.type==='rope_body' && (r.aId===rope.id||r.bId===rope.id) && r.props?.anchor==='right');
+    const bL = elements.find(e => e.id===(LR.aId===rope.id?LR.bId:LR.aId));
+    const bR = elements.find(e => e.id===(RR.aId===rope.id?RR.bId:RR.aId));
+    if (!bL||!bR) continue;
+    if (!graph[bL.id]) graph[bL.id]=[];
+    if (!graph[bR.id]) graph[bR.id]=[];
+    graph[bL.id].push({ropeId:rope.id, otherBodyId:bR.id});
+    graph[bR.id].push({ropeId:rope.id, otherBodyId:bL.id});
+  }
+
+  const visited = new Set();
+  const chains = [];
+  for (const startId of Object.keys(graph).map(Number)) {
+    if (visited.has(startId)) continue;
+    const bodyIds=[], ropeIds=new Set(), queue=[startId];
+    while (queue.length) {
+      const id=queue.shift(); if (visited.has(id)) continue;
+      visited.add(id); bodyIds.push(id);
+      for (const {ropeId,otherBodyId} of (graph[id]||[])) {
+        ropeIds.add(ropeId); if (!visited.has(otherBodyId)) queue.push(otherBodyId);
+      }
+    }
+    const bodies = bodyIds.map(id=>elements.find(e=>e.id===id)).filter(Boolean).sort((a,b)=>a.x-b.x);
+    const ropes  = [...ropeIds].map(id=>elements.find(e=>e.id===id)).filter(Boolean);
+    chains.push({bodies, ropes, graph});
+  }
+  return chains;
+}
+
+function solveRopeChain(chain, excludeSpring=false) {
+  const {bodies, ropes, graph} = chain;
+  const n = bodies.length;
+  if (n < 2) return null;
+
+  const ref = getRefSystem();
+  const g   = parseFloat(ref?.props?.gravity) || 0;
+
+  // Fune tra corpo[i] e corpo[i+1]
+  const ropesBetween = [];
+  for (let i=0; i<n-1; i++) {
+    const bA=bodies[i], bB=bodies[i+1];
+    const rope = ropes.find(r=>(graph[bA.id]||[]).some(e=>e.ropeId===r.id&&e.otherBodyId===bB.id));
+    ropesBetween.push(rope||null);
+  }
+
+  // Forze per ogni corpo
+  const bodyData = bodies.map(body => {
+    const p = body.props||{};
+    const m = parseFloat(p.mass)||0;
+    const pesoFy = (g>0&&m>0) ? -m*g : 0;
+    let Fx=0, Fy=pesoFy;
+    (p.forces||[]).forEach(f => { Fx+=parseFloat(f.fx)||0; Fy+=parseFloat(f.fy)||0; });
+    if (typeof getRopeForceOnBody==='function') {
+      const rf=getRopeForceOnBody(body); if (rf) { Fx+=rf.fx; Fy+=rf.fy; }
+    }
+    if (!excludeSpring && typeof getSpringConstraint==='function') {
+      const sc=getSpringConstraint(body);
+      if (sc) {
+        const sp=elements.find(e=>e.id===(sc.aId===body.id?sc.bId:sc.aId));
+        if (sp) {
+          const k=parseFloat(sp.props?.k)||0, L0=parseFloat(sp.props?.L0)||0;
+          const Lc=parseFloat(sp.props?._L_calc);
+          const anchor=sp.props?.anchor||'left';
+          if ((anchor==='left'||anchor==='right') && k>0 && !isNaN(Lc)) {
+            const F=k*(Lc-L0);
+            Fx += (anchor==='left') ? -F : +F;
+          }
+        }
+      }
+    }
+    // In modalità NoSpring: il corpo con molla è fisso (la molla è un vincolo fisso)
+    // Usiamo massa virtuale molto grande per simulare corpo ancorato
+    const hasSpring = !excludeSpring ? false : (typeof getSpringConstraint==='function' && !!getSpringConstraint(body));
+    const mEff = (excludeSpring && hasSpring) ? 1e9 : (parseFloat(body.props?.mass)||0);
+    const floorRel = relations.find(r=>r.type==='body_on_floor'&&(r.aId===body.id||r.bId===body.id));
+    const N = floorRel ? Math.max(0,-Fy) : 0;
+    const muS=parseFloat(floorRel?.props?.muS), muK=parseFloat(floorRel?.props?.muK);
+    return {body, m:mEff, Fx_ext:Fx, Fy_ext:Fy, N, muS, muK, floorRel, friction:0, _a_final:0};
+  });
+
+  const sumM  = bodyData.reduce((s,d)=>s+d.m, 0);
+  if (sumM<1e-9) return null;
+
+
+  // Attrito
+  const sumFx = bodyData.reduce((s,d)=>s+d.Fx_ext, 0);
+  const fsMax  = bodyData.reduce((s,d)=>s+(!isNaN(d.muS)&&d.muS>0?d.muS*d.N:0), 0);
+  let a_final;
+  if (Math.abs(sumFx)<=fsMax) {
+    a_final=0; bodyData.forEach(d=>{d.friction=0;});
+  } else {
+    const sign=sumFx>0?-1:1;
+    const sumFxF=bodyData.reduce((s,d)=>s+d.Fx_ext+(!isNaN(d.muK)&&d.muK>0?d.muK*d.N*sign:0),0);
+    a_final=sumFxF/sumM;
+    bodyData.forEach(d=>{d.friction=(!isNaN(d.muK)&&d.muK>0)?d.muK*d.N*sign:0;});
+  }
+
+  // Calcola tensioni con gestione slack
+  const tensions = {};
+  let active = [...bodyData], activeR = [...ropesBetween], redo=true;
+
+  while (redo) {
+    redo=false;
+    const sM=active.reduce((s,d)=>s+d.m,0);
+    const sFx=active.reduce((s,d)=>s+d.Fx_ext+d.friction,0);
+    const a_sub=sM>1e-9?sFx/sM:0;
+    let Tp=0;
+    for (let i=0; i<activeR.length; i++) {
+      const {m,Fx_ext,friction}=active[i];
+      const Ti = m*a_sub - Fx_ext - friction + Tp;
+      if (Ti < -1e-9) {
+        // Slack — split
+        tensions[activeR[i]?.id]=0;
+        const lB=active.slice(0,i+1), lR=activeR.slice(0,i);
+        const sML=lB.reduce((s,d)=>s+d.m,0), sFxL=lB.reduce((s,d)=>s+d.Fx_ext+d.friction,0);
+        const aL=sML>1e-9?sFxL/sML:0;
+        let TpL=0;
+        for (let j=0;j<lR.length;j++) {
+          const Tj=lB[j].m*aL-lB[j].Fx_ext-lB[j].friction+TpL;
+          tensions[lR[j]?.id]=Math.max(0,Tj); TpL=Math.max(0,Tj);
+        }
+        lB.forEach(d=>{d._a_final=aL;});
+        active=active.slice(i+1); activeR=activeR.slice(i+1);
+        redo=true; break;
+      }
+      tensions[activeR[i]?.id]=Ti; Tp=Ti;
+    }
+    if (!redo) active.forEach(d=>{d._a_final=a_sub;});
+  }
+
+  return {a:a_final, tensions, normals:Object.fromEntries(bodyData.map(d=>[d.body.id,d.N])), bodyData, ropesBetween};
+}
+
+function getRopeSystemResult() {
+  const chains=findRopeChains(); if (!chains.length) return null;
+  const results={};
+  for (const chain of chains) {
+    const sol=solveRopeChain(chain); if (!sol) continue;
+    for (const body of chain.bodies) results[`body_${body.id}`]={...sol,chain};
+    for (const rope of chain.ropes)  results[`rope_${rope.id}`]={...sol,chain};
+  }
+  return results;
+}
+
+function getRopeSystemResultNoSpring() {
+  const chains=findRopeChains(); if (!chains.length) return null;
+  const results={};
+  for (const chain of chains) {
+    const sol=solveRopeChain(chain,true); if (!sol) continue;
+    for (const body of chain.bodies) results[`body_${body.id}`]={...sol,chain};
+    for (const rope of chain.ropes)  results[`rope_${rope.id}`]={...sol,chain};
+  }
+  return results;
+}
+
+function getRopeSystemTension(ropeEl) {
+  const res=getRopeSystemResult(); if (!res) return null;
+  const entry=res[`rope_${ropeEl.id}`]; if (!entry) return null;
+  // Se la fune è slack (forza sul corpo con molla), T=0
+  if (ropeEl._isSlack) return null;
+  const T=entry.tensions[ropeEl.id];
+  if (T===undefined||Math.abs(T)<1e-9) return null;
+  return {T:Math.abs(T), a:entry.a};
+}
+
+function getRopeSystemForceOnBody(bodyEl) {
+  const res=getRopeSystemResult(); if (!res) return null;
+  const entry=res[`body_${bodyEl.id}`]; if (!entry) return null;
+  const {tensions, ropesBetween, chain, a}=entry;
+  const bodyIdx=chain.bodies.findIndex(b=>b.id===bodyEl.id);
+  if (bodyIdx<0) return null;
+  const bd=entry.bodyData[bodyIdx];
+  const bodyA=bd._a_final!==undefined?bd._a_final:a;
+
+  // Il solver gestisce già lo slack per segmento tramite _a_final e tensioni nulle.
+  // Non serve un controllo globale anySlack — ogni corpo usa la propria _a_final.
+
+  const T_right_raw=tensions[ropesBetween[bodyIdx]?.id];
+  const T_left_raw =tensions[ropesBetween[bodyIdx-1]?.id];
+
+  const T_right=(T_right_raw!=null&&T_right_raw>1e-9)?T_right_raw:undefined;
+  const T_left =(T_left_raw !=null&&T_left_raw >1e-9)?T_left_raw :undefined;
+
+  let netFx=0;
+  if (T_right_raw!=null) netFx+=T_right_raw;
+  if (T_left_raw !=null) netFx-=T_left_raw;
+
+  return {fx:netFx, fy:0, a:bodyA, T_left, T_right, T_left_raw, T_right_raw, friction:bd.friction, chain};
+}
+
+// ═══ MODULE: pulley-system.js ═══
+// ─── Solver sistema con carrucola ─────────────────────────────────────────────
+// Risolve il sistema fune+carrucola con vincolo cinematico corretto:
+// a_appeso = a_piano × cos(θ)  dove θ è l'angolo della fune col piano
+//
+// Equazioni:
+//   Blocco piano:  T·cos(θ) - F_attrito = m_piano × a_piano
+//   Corpo appeso:  m_app·g - T = m_app × a_appeso = m_app × a_piano × cos(θ)
+//
+// Soluzione:
+//   a_piano = (m_app·g·cos(θ) - F_attrito) / (m_piano + m_app·cos²(θ))
+//   T       = m_app·(g - a_piano·cos(θ))
+
+function solvePulleySystem(ropeEl) {
+  // Trova la carrucola collegata
+  const pulleyRel = relations.find(r =>
+    r.type === 'rope_on_pulley' && (r.aId === ropeEl.id || r.bId === ropeEl.id)
+  );
+  if (!pulleyRel) return null;
+
+  const pulleyEl_s = elements.find(e =>
+    e.id === (pulleyRel.aId === ropeEl.id ? pulleyRel.bId : pulleyRel.aId)
+  );
+
+  // Controlla se la carrucola è su piano inclinato
+  const planeOnPulleyRel = pulleyEl_s ? relations.find(r =>
+    r.type === 'pulley_on_plane' && (r.aId === pulleyEl_s.id || r.bId === pulleyEl_s.id)
+  ) : null;
+  const inclinedPlaneEl = planeOnPulleyRel
+    ? elements.find(e => e.id === (planeOnPulleyRel.aId === pulleyEl_s.id ? planeOnPulleyRel.bId : planeOnPulleyRel.aId))
+    : null;
+
+  // Trova corpo appeso
+  const hangingRel = relations.find(r =>
+    r.type === 'rope_body' &&
+    (r.aId === ropeEl.id || r.bId === ropeEl.id) &&
+    r.props?.anchor === 'hanging'
+  );
+  if (!hangingRel) return null;
+
+  // Trova corpo sul piano (o sul pavimento)
+  const planeRel = relations.find(r =>
+    r.type === 'rope_body' &&
+    (r.aId === ropeEl.id || r.bId === ropeEl.id) &&
+    r.props?.anchor !== 'hanging'
+  );
+  if (!planeRel) return null;
+
+  const hangingBody = elements.find(e =>
+    e.id === (hangingRel.aId === ropeEl.id ? hangingRel.bId : hangingRel.aId)
+  );
+  const planeBody = elements.find(e =>
+    e.id === (planeRel.aId === ropeEl.id ? planeRel.bId : planeRel.aId)
+  );
+  if (!hangingBody || !planeBody) return null;
+
+  const ref = getRefSystem();
+  const g = Math.abs(parseFloat(ref?.props?.gravity) || 9.81);
+  const m_app   = parseFloat(hangingBody.props?.mass) || 0;
+  const m_piano = parseFloat(planeBody.props?.mass)   || 0;
+  if (m_app <= 0 || m_piano <= 0) return null;
+
+  // ── Caso piano inclinato ──────────────────────────────────────────────────
+  if (inclinedPlaneEl) {
+    const geo = getPlaneGeometry(inclinedPlaneEl);
+    const sinTheta = Math.abs(geo.dy_fis); // sin(θ) dal piano
+    const cosTheta = Math.abs(geo.dx_fis); // cos(θ) dal piano
+    const theta = Math.asin(sinTheta);
+
+    // Forze esterne sul corpo piano (componente lungo il piano)
+    let F_ext_piano = 0;
+    (planeBody.props?.forces || []).forEach(f => {
+      const fx = parseFloat(f.fx) || 0;
+      const fy = parseFloat(f.fy) || 0;
+      F_ext_piano += fx * cosTheta + fy * sinTheta;
+    });
+
+    // Forze esterne sul corpo appeso (componente verticale)
+    let F_ext_appeso = 0;
+    (hangingBody.props?.forces || []).forEach(f => {
+      F_ext_appeso += parseFloat(f.fy) || 0;
+    });
+
+    // Attrito sul piano inclinato
+    let F_attrito = 0;
+    let attrito_statico = false;
+    const planeBodyRel = relations.find(r =>
+      r.type === 'body_on_plane' && (r.aId === planeBody.id || r.bId === planeBody.id)
+    );
+    const N_piano = m_piano * g * cosTheta;
+    const muS_p = planeBodyRel ? (parseFloat(planeBodyRel.props?.muS) || 0) : 0;
+    const muK_p = planeBodyRel ? (parseFloat(planeBodyRel.props?.muK) || 0) : 0;
+    const v0s_p = parseFloat(planeBody.props?.v0s) || 0;
+    const isMoving_p = Math.abs(v0s_p) > 1e-9;
+
+    // Forza netta senza attrito per determinare direzione moto tendente
+    const F_net_nofriction = m_app * g + F_ext_appeso - m_piano * g * sinTheta + F_ext_piano;
+    const dirMotion = F_net_nofriction >= 0 ? 1 : -1;
+
+    if (!isMoving_p && muS_p > 0) {
+      const f_s_max = muS_p * N_piano;
+      if (Math.abs(F_net_nofriction) <= f_s_max) {
+        attrito_statico = true;
+      } else {
+        F_attrito = muK_p > 0 ? muK_p * N_piano * (-dirMotion) : 0;
+      }
+    } else if (isMoving_p && muK_p > 0) {
+      const dirMotoAttuale = v0s_p > 0 ? 1 : -1;
+      F_attrito = muK_p * N_piano * (-dirMotoAttuale);
+    }
+
+    // Sistema (a positivo = m2 scende, m1 sale lungo il piano):
+    let a, T;
+    if (attrito_statico) {
+      a = 0;
+      T = m_app * g + F_ext_appeso; // T = m₂g (bilancio corpo appeso)
+    } else {
+      const F_net = m_app * g + F_ext_appeso - m_piano * g * sinTheta + F_attrito + F_ext_piano;
+      a = F_net / (m_app + m_piano);
+      T = Math.max(0, m_app * (g - a) + F_ext_appeso);
+    }
+
+    // Direzione tensione sul corpo piano: sempre verso il vertice (carrucola)
+    const dirToPulley = pulleyEl_s && pulleyEl_s.x > planeBody.x ? 1 : -1;
+    const Tx = T * cosTheta * dirToPulley;
+    const Ty = T * sinTheta; // fisico: positivo = verso l'alto
+
+    // Accelerazione corpo piano: se a>0 sale (verso vertice), se a<0 scende
+    // Componenti in coordinate fisiche
+    const a_piano_x = a * cosTheta * dirToPulley;
+    const a_piano_y = a * sinTheta; // positivo = verso l'alto fisico
+
+    // Accelerazione corpo appeso: se a>0 scende, se a<0 sale
+    const a_appeso_y = -a; // negativo = verso il basso fisico quando a>0
+
+    return {
+      T,
+      a_piano: a,
+      a_appeso: -a,
+      a_piano_x,
+      a_piano_y,
+      a_appeso_y,
+      theta: theta * 180 / Math.PI,
+      cosTheta, sinTheta,
+      planeBodyId: planeBody.id,
+      hangingBodyId: hangingBody.id,
+      Tx, Ty,
+      isOnInclinedPlane: true,
+      N_piano,
+      attrito_statico,
+      F_attrito,
+      muS: muS_p, muK: muK_p,
+    };
+  }
+
+  // ── Caso pavimento (logica esistente) ────────────────────────────────────
+
+  // Angolo θ della fune con l'orizzontale dal segmento _seg1
+  let cosTheta = 1, sinTheta = 0, theta = 0;
+  if (ropeEl._seg1 && ropeEl._seg1.length === 2) {
+    const p1 = ropeEl._seg1[0];
+    const p2 = ropeEl._seg1[1];
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y; // positivo = verso il basso in SVG
+    const dist = Math.hypot(dx, dy);
+    if (dist > 1e-6) {
+      // θ = angolo rispetto all'orizzontale
+      // dy negativo in SVG = verso l'alto = angolo positivo in fisica
+      cosTheta = Math.abs(dx) / dist;
+      sinTheta = Math.abs(dy) / dist;
+      theta = Math.atan2(Math.abs(dy), Math.abs(dx));
+    }
+  }
+
+  // Attrito sul corpo piano
+  let F_attrito = 0;
+  const floorRel = relations.find(r =>
+    r.type === 'body_on_floor' && (r.aId === planeBody.id || r.bId === planeBody.id)
+  );
+  if (floorRel) {
+    const muK = parseFloat(floorRel.props?.muK) || 0;
+    const muS = parseFloat(floorRel.props?.muS) || 0;
+    const N = m_piano * g; // semplificato: N = peso (trascuriamo forze verticali extra)
+    // Forza esterna orizzontale sul corpo piano
+    let Fx_ext = 0;
+    (planeBody.props?.forces || []).forEach(f => {
+      Fx_ext += parseFloat(f.fx) || 0;
+    });
+    // Determina se il sistema si muove
+    // Forza motrice = T·cos(θ) + Fx_ext
+    // Per ora usiamo muK (assume moto)
+    F_attrito = muK * N;
+  }
+
+  // Risoluzione sistema
+  // a_piano = (m_app·g·cos(θ) + Fx_ext_piano - F_attrito) / (m_piano + m_app·cos²(θ))
+  let Fx_ext_piano = 0;
+  (planeBody.props?.forces || []).forEach(f => {
+    Fx_ext_piano += parseFloat(f.fx) || 0;
+  });
+
+  // Direzione della fune verso la carrucola — basata sulla posizione relativa
+  const pulleyEl_dir = elements.find(e =>
+    e.id === (pulleyRel.aId === ropeEl.id ? pulleyRel.bId : pulleyRel.aId)
+  );
+  const dirToPulley = pulleyEl_dir && pulleyEl_dir.x < planeBody.x ? -1 : 1;
+
+  // Forza netta che accelera il sistema
+  const F_motrice = m_app * g * cosTheta + Fx_ext_piano * dirToPulley;
+  const denominator = m_piano + m_app * cosTheta * cosTheta;
+
+  if (Math.abs(denominator) < 1e-9) return null;
+
+  let a_piano = (F_motrice - F_attrito) / denominator;
+  // Se a_piano < 0 e non ci sono forze che spingono, il sistema è fermo
+  if (a_piano < 0) a_piano = 0;
+
+  const a_appeso = a_piano * cosTheta;
+
+  // Tensione: da equazione corpo appeso
+  const T = m_app * (g - a_appeso);
+
+
+  // Componenti della tensione nella direzione reale della fune (da _seg1)
+  let Tx, Ty;
+  if (ropeEl._seg1 && ropeEl._seg1.length === 2) {
+    const p1 = ropeEl._seg1[0];
+    const p2 = ropeEl._seg1[1];
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist > 1e-6) {
+      const ref2 = getRefSystem();
+      const flipY2 = ref2?.props?.flipY;
+      // Direzione fisica verso la carrucola
+      Tx = T * (dx / dist);
+      Ty = T * (flipY2 ? (dy / dist) : (-dy / dist));
+    } else {
+      Tx = T * cosTheta * dirToPulley;
+      Ty = T * sinTheta;
+    }
+  } else {
+    Tx = T * cosTheta * dirToPulley;
+    Ty = T * sinTheta;
+  }
+
+
+  const result = {
+    T,
+    a_piano,
+    a_appeso,
+    theta: theta * 180 / Math.PI,
+    cosTheta,
+    sinTheta,
+    planeBodyId:   planeBody.id,
+    hangingBodyId: hangingBody.id,
+    Tx,
+    Ty,
+  };
+
+  return result;
+}
+
+// Cache dei risultati per evitare doppi calcoli
+const _pulleySysCache = {};
+
+function getPulleySystemResult(ropeEl) {
+  if (!ropeEl) return null;
+  const cacheKey = ropeEl.id;
+  if (_pulleySysCache[cacheKey]) return _pulleySysCache[cacheKey];
+  const result = solvePulleySystem(ropeEl);
+  _pulleySysCache[cacheKey] = result;
+  return result;
+}
+
+function clearPulleyCache() {
+  for (const k in _pulleySysCache) delete _pulleySysCache[k];
+}
+
+// ─── Forza sul corpo piano dalla carrucola (usa solver corretto) ───────────────
+function getPulleyForceOnBodyCorrect(bodyEl) {
+  // Trova funi collegate a questo corpo (non hanging)
+  const ropeRels = relations.filter(r =>
+    r.type === 'rope_body' &&
+    (r.aId === bodyEl.id || r.bId === bodyEl.id) &&
+    r.props?.anchor !== 'hanging'
+  );
+  if (!ropeRels.length) return null;
+
+  for (const rel of ropeRels) {
+    const ropeEl = elements.find(e =>
+      e.id === (rel.aId === bodyEl.id ? rel.bId : rel.aId)
+    );
+    if (!ropeEl || ropeEl.type !== 'rope') continue;
+
+    const pulleyRel = relations.find(r =>
+      r.type === 'rope_on_pulley' && (r.aId === ropeEl.id || r.bId === ropeEl.id)
+    );
+    if (!pulleyRel) continue;
+
+    const result = getPulleySystemResult(ropeEl);
+    if (!result) continue;
+    if (result.planeBodyId !== bodyEl.id) continue;
+
+    return { fx: result.Tx, fy: result.Ty, T: result.T, a: result.a_piano,
+             ax: result.a_piano_x, ay: result.a_piano_y };
+  }
+  return null;
+}
+
+// ─── Forza sul corpo appeso dalla carrucola (usa solver corretto) ─────────────
+function getPulleyForceOnHangingBodyCorrect(bodyEl) {
+  const hangingRel = relations.find(r =>
+    r.type === 'rope_body' &&
+    (r.aId === bodyEl.id || r.bId === bodyEl.id) &&
+    r.props?.anchor === 'hanging'
+  );
+  if (!hangingRel) return null;
+
+  const ropeEl = elements.find(e =>
+    e.id === (hangingRel.aId === bodyEl.id ? hangingRel.bId : hangingRel.aId)
+  );
+  if (!ropeEl || ropeEl.type !== 'rope') return null;
+
+  // Se è un sistema Atwood (2+ corpi appesi), non usare questo solver
+  const hangCount = relations.filter(r => r.type === 'rope_body' &&
+    (r.aId === ropeEl.id || r.bId === ropeEl.id) &&
+    (r.props?.anchor === 'hanging' || r.props?.anchor === 'hanging_left' || r.props?.anchor === 'hanging_right')
+  ).length;
+  if (hangCount >= 2) return null;
+
+  const pulleyRel = relations.find(r =>
+    r.type === 'rope_on_pulley' && (r.aId === ropeEl.id || r.bId === ropeEl.id)
+  );
+  if (!pulleyRel) return null;
+
+  const result = getPulleySystemResult(ropeEl);
+  if (!result) return null;
+  if (result.hangingBodyId !== bodyEl.id) return null;
+
+  const ref = getRefSystem();
+  const flipY = ref?.props?.flipY;
+  return { fx: 0, fy: flipY ? -result.T : result.T, T: result.T, a: result.a_appeso };
+}
+
+// ─── Solver Macchina di Atwood ────────────────────────────────────────────────
+// Generalizzato con forze esterne:
+//   body1 (sinistro): T - m1·g + F1y = m1·a
+//   body2 (destro):   T - m2·g + F2y = m2·(-a)  [a positivo = body1 scende]
+// → a = ((m1-m2)·g - F1y + F2y) / (m1+m2)
+//   T = m1·(g - a) - F1y  oppure  m2·(g + a) - F2y
+
+function solveAtwoodSystem(ropeEl) {
+  const hangingRels = relations.filter(r => r.type === 'rope_body' &&
+    (r.aId === ropeEl.id || r.bId === ropeEl.id) &&
+    (r.props?.anchor === 'hanging' || r.props?.anchor === 'hanging_left' || r.props?.anchor === 'hanging_right')
+  );
+  if (hangingRels.length < 2) return null;
+
+  const body1 = elements.find(e => e.id === (hangingRels[0].aId === ropeEl.id ? hangingRels[0].bId : hangingRels[0].aId));
+  const body2 = elements.find(e => e.id === (hangingRels[1].aId === ropeEl.id ? hangingRels[1].bId : hangingRels[1].aId));
+  if (!body1 || !body2) return null;
+
+  const ref   = getRefSystem();
+  const g     = Math.abs(parseFloat(ref?.props?.gravity) || 9.81);
+  const flipY = ref?.props?.flipY;
+  const m1    = parseFloat(body1.props?.mass) || 0;
+  const m2    = parseFloat(body2.props?.mass) || 0;
+  if (m1 <= 0 || m2 <= 0) return null;
+
+  // Forze esterne verticali sui due corpi (in fisica: positivo = su)
+  let F1y = 0, F2y = 0;
+  (body1.props?.forces || []).forEach(f => {
+    F1y += flipY ? -(parseFloat(f.fy)||0) : (parseFloat(f.fy)||0);
+  });
+  (body2.props?.forces || []).forEach(f => {
+    F2y += flipY ? -(parseFloat(f.fy)||0) : (parseFloat(f.fy)||0);
+  });
+
+  // a positivo = body1 scende, body2 sale
+  const denom = m1 + m2;
+  const a = ((m1 - m2) * g - F1y + F2y) / denom;
+  const T = m1 * (g - a) - F1y;
+
+  return {
+    T: Math.max(0, T), // T non può essere negativa
+    a,
+    a_left:  a,
+    a_right: -a,
+    leftBodyId:  body1.id,
+    rightBodyId: body2.id,
+  };
+}
+
+function getAtwoodSystemResult(ropeEl) {
+  if (!ropeEl) return null;
+  const cacheKey = `atwood_${ropeEl.id}`;
+  if (_pulleySysCache[cacheKey]) return _pulleySysCache[cacheKey];
+  const result = solveAtwoodSystem(ropeEl);
+  _pulleySysCache[cacheKey] = result;
+  return result;
+}
+
+// Forza tensione su corpo Atwood (verso l'alto)
+function getPulleyForceOnAtwoodBody(bodyEl) {
+  const rels = relations.filter(r => r.type === 'rope_body' &&
+    (r.aId === bodyEl.id || r.bId === bodyEl.id) &&
+    (r.props?.anchor === 'hanging' || r.props?.anchor === 'hanging_left' || r.props?.anchor === 'hanging_right')
+  );
+  if (!rels.length) return null;
+
+  for (const rel of rels) {
+    const ropeEl = elements.find(e => e.id === (rel.aId === bodyEl.id ? rel.bId : rel.aId));
+    if (!ropeEl || ropeEl.type !== 'rope') continue;
+    // Verifica che ci siano almeno 2 corpi appesi (Atwood)
+    const hangCount = relations.filter(r2 => r2.type === 'rope_body' &&
+      (r2.aId === ropeEl.id || r2.bId === ropeEl.id) &&
+      (r2.props?.anchor === 'hanging' || r2.props?.anchor === 'hanging_left' || r2.props?.anchor === 'hanging_right')
+    ).length;
+    if (hangCount < 2) continue;
+    const result = getAtwoodSystemResult(ropeEl);
+    if (!result) continue;
+    const ref = getRefSystem();
+    const flipY = ref?.props?.flipY;
+    // Determina se questo corpo è il "sinistro" (body1)
+    const isLeft = result.leftBodyId === bodyEl.id;
+    const a_body = isLeft ? result.a_left : result.a_right;
+    return { fx: 0, fy: flipY ? -result.T : result.T, T: result.T, a: a_body };
+  }
+  return null;
+}
+
+// ─── Solver fune-carrucola-molla ──────────────────────────────────────────────
+// La tensione nella fune = forza della molla = k·Δx
+// In equilibrio: T = k·Δx
+// Se c'è un corpo intermedio tra fune e molla: T = m·g (corpo in equilibrio)
+// La molla si allunga di Δx = T/k
+
+function getPulleySpringForce(ropeEl) {
+  const ropeSpringRel = relations.find(r =>
+    r.type === 'rope_spring' && (r.aId === ropeEl.id || r.bId === ropeEl.id)
+  );
+  if (!ropeSpringRel) return null;
+
+  const springEl = elements.find(e =>
+    e.id === (ropeSpringRel.aId === ropeEl.id ? ropeSpringRel.bId : ropeSpringRel.aId)
+  );
+  if (!springEl) return null;
+
+  const k = parseFloat(springEl.props?.k) || 0;
+  if (k <= 0) return null;
+
+  // Cerca corpo appeso sulla stessa fune
+  const hangingRel = relations.find(r =>
+    r.type === 'rope_body' &&
+    (r.aId === ropeEl.id || r.bId === ropeEl.id) &&
+    r.props?.anchor === 'hanging'
+  );
+  let hangingBody = hangingRel
+    ? elements.find(e => e.id === (hangingRel.aId === ropeEl.id ? hangingRel.bId : hangingRel.aId))
+    : null;
+
+  // Se non trovato sulla stessa fune, cerca sull'altra fune della stessa carrucola
+  if (!hangingBody) {
+    const pulleyRel_sp = relations.find(r =>
+      r.type === 'rope_on_pulley' && (r.aId === ropeEl.id || r.bId === ropeEl.id)
+    );
+    if (pulleyRel_sp) {
+      const pulleyId_sp = pulleyRel_sp.aId === ropeEl.id ? pulleyRel_sp.bId : pulleyRel_sp.aId;
+      // Trova le altre funi collegate alla stessa carrucola
+      const otherRopeRels = relations.filter(r =>
+        r.type === 'rope_on_pulley' && r.id !== pulleyRel_sp.id &&
+        (r.aId === pulleyId_sp || r.bId === pulleyId_sp)
+      );
+      for (const orr of otherRopeRels) {
+        const otherRopeId = orr.aId === pulleyId_sp ? orr.bId : orr.aId;
+        const hangRel2 = relations.find(r =>
+          r.type === 'rope_body' &&
+          (r.aId === otherRopeId || r.bId === otherRopeId) &&
+          r.props?.anchor === 'hanging'
+        );
+        if (hangRel2) {
+          hangingBody = elements.find(e =>
+            e.id === (hangRel2.aId === otherRopeId ? hangRel2.bId : hangRel2.aId)
+          );
+          if (hangingBody) break;
+        }
+      }
+    }
+  }
+
+  // Trova il corpo sul piano (lato orizzontale della fune)
+  const planeRel = relations.find(r =>
+    r.type === 'rope_body' &&
+    (r.aId === ropeEl.id || r.bId === ropeEl.id) &&
+    (r.props?.anchor === 'left' || r.props?.anchor === 'right')
+  );
+  const planeBody = planeRel
+    ? elements.find(e => e.id === (planeRel.aId === ropeEl.id ? planeRel.bId : planeRel.aId))
+    : null;
+
+  const ref = getRefSystem();
+  const g = Math.abs(parseFloat(ref?.props?.gravity) || 9.81);
+
+  // Tensione determinata dal peso del corpo appeso (se presente)
+  let T = 0;
+  if (hangingBody) {
+    const m = parseFloat(hangingBody.props?.mass) || 0;
+    if (m > 0) T = m * g;
+  } else if (planeBody) {
+    // Equilibrio: T da risolvere con il sistema piano+molla
+    // Per ora: T = 0 (nessun corpo appeso → molla a riposo)
+    T = 0;
+  }
+
+  const dx = T / k; // allungamento molla in unità fisiche (m)
+
+  return { T, k, dx, springEl, hangingBody, planeBody };
+}
+
+// ─── Solver corpo ↔ carrucola ↔ molla (lati opposti) ─────────────────────────
+// Equilibrio: T = m·g = k·Δx  →  Δx = m·g / k
+
+function solveBodyPulleySpring(ropeEl) {
+  // Verifica che ci sia una molla (rope_spring) sulla fune o sull'altra fune della carrucola
+  let ropeSpringRel = relations.find(r =>
+    r.type === 'rope_spring' && (r.aId === ropeEl.id || r.bId === ropeEl.id)
+  );
+
+  // Cerca corpo appeso sulla stessa fune
+  let hangingRel = relations.find(r =>
+    r.type === 'rope_body' &&
+    (r.aId === ropeEl.id || r.bId === ropeEl.id) &&
+    r.props?.anchor === 'hanging'
+  );
+
+  // Se non c'è molla su questa fune, cercala sull'altra fune della stessa carrucola
+  if (!ropeSpringRel && hangingRel) {
+    const pulleyRel_bps = relations.find(r =>
+      r.type === 'rope_on_pulley' && (r.aId === ropeEl.id || r.bId === ropeEl.id)
+    );
+    if (pulleyRel_bps) {
+      const pulleyId_bps = pulleyRel_bps.aId === ropeEl.id ? pulleyRel_bps.bId : pulleyRel_bps.aId;
+      const otherRopeRels2 = relations.filter(r =>
+        r.type === 'rope_on_pulley' && r.id !== pulleyRel_bps.id &&
+        (r.aId === pulleyId_bps || r.bId === pulleyId_bps)
+      );
+      for (const orr2 of otherRopeRels2) {
+        const otherRopeId2 = orr2.aId === pulleyId_bps ? orr2.bId : orr2.aId;
+        ropeSpringRel = relations.find(r =>
+          r.type === 'rope_spring' && (r.aId === otherRopeId2 || r.bId === otherRopeId2)
+        );
+        if (ropeSpringRel) break;
+      }
+    }
+  }
+
+  if (!ropeSpringRel || !hangingRel) return null;
+
+  const springEl = elements.find(e =>
+    e.id === (ropeSpringRel.aId === ropeEl.id ? ropeSpringRel.bId : ropeSpringRel.aId)
+  );
+  const hangingBody = elements.find(e =>
+    e.id === (hangingRel.aId === ropeEl.id ? hangingRel.bId : hangingRel.aId)
+  );
+  if (!springEl || !hangingBody) return null;
+
+  const ref = getRefSystem();
+  const g = Math.abs(parseFloat(ref?.props?.gravity) || 9.81);
+  const m = parseFloat(hangingBody.props?.mass) || 0;
+  const k = parseFloat(springEl.props?.k) || 0;
+  const L0 = parseFloat(springEl.props?.L0) || 0;
+
+  if (m <= 0) return null;
+
+  const T = m * g;
+  const dx = k > 0 ? T / k : null; // allungamento in unità fisiche
+
+  return {
+    T,
+    dx,
+    k,
+    L0,
+    m,
+    hangingBodyId: hangingBody.id,
+    springId: springEl.id,
+  };
+}
+
+function getBodyPulleySpringResult(ropeEl) {
+  if (!ropeEl) return null;
+  const cacheKey = `bps_${ropeEl.id}`;
+  if (_pulleySysCache[cacheKey]) return _pulleySysCache[cacheKey];
+  const result = solveBodyPulleySpring(ropeEl);
+  _pulleySysCache[cacheKey] = result;
+  return result;
+}
+
+// Forza tensione sul corpo appeso nel sistema corpo-carrucola-molla
+function getPulleySpringForceOnBody(bodyEl) {
+  const hangingRel = relations.find(r =>
+    r.type === 'rope_body' &&
+    (r.aId === bodyEl.id || r.bId === bodyEl.id) &&
+    r.props?.anchor === 'hanging'
+  );
+  if (!hangingRel) return null;
+
+  const ropeEl = elements.find(e =>
+    e.id === (hangingRel.aId === bodyEl.id ? hangingRel.bId : hangingRel.aId)
+  );
+  if (!ropeEl) return null;
+
+  // Verifica che sia il sistema corpo-carrucola-molla
+  const result = getBodyPulleySpringResult(ropeEl);
+  if (!result || result.hangingBodyId !== bodyEl.id) return null;
+
+  // Non usare questo se è già gestito da getPulleyForceOnHangingBodyCorrect
+  // (quella funzione gestisce il caso con corpo sul piano)
+  const hasPlaneBody = relations.some(r =>
+    r.type === 'rope_body' &&
+    (r.aId === ropeEl.id || r.bId === ropeEl.id) &&
+    (r.props?.anchor === 'left' || r.props?.anchor === 'right')
+  );
+  if (hasPlaneBody) return null;
+
+  const ref = getRefSystem();
+  const flipY = ref?.props?.flipY;
+  return { fx: 0, fy: flipY ? -result.T : result.T, T: result.T, a: 0 };
+}
+
+// ═══ MODULE: relations.js ═══
+// ─── Sistema relazioni ────────────────────────────────────────────────────────
+
+// Tipi di relazione disponibili per coppia
+// Ritorna null se la coppia non ha senso fisicamente
+function getRelationType(a, b) {
+  const BODIES   = ['point_mass','block','sphere','rect_body'];
+  const at = a.type, bt = b.type;
+  if (BODIES.includes(at) && bt === 'floor')   return 'body_on_floor';
+  if (BODIES.includes(bt) && at === 'floor')   return 'body_on_floor';
+  if (BODIES.includes(at) && bt === 'wall')    return 'body_on_wall';
+  if (BODIES.includes(bt) && at === 'wall')    return 'body_on_wall';
+  if (BODIES.includes(at) && bt === 'inclined_plane') return 'body_on_plane';
+  if (BODIES.includes(bt) && at === 'inclined_plane') return 'body_on_plane';
+  if (BODIES.includes(at) && bt === 'spring')  return 'spring_body';
+  if (BODIES.includes(bt) && at === 'spring')  return 'spring_body';
+  if (at === 'spring' && bt === 'floor')       return 'spring_on_floor';
+  if (at === 'floor'  && bt === 'spring')      return 'spring_on_floor';
+  if (at === 'spring' && bt === 'wall')        return 'spring_on_wall';
+  if (at === 'wall'   && bt === 'spring')      return 'spring_on_wall';
+  if (at === 'spring' && bt === 'inclined_plane') return 'spring_on_plane';
+  if (at === 'inclined_plane' && bt === 'spring') return 'spring_on_plane';
+  if (at === 'spring' && bt === 'spring')      return 'spring_spring';
+  if (BODIES.includes(at) && bt === 'rope')  return 'rope_body';
+  if (BODIES.includes(bt) && at === 'rope')  return 'rope_body';
+  if (at === 'rope' && bt === 'floor')       return 'rope_on_floor';
+  if (at === 'floor'  && bt === 'rope')      return 'rope_on_floor';
+  if (at === 'pulley_simple' && bt === 'floor') return 'pulley_on_floor';
+  if (at === 'floor' && bt === 'pulley_simple') return 'pulley_on_floor';
+  if (at === 'pulley_simple' && bt === 'inclined_plane') return 'pulley_on_plane';
+  if (at === 'inclined_plane' && bt === 'pulley_simple') return 'pulley_on_plane';
+  if (at === 'rope' && bt === 'pulley_simple') return 'rope_on_pulley';
+  if (at === 'pulley_simple' && bt === 'rope') return 'rope_on_pulley';
+  if (at === 'rope' && bt === 'spring')        return 'rope_spring';
+  if (at === 'spring' && bt === 'rope')        return 'rope_spring';
+  if (at === 'slider' || bt === 'slider') return 'slider_prop';
+  if (at === 'display' || bt === 'display') return 'display_prop';
+  if (at === 'option_list' || bt === 'option_list') return 'option_prop';
+  if (at === 'stats' || bt === 'stats') return 'stats_prop';
+  if (at === 'chart'       || bt === 'chart')        return 'chart_prop';
+  if (at === 'data_table'  || bt === 'data_table')  return 'table_prop';
+  if (BODIES.includes(at) && bt === 'lever')  return 'body_on_lever';
+  if (BODIES.includes(bt) && at === 'lever')  return 'body_on_lever';
+  if (at === 'spring' && bt === 'lever')       return 'spring_on_lever';
+  if (bt === 'spring' && at === 'lever')       return 'spring_on_lever';
+  if (BODIES.includes(at) && BODIES.includes(bt)) return null;
+  return 'generic';
+}
+
+
+// Ottieni la relazione esistente tra due elementi
+function getRelation(aId, bId) {
+  return relations.find(r =>
+    (r.aId === aId && r.bId === bId) || (r.aId === bId && r.bId === aId)
+  );
+}
+
+// Applica il posizionamento fisico basato su relazione + scala riferimento
+function applyRelationPositions() {
+  const ref = getRefSystem();
+  if (!ref) return;
+
+  const ML = 50, MB = 50, W = 340, H = 300;
+  const axisW = W - ML - 24, axisH = H - MB - 24;
+  const halfX = Math.max(0.1, parseFloat(ref.props?.halfX) || 5);
+  const halfY = Math.max(0.1, parseFloat(ref.props?.halfY) || 5);
+  const scaleX = axisW / (2 * halfX);
+  const scaleY = axisH / (2 * halfY);
+  // Origine canvas del riferimento
+  const originX = ref.x + ML + axisW / 2;
+  const originY = ref.y + MB + axisH / 2;
+  const flipY   = ref.props?.flipY;
+
+  for (const rel of relations) {
+    const a = elements.find(e => e.id === rel.aId);
+    const b = elements.find(e => e.id === rel.bId);
+    if (!a || !b) continue;
+
+    // Salta relazioni che non implicano posizionamento fisico
+    const skipTypes = ['stats_prop','chart_prop','table_prop','display_prop','slider_prop','option_prop'];
+    if (skipTypes.includes(rel.type)) continue;
+
+    const BODIES = ['point_mass','block','sphere','rect_body'];
+    const body   = BODIES.includes(a.type) ? a : b;
+    const surf   = a === body ? b : a;
+    const bodyDef = DEFS[body.type];
+    const surfDef = DEFS[surf.type];
+
+    const h = parseFloat(rel.props?.height) || 0; // altezza fisica in metri
+
+    // Reset rotazione (solo body_on_plane con rect_body la imposta)
+    // Non resettare se il corpo è già su un piano inclinato
+    const bodyAlreadyOnPlane = relations.some(r2 =>
+      r2.type === 'body_on_plane' && (r2.aId === body.id || r2.bId === body.id)
+    );
+    const springAlreadyOnPlane = relations.some(r2 =>
+      r2.type === 'spring_on_plane' && (r2.aId === body.id || r2.bId === body.id)
+    ) || relations.some(r2 =>
+      r2.type === 'spring_on_plane' && (r2.aId === surf.id || r2.bId === surf.id)
+    );
+    if (rel.type !== 'body_on_plane' && !bodyAlreadyOnPlane && !springAlreadyOnPlane) body._rotation = null;
+
+    if (rel.type === 'body_on_floor') {
+      // Superficie del pavimento a y locale = 10px
+      const floorSurfaceY = surf.y + 10;
+      const hPx = h * scaleY;
+      body.y = floorSurfaceY - bodyDef.h - hPx;
+
+      // Se il corpo ha anche un vincolo spring_body (molla orizzontale),
+      // la molla determina X e aggiorniamo xOffset di conseguenza
+      const springRel = relations.find(r =>
+        r.type === 'spring_body' && (r.aId === body.id || r.bId === body.id)
+      );
+      if (springRel) {
+        // X verrà impostata dal blocco spring_body — qui aggiorniamo solo Y
+        // xOffset viene aggiornato dopo che spring_body ha posizionato il corpo
+      } else {
+        // Nessuna molla: X dal piano come prima
+        const xOff = parseFloat(rel.props?.xOffset) || 0;
+        const xMin = parseFloat(surf.props?.xMin) ?? 0;
+        const xMax = parseFloat(surf.props?.xMax) ?? 10;
+        const lenM = xMax - xMin;
+        const lenPx_f = surf._wPx ?? Math.max(10, Math.round(lenM * scaleX));
+        const xRel = xOff - xMin;
+        const xPx  = (xRel / lenM) * lenPx_f;
+        body.x = surf.x + xPx - bodyDef.w / 2;
+      }
+    }
+
+    if (rel.type === 'body_on_plane') {
+      const plane = surf;
+      const geo   = getPlaneGeometry(plane);
+      const lenM  = geo.lenM;
+      const s     = Math.max(0, Math.min(lenM, parseFloat(rel.props?.s) || 0));
+      const sPx   = (s / lenM) * geo.lenPx;
+
+      // Se il corpo ha un vincolo spring_body con molla sul piano,
+      // la posizione è gestita da spring_body — skip il posizionamento
+      const springRelBp = relations.find(r =>
+        r.type === 'spring_body' && (r.aId === body.id || r.bId === body.id)
+      );
+      const hasSpringOnPlane = springRelBp && (() => {
+        const sp = elements.find(e =>
+          e.id === (springRelBp.aId === body.id ? springRelBp.bId : springRelBp.aId)
+        );
+        return sp && relations.some(r =>
+          r.type === 'spring_on_plane' && (r.aId === sp.id || r.bId === sp.id)
+        );
+      })();
+      if (hasSpringOnPlane) {
+        const angleRad_bp = Math.atan2(geo.dy, geo.dx);
+        body._rotation = { angle: angleRad_bp * 180 / Math.PI, cx: 0, cy: 0 };
+      } else {
+
+      // Punto sull'ipotenusa alla posizione s
+      const px = plane.x + geo.x0 + geo.dx * sPx;
+      const py = plane.y + geo.y0 + geo.dy * sPx;
+
+      if (body.type === 'rect_body') {
+        // Angolo SVG dell'ipotenusa (dal basso verso l'alto)
+        const angleRad = Math.atan2(geo.dy, geo.dx);
+        const angleDeg = angleRad * 180 / Math.PI;
+
+        const W = bodyDef.w, H = bodyDef.h; // 50, 32
+
+        // La normale geo.nx, geo.ny punta FUORI dal piano (verso il corpo).
+        // Il lato di contatto è quello nella direzione della normale negativa
+        // (il lato che tocca il piano, cioè il lato che guarda VERSO il piano)
+        // In coord locali, la normale inversa è:
+        const nx_loc = -(geo.nx * Math.cos(angleRad) + geo.ny * Math.sin(angleRad));
+        const ny_loc = -(-geo.nx * Math.sin(angleRad) + geo.ny * Math.cos(angleRad));
+
+        // Il punto di contatto è il vertice del rettangolo nella direzione -normale locale
+        // Cioè, tra i 4 vertici scegliamo quello con il minimo dot product con (nx_loc, ny_loc)
+        const corners = [
+          { x: 0, y: 0 }, { x: W, y: 0 },
+          { x: W, y: H }, { x: 0, y: H }
+        ];
+        let minDot = Infinity, contactCorner = corners[0];
+        for (const c of corners) {
+          const dot = (c.x - W/2) * nx_loc + (c.y - H/2) * ny_loc;
+          if (dot < minDot) { minDot = dot; contactCorner = c; }
+        }
+        // Usa il centro del lato più vicino al piano (non il vertice)
+        // Il lato è quello perpendicolare alla normale locale
+        // Semplificato: se ny_loc > 0 → lato y=H, se ny_loc < 0 → lato y=0
+        //               se nx_loc > 0 → lato x=W, se nx_loc < 0 → lato x=0
+        // Usiamo il contributo dominante
+        let lcx, lcy;
+        if (Math.abs(ny_loc) >= Math.abs(nx_loc)) {
+          // Lato orizzontale dominante
+          lcy = ny_loc > 0 ? H : 0;
+          lcx = W / 2;
+        } else {
+          // Lato verticale dominante
+          lcx = nx_loc > 0 ? W : 0;
+          lcy = H / 2;
+        }
+
+        // Dopo rotazione di angleRad, il punto (lcx, lcy) si sposta di:
+        const rx = lcx * Math.cos(angleRad) - lcy * Math.sin(angleRad);
+        const ry = lcx * Math.sin(angleRad) + lcy * Math.cos(angleRad);
+
+        body.x = px - rx;
+        body.y = py - ry;
+        body._rotation = { angle: angleDeg, cx: 0, cy: 0 };
+        body._contactLocal = { x: lcx, y: lcy };
+      } else {
+        // Corpo puntiforme: centrato sul punto dell'ipotenusa
+        body.x = px - bodyDef.w / 2;
+        body.y = py - bodyDef.h / 2;
+        body._rotation = null;
+      }
+      } // end else (no spring on plane)
+    }
+
+    if (rel.type === 'body_on_wall') {
+      const wall   = surf;
+      const geo    = getWallGeometry(wall);
+      const flipXw = wall.props?.flipX;
+      const s      = parseFloat(rel.props?.s) || 0;
+
+      // X dalla parete (sempre)
+      if (!flipXw) {
+        body.x = wall.x + 13;
+      } else {
+        body.x = wall.x - bodyDef.w;
+      }
+
+      // Se il corpo ha anche un vincolo spring_body (molla verticale),
+      // Y verrà impostata dal blocco spring_body — qui solo X
+      const springRelW = relations.find(r =>
+        r.type === 'spring_body' && (r.aId === body.id || r.bId === body.id)
+      );
+      if (!springRelW) {
+        // Nessuna molla: Y dalla parete come prima
+        const yMin = parseFloat(wall.props?.yMin) ?? 0;
+        const yMax = parseFloat(wall.props?.yMax) ?? 10;
+        const lenM = yMax - yMin;
+        const sRel = s - yMin;
+        const sPx  = (sRel / lenM) * geo.lenPx;
+        body.y = wall.y + geo.lenPx - sPx - bodyDef.h / 2;
+      }
+    }
+
+    if (rel.type === 'body_on_lever') {
+      const lever = surf.type === 'lever' ? surf : body;
+      const bodyEl = surf.type === 'lever' ? body : surf;
+      const bodyDefL = DEFS[bodyEl.type] || { w: 30, h: 30 };
+      if (!lever || !bodyEl) continue;
+
+      const lengthPx = lever._lengthPx || 200;
+      const thick = lever._thicknessPx || 6;
+      const fulcrumFrac = (typeof getLeverFulcrumFrac === 'function') ? getLeverFulcrumFrac(lever) : 0.5;
+      const lengthM = Math.max(0.5, parseFloat(lever.props?.length) || 10);
+      // pos in metri dal lato sinistro
+      const posM = Math.max(0, Math.min(lengthM, parseFloat(rel.props?.pos) || fulcrumFrac * lengthM));
+      const pos = posM / lengthM; // 0-1 per px
+      const theta = (parseFloat(lever.props?.theta) || 0) * Math.PI / 180;
+      const cosT = Math.cos(theta), sinT = Math.sin(theta);
+
+      // Posizione locale sulla barra (sopra la barra)
+      const localX = pos * lengthPx;
+      const localY = -bodyDefL.h / 2; // sopra la barra
+
+      // Ruota attorno al fulcro
+      const fxL = fulcrumFrac * lengthPx;
+      const fyL = thick / 2;
+      const dxL = localX - fxL;
+      const dyL = localY - fyL;
+      const rotX = fxL + dxL * cosT - dyL * sinT;
+      const rotY = fyL + dxL * sinT + dyL * cosT;
+
+      bodyEl.x = lever.x + rotX - bodyDefL.w / 2;
+      bodyEl.y = lever.y + rotY;
+      bodyEl._rotation = { angle: theta * 180 / Math.PI, cx: bodyDefL.w / 2, cy: bodyDefL.h / 2 };
+    }
+
+    if (rel.type === 'spring_body') {
+      // Se la molla è in serie, usa sempre l'ultima della catena
+      let spring = surf;
+      if (spring._seriesRole) {
+        // Trova tutte le molle della stessa catena e prendi l'ultima
+        const seriesRels = relations.filter(r => r.type === 'spring_spring' && r.props?.layout === 'series');
+        const adj = {};
+        for (const r of seriesRels) {
+          if (!adj[r.aId]) adj[r.aId] = [];
+          if (!adj[r.bId]) adj[r.bId] = [];
+          adj[r.aId].push(r.bId);
+          adj[r.bId].push(r.aId);
+        }
+        // Flood-fill dal nodo corrente per trovare tutti i nodi della catena
+        const chainSet = new Set();
+        const queue = [spring.id];
+        while (queue.length) {
+          const cur = queue.shift();
+          if (chainSet.has(cur)) continue;
+          chainSet.add(cur);
+          (adj[cur]||[]).forEach(id => queue.push(id));
+        }
+        // Trova il nodo con _seriesRole === 'last' nella catena
+        const lastSp = [...chainSet]
+          .map(id => elements.find(e => e.id === id))
+          .filter(Boolean)
+          .find(s => s._seriesRole === 'last');
+        if (lastSp) spring = lastSp;
+      }
+      const anchor = spring.props?.anchor || 'left';
+      const horiz  = anchor === 'left' || anchor === 'right';
+
+      const ref2 = getRefSystem();
+      const ML2=50,W2=340,MR2=24,MB2=50,H2=300,MT2=24;
+      const axisW2=W2-ML2-MR2, axisH2=H2-MB2-MT2;
+      const hX2=Math.max(0.1,parseFloat(ref2?.props?.halfX)||5);
+      const hY2=Math.max(0.1,parseFloat(ref2?.props?.halfY)||5);
+      const sX2=axisW2/(2*hX2), sY2=axisH2/(2*hY2);
+      const sIso2=Math.min(sX2,sY2);
+
+      const L0s2 = parseFloat(spring.props?.L0);
+      const Ls2  = parseFloat(spring.props?._L_calc);
+      const tailAnchor2=10, tailFree2=8, nCoils2=8;
+      const baseZig2=nCoils2*6;
+
+      // Helper locale: calcola zig per una molla
+      const getZig2 = sp => {
+        const nC=8,tA=10,tF=8,bz=nC*6;
+        const L0=parseFloat(sp.props?.L0), Lc=parseFloat(sp.props?._L_calc);
+        const horiz2_g = (sp.props?.anchor||'left')==='left'||(sp.props?.anchor||'left')==='right';
+        const sc = horiz2_g ? sX2 : sY2;
+        const vS=Math.max(1,parseFloat(sp.props?.visScale)||5);
+        const dx=(!isNaN(Lc)&&!isNaN(L0))?Lc-L0:0;
+        return { zig:Math.max(nC*3,Math.round(bz+dx*sc*vS)), tA, tF };
+      };
+      const horiz2_sc = anchor === 'left' || anchor === 'right';
+      const scale2 = horiz2_sc ? sX2 : sY2;
+      const visScale2 = Math.max(1, parseFloat(spring.props?.visScale) || 5);
+      let zig2 = baseZig2;
+      if (!isNaN(L0s2) && L0s2 > 1e-9) {
+        const dx2_ap = (!isNaN(Ls2)) ? Ls2 - L0s2 : 0;
+        zig2 = Math.max(nCoils2 * 3, Math.round(baseZig2 + dx2_ap * scale2 * visScale2));
+      }
+      const wallOff2 = 8;
+      const freeLocal = tailAnchor2 + zig2 + tailFree2;
+
+      // Posizione assoluta parete e estremo libero in canvas
+      // Per anchor=top: parete a spring.y+8, estremo libero a spring.y+8+freeLocal
+      // Per anchor=bottom: parete a spring.y+_hPx-8, estremo libero a spring.y+_hPx-8-freeLocal
+      // Per anchor=left: parete a spring.x+8, estremo libero a spring.x+8+freeLocal
+      // Per anchor=right: parete a spring.x+_wPx-8, estremo libero a spring.x+_wPx-8-freeLocal
+      const hPx2 = spring._hPx || (freeLocal + 14);
+      const wPx2 = spring._wPx || (freeLocal + 14);
+
+      // Estremo libero in canvas:
+      // anchor=left:   parete a sx,  estremo libero a destra = spring.x + 8 + freeLocal
+      // anchor=right:  parete a dx,  estremo libero a sinistra = spring.x (x=0 del bbox)
+      // anchor=top:    parete in alto, estremo libero in basso = spring.y + 8 + freeLocal
+      // anchor=bottom: parete in basso, estremo libero in alto = spring.y (y=0 del bbox)
+      const xFree2 = anchor==='left'   ? spring.x + 8 + freeLocal : spring.x;
+      const yFree2 = anchor==='top'    ? spring.y + 8 + freeLocal : spring.y;
+
+      if (horiz) {
+        const cy_sp = spring.y + 16;
+        const isRect = body.type === 'rect_body';
+        if (spring._inParallel) {
+          const allSp = parallelGroup(spring.id);
+          const getFreeX2 = s => { const {zig,tA,tF}=getZig2(s); return s.x+8+tA+zig+tF; };
+          const xBar2 = anchor === 'left'
+            ? Math.max(...allSp.map(getFreeX2))
+            : Math.min(...allSp.map(s => s.x));
+          const yTop2 = Math.min(...allSp.map(s=>s.y)) - 4;
+          const yBot2 = Math.max(...allSp.map(s=>s.y+(s._hPx||32))) + 4;
+          const yMid2 = (yTop2+yBot2)/2;
+          const attachDirH2 = anchor === 'left' ? 1 : -1;
+          const xTip = xBar2 + attachDirH2*16;
+          body.x = isRect
+            ? (anchor === 'left' ? xTip : xTip - bodyDef.w)
+            : xTip - bodyDef.w/2;
+          body.y = yMid2 - bodyDef.h/2;
+        } else {
+          body.x = isRect
+            ? (anchor === 'left' ? xFree2 : xFree2 - bodyDef.w)
+            : xFree2 - bodyDef.w/2;
+          // rect_body: bordo inferiore allineato al bordo inferiore della molla
+          // point_mass: centrato verticalmente sulla molla
+          body.y = isRect
+            ? spring.y + (spring._hPx || 32) - bodyDef.h
+            : cy_sp - bodyDef.h / 2;
+        }
+      } else {
+        const cx_sp = spring.x + 16;
+        const isRect2 = body.type === 'rect_body';
+        if (spring._inParallel) {
+          const allSp2 = parallelGroup(spring.id);
+          const getFreeY2 = s => { const {zig,tA,tF}=getZig2(s); return s.y+8+tA+zig+tF; };
+          const yBar2 = anchor === 'top'
+            ? Math.max(...allSp2.map(getFreeY2))
+            : Math.min(...allSp2.map(s => s.y));
+          const xMid2 = allSp2.reduce((sum,s)=>sum+s.x+16, 0) / allSp2.length;
+          const attachDirV2 = anchor === 'top' ? 1 : -1;
+          const yTip = yBar2 + attachDirV2*16;
+          body.x = xMid2 - bodyDef.w/2;
+          body.y = isRect2
+            ? (anchor === 'top' ? yTip : yTip - bodyDef.h)
+            : yTip - bodyDef.h/2;
+        } else {
+          body.x = cx_sp - bodyDef.w / 2;
+          body.y = isRect2
+            ? (anchor === 'top' ? yFree2 : yFree2 - bodyDef.h)
+            : yFree2 - bodyDef.h/2;
+        }
+      }
+
+      // Se il corpo è anche su un pavimento (molla orizzontale + piano):
+      // il piano determina Y, aggiorniamo anche xOffset del vincolo floor
+      if (horiz) {
+        const floorRel = relations.find(r =>
+          r.type === 'body_on_floor' && (r.aId === body.id || r.bId === body.id)
+        );
+        if (floorRel) {
+          const floor = elements.find(e => e.id === (floorRel.aId === body.id ? floorRel.bId : floorRel.aId));
+          if (floor) {
+            // Y dal piano
+            const floorSurfaceY = floor.y + 10;
+            const hPx_f = (parseFloat(floorRel.props?.height) || 0) * scaleY;
+            body.y = floorSurfaceY - bodyDef.h - hPx_f;
+            // Aggiorna xOffset in coordinate fisiche
+            const xMin_f = parseFloat(floor.props?.xMin) ?? 0;
+            const xMax_f = parseFloat(floor.props?.xMax) ?? 10;
+            const lenM_f = xMax_f - xMin_f;
+            const lenPx_f = floor._wPx ?? Math.max(10, Math.round(lenM_f * scaleX));
+            const xPx_f = (body.x + bodyDef.w/2) - floor.x;
+            const xOff_f = xMin_f + (xPx_f / lenPx_f) * lenM_f;
+            floorRel.props.xOffset = xOff_f;
+          }
+        }
+      }
+
+      // Se la molla è sul piano inclinato: posiziona il corpo sull'estremo libero ruotato
+      const planeSpringRel = relations.find(r =>
+        r.type === 'spring_on_plane' && (r.aId === spring.id || r.bId === spring.id)
+      );
+      if (planeSpringRel) {
+        const planeEl2 = elements.find(e =>
+          e.id === (planeSpringRel.aId === spring.id ? planeSpringRel.bId : planeSpringRel.aId)
+        );
+        if (planeEl2) {
+          const geo2 = getPlaneGeometry(planeEl2);
+          const wPx2 = spring._wPx || 80;
+          const hPx2 = spring._hPx || 32;
+          const anchor2 = spring.props?.anchor || 'left';
+
+          // ── Piano flipX=true (sale verso sinistra) → modulo dedicato ──────
+          if (geo2.flipX) {
+            const result = positionBodyOnFlipXPlane(body, bodyDef, spring, geo2, anchor2, getZig2);
+            if (result) {
+              // Aggiorna s del vincolo body_on_plane
+              const planeBodyRelFX = relations.find(r =>
+                r.type === 'body_on_plane' && (r.aId === body.id || r.bId === body.id)
+              );
+              if (planeBodyRelFX) {
+                const dxPx = result.freeX - (planeEl2.x + geo2.x0);
+                const dyPx = result.freeY - (planeEl2.y + geo2.y0);
+                const sPx2 = dxPx * geo2.dx + dyPx * geo2.dy;
+                planeBodyRelFX.props.s = Math.max(0, Math.min(geo2.lenM, (sPx2 / geo2.lenPx) * geo2.lenM));
+              }
+            }
+            // Non proseguire con il codice flipX=false
+          } else {
+          // ── Piano flipX=false (sale verso destra) → codice originale ──────
+          const pwx = spring._planeAnchorX ?? spring.x + (anchor2 === 'left' ? 8 : wPx2 - 8);
+          const pwy = spring._planeAnchorY ?? spring.y + hPx2;
+
+          // Lunghezza parete→estremo libero
+          const {zig: zigFree, tA: tAFree, tF: tFFree} = getZig2(spring);
+          const springLenPx = tAFree + zigFree + tFFree + (anchor2 === 'right' ? 6 : 0);
+
+          // Per flipX=false: anchor=left → dir=+1 (verso l'alto del piano)
+          // Per flipX=true:  la direzione geo.dx punta già verso l'alto (sinistra),
+          //                  anchor=left → parete in basso → estremo libero in alto → dir=+1
+          //                  anchor=right → parete in alto → estremo libero in basso → dir=-1
+          // Stesso segno per entrambi i flipX — la direzione è già nel segno di geo.dx/dy
+          const dir2 = anchor2 === 'left' ? 1 : -1;
+          const freeX = pwx + dir2 * geo2.dx * springLenPx;
+          const freeY = pwy + dir2 * geo2.dy * springLenPx;
+
+          if (body.type === 'rect_body') {
+            const angleRad2 = Math.atan2(geo2.dy, geo2.dx);
+            const angleDeg2 = angleRad2 * 180 / Math.PI;
+            const W2 = bodyDef.w, H2 = bodyDef.h;
+
+            // anchor=left: vertice basso-sinistra sull'estremo libero (lcx=0, lcy=H)
+            // anchor=right: vertice basso-destra sull'estremo libero (lcx=W, lcy=H)
+            const lcx2 = anchor2 === 'left' ? 0 : W2;
+            const lcy2 = H2;
+
+            const rx2 = lcx2 * Math.cos(angleRad2) - lcy2 * Math.sin(angleRad2);
+            const ry2 = lcx2 * Math.sin(angleRad2) + lcy2 * Math.cos(angleRad2);
+
+            body.x = freeX - rx2;
+            body.y = freeY - ry2;
+            body._rotation = { angle: angleDeg2, cx: 0, cy: 0 };
+            // Centro del lato appoggiato al piano (centro lato inferiore in coord locali)
+            body._contactLocal = { x: W2 / 2, y: H2 };
+          } else {
+            const shiftX = geo2.nx * bodyDef.h / 2;
+            const shiftY = geo2.ny * bodyDef.h / 2;
+            body.x = freeX - bodyDef.w / 2 + shiftX;
+            body.y = freeY - bodyDef.h / 2 + shiftY;
+            body._rotation = null;
+          }
+
+          // Aggiorna s del vincolo body_on_plane se presente
+          const planeBodyRel = relations.find(r =>
+            r.type === 'body_on_plane' && (r.aId === body.id || r.bId === body.id)
+          );
+          if (planeBodyRel) {
+            // Calcola la posizione s lungo il piano in metri
+            const dxPx = freeX - (planeEl2.x + geo2.x0);
+            const dyPx = freeY - (planeEl2.y + geo2.y0);
+            const sPx2 = dxPx * geo2.dx + dyPx * geo2.dy;
+            planeBodyRel.props.s = Math.max(0, Math.min(geo2.lenM, (sPx2 / geo2.lenPx) * geo2.lenM));
+          }
+          } // end else flipX=false
+        }
+      }
+      if (!horiz) {
+        const wallRelS = relations.find(r =>
+          r.type === 'body_on_wall' && (r.aId === body.id || r.bId === body.id)
+        );
+        if (wallRelS) {
+          const wallS = elements.find(e =>
+            e.id === (wallRelS.aId === body.id ? wallRelS.bId : wallRelS.aId)
+          );
+          if (wallS) {
+            // X dalla parete
+            const flipXw2 = wallS.props?.flipX;
+            if (!flipXw2) {
+              body.x = wallS.x + 13;
+            } else {
+              body.x = wallS.x - bodyDef.w;
+            }
+            // Aggiorna s in coordinate fisiche
+            const geo_ws = getWallGeometry(wallS);
+            const yMin_ws = parseFloat(wallS.props?.yMin) ?? 0;
+            const yMax_ws = parseFloat(wallS.props?.yMax) ?? 10;
+            const lenM_ws = yMax_ws - yMin_ws;
+            const yPx_ws = (body.y + bodyDef.h/2) - wallS.y;
+            const sPx_ws = geo_ws.lenPx - yPx_ws;
+            const s_ws = yMin_ws + (sPx_ws / geo_ws.lenPx) * lenM_ws;
+            wallRelS.props.s = s_ws;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Ctrl+click — apre il modal relazione
+let _pendingRelation = null; // { aId, bId } in costruzione
+
+function handleCtrlClick(clickedId) {
+  if (!selectedId || clickedId === selectedId) return;
+  const a = elements.find(e => e.id === selectedId);
+  const b = elements.find(e => e.id === clickedId);
+  if (!a || !b) return;
+
+  const existing = getRelation(a.id, b.id);
+  const type     = getRelationType(a, b);
+  openRelationModal(a, b, existing, type);
+}
+
+// ─── Modal relazione ──────────────────────────────────────────────────────────
+function openRelationModal(a, b, existing, type) {
+  _pendingRelation = { aId: a.id, bId: b.id, type, props: existing ? {...existing.props} : { height: 0 } };
+
+  const overlay = document.getElementById('relation-overlay');
+  const body    = document.getElementById('relation-modal-body');
+  const title   = document.getElementById('relation-title');
+  const delBtn  = document.getElementById('relation-btn-del');
+
+  title.textContent = existing ? 'Modifica vincolo' : 'Nuovo vincolo';
+  delBtn.style.display = existing ? 'block' : 'none';
+  body.innerHTML = '';
+
+  // Coppia elementi
+  const pair = document.createElement('div');
+  pair.className = 'relation-pair';
+  pair.innerHTML = `
+    <div class="relation-pair-item">${DEFS[a.type].label}</div>
+    <div class="relation-pair-arrow">⟷</div>
+    <div class="relation-pair-item">${DEFS[b.type].label}</div>
+  `;
+  body.appendChild(pair);
+
+  // Campi in base al tipo
+  if (type === 'spring_on_plane') {
+    const planeEl = a.type === 'inclined_plane' ? a : b;
+    const springEl = a.type === 'spring' ? a : b;
+    const geo_sp = getPlaneGeometry(planeEl);
+    const lenM_sp = geo_sp.lenM;
+    if (_pendingRelation.props.sAnchor === undefined) {
+      _pendingRelation.props.sAnchor = (lenM_sp / 2).toFixed(2);
+    }
+    const desc_sp = document.createElement('div');
+    desc_sp.className = 'prop-hint'; desc_sp.style.marginBottom = '10px';
+    desc_sp.textContent = 'La parete della molla si ancora al piano inclinato nella posizione s specificata (misurata dal basso).';
+    body.appendChild(desc_sp);
+    body.appendChild(makeRelationField(
+      `Posizione s parete (0 ÷ ${lenM_sp.toFixed(2)} m)`,
+      'sAnchor', 'm', `es. ${(lenM_sp/4).toFixed(1)}`, _pendingRelation.props
+    ));
+  } else if (type === 'spring_on_wall') {
+    const wallEl = a.type === 'wall' ? a : b;
+    const springEl = a.type === 'spring' ? a : b;
+    const yMin_sw = parseFloat(wallEl.props?.yMin) ?? 0;
+    const yMax_sw = parseFloat(wallEl.props?.yMax) ?? 10;
+    if (_pendingRelation.props.yAnchor === undefined) {
+      _pendingRelation.props.yAnchor = ((yMin_sw + yMax_sw) / 2).toFixed(2);
+    }
+    const desc_sw = document.createElement('div');
+    desc_sw.className = 'prop-hint'; desc_sw.style.marginBottom = '10px';
+    desc_sw.textContent = 'La parete della molla si ancora alla parete verticale nella quota Y specificata.';
+    body.appendChild(desc_sw);
+    body.appendChild(makeRelationField(
+      `Quota Y parete (${yMin_sw} ÷ ${yMax_sw} m)`,
+      'yAnchor', 'm', `es. ${((yMin_sw+yMax_sw)/2).toFixed(1)}`, _pendingRelation.props
+    ));
+  } else if (type === 'spring_on_floor') {
+    // Molla agganciata al pavimento: specifica posizione X della parete della molla
+    const floorEl = a.type === 'floor' ? a : b;
+    const springEl = a.type === 'spring' ? a : b;
+    const xMin_sf = parseFloat(floorEl.props?.xMin) ?? 0;
+    const xMax_sf = parseFloat(floorEl.props?.xMax) ?? 10;
+    if (_pendingRelation.props.xAnchor === undefined) {
+      _pendingRelation.props.xAnchor = ((xMin_sf + xMax_sf) / 2).toFixed(2);
+    }
+    const desc = document.createElement('div');
+    desc.className = 'prop-hint'; desc.style.marginBottom = '10px';
+    desc.textContent = 'La parete della molla si ancora al pavimento nella posizione X specificata.';
+    body.appendChild(desc);
+    body.appendChild(makeRelationField(
+      `Posizione X parete (${xMin_sf} ÷ ${xMax_sf} m)`,
+      'xAnchor', 'm', `es. ${xMin_sf}`, _pendingRelation.props
+    ));
+  } else if (type === 'pulley_on_plane') {
+    const desc = document.createElement('div');
+    desc.className = 'prop-hint'; desc.style.marginBottom = '10px';
+    desc.textContent = 'La carrucola viene posizionata al vertice del piano inclinato.';
+    body.appendChild(desc);
+
+  } else if (type === 'pulley_on_floor') {
+    const floorEl = a.type === 'floor' ? a : b;
+    const xMin_pf = parseFloat(floorEl.props?.xMin) ?? 0;
+    const xMax_pf = parseFloat(floorEl.props?.xMax) ?? 10;
+    if (_pendingRelation.props.xOffset === undefined) {
+      _pendingRelation.props.xOffset = ((xMin_pf + xMax_pf) / 2).toFixed(2);
+    }
+    if (_pendingRelation.props.height === undefined) {
+      _pendingRelation.props.height = 1.5;
+    }
+    const desc = document.createElement('div');
+    desc.className = 'prop-hint'; desc.style.marginBottom = '10px';
+    desc.textContent = 'La carrucola viene posizionata sopra il pavimento alla posizione e altezza specificate.';
+    body.appendChild(desc);
+    body.appendChild(makeRelationField(
+      `Posizione X (${xMin_pf} ÷ ${xMax_pf} m)`,
+      'xOffset', 'm', `es. 0`, _pendingRelation.props
+    ));
+    body.appendChild(makeRelationField(
+      'Altezza dal pavimento',
+      'height', 'm', 'es. 1.5', _pendingRelation.props
+    ));
+
+  } else if (type === 'rope_on_pulley') {
+    if (_pendingRelation.props.side === undefined) {
+      _pendingRelation.props.side = 'left';
+    }
+    const desc = document.createElement('div');
+    desc.className = 'prop-hint'; desc.style.marginBottom = '10px';
+    desc.textContent = 'Specifica da quale lato della carrucola passa la fune.';
+    body.appendChild(desc);
+    // Bottoni lato
+    const sideWrap = document.createElement('div');
+    sideWrap.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px';
+    [{ value: 'left', label: '← Sinistra' }, { value: 'right', label: '→ Destra' }].forEach(({ value, label }) => {
+      const btn = document.createElement('button');
+      btn.textContent = label;
+      const setActive = (active) => {
+        btn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;padding:6px 4px;
+          border-radius:4px;cursor:pointer;text-align:center;
+          border:1px solid ${active ? 'var(--accent)' : 'var(--border)'};
+          background:${active ? 'rgba(200,240,96,0.15)' : 'transparent'};
+          color:${active ? 'var(--accent)' : 'var(--muted)'};transition:all 0.12s`;
+      };
+      setActive(_pendingRelation.props.side === value);
+      btn.addEventListener('click', () => {
+        _pendingRelation.props.side = value;
+        sideWrap.querySelectorAll('button').forEach((b, i) => {
+          setActive(i === (value === 'left' ? 0 : 1));
+        });
+      });
+      sideWrap.appendChild(btn);
+    });
+    body.appendChild(sideWrap);
+
+  } else if (type === 'spring_on_lever') {
+    const leverEl = a.type === 'lever' ? a : b;
+    const lengthM = Math.max(0.5, parseFloat(leverEl.props?.length) || 10);
+    const d1Frac = (typeof getLeverFulcrumFrac === 'function') ? getLeverFulcrumFrac(leverEl) : 0.5;
+    const d1M = d1Frac * lengthM;
+
+    if (_pendingRelation.props.pos === undefined) {
+      _pendingRelation.props.pos = (d1M + 1).toFixed(2);
+    }
+    if (_pendingRelation.props.side === undefined) {
+      _pendingRelation.props.side = 'below'; // sotto o sopra la leva
+    }
+
+    const desc = document.createElement('div');
+    desc.className = 'prop-hint'; desc.style.marginBottom = '10px';
+    desc.textContent = `Posizione della molla sulla leva (0 ÷ ${lengthM.toFixed(1)} m). Fulcro a ${d1M.toFixed(2)} m.`;
+    body.appendChild(desc);
+
+    // Posizione
+    const posRow = document.createElement('div');
+    posRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+    const posLbl = document.createElement('div');
+    posLbl.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:60px;';
+    posLbl.textContent = 'Posizione';
+    const posInput = document.createElement('input');
+    posInput.type = 'number'; posInput.step = '0.1';
+    posInput.min = '0'; posInput.max = lengthM.toFixed(1);
+    posInput.value = parseFloat(_pendingRelation.props.pos).toFixed(2);
+    posInput.style.cssText = `flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+      color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+    const posUnit = document.createElement('span');
+    posUnit.style.cssText = 'font-size:10px;color:#606070;'; posUnit.textContent = 'm';
+    posInput.addEventListener('input', () => {
+      _pendingRelation.props.pos = parseFloat(posInput.value).toFixed(3);
+    });
+    posRow.appendChild(posLbl); posRow.appendChild(posInput); posRow.appendChild(posUnit);
+    body.appendChild(posRow);
+
+    // Lato (sopra/sotto)
+    const sideRow = document.createElement('div');
+    sideRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+    const sideLbl = document.createElement('div');
+    sideLbl.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:60px;';
+    sideLbl.textContent = 'Lato';
+    const sideSelect = document.createElement('select');
+    sideSelect.style.cssText = `flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+      color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+    [['below','Sotto la leva'],['above','Sopra la leva']].forEach(([v,t]) => {
+      const opt = document.createElement('option');
+      opt.value = v; opt.textContent = t;
+      if (v === _pendingRelation.props.side) opt.selected = true;
+      sideSelect.appendChild(opt);
+    });
+    sideSelect.addEventListener('change', () => {
+      _pendingRelation.props.side = sideSelect.value;
+    });
+    sideRow.appendChild(sideLbl); sideRow.appendChild(sideSelect);
+    body.appendChild(sideRow);
+
+  } else if (type === 'stats_prop') {
+    const tblEl2 = a.type === 'data_table' ? a : b;
+    if (_pendingRelation.props.colIdx === undefined) _pendingRelation.props.colIdx = 0;
+    const headers2 = tblEl2.props?.headers || [];
+    const colRow = document.createElement('div');
+    colRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+    const colL = document.createElement('div');
+    colL.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:60px;'; colL.textContent = 'Colonna';
+    const colSel = document.createElement('select');
+    colSel.style.cssText = `flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+      color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+    headers2.forEach((h,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=h||`Col ${i+1}`; if(i===_pendingRelation.props.colIdx) o.selected=true; colSel.appendChild(o); });
+    if (!headers2.length) { const o=document.createElement('option'); o.textContent='(nessuna)'; colSel.appendChild(o); }
+    colSel.addEventListener('change',()=>{ _pendingRelation.props.colIdx=parseInt(colSel.value); });
+    colRow.appendChild(colL); colRow.appendChild(colSel); body.appendChild(colRow);
+
+  } else if (type === 'chart_prop') {
+    const chartEl = a.type === 'chart' ? a : b;
+    const tblEl   = a.type === 'chart' ? b : a;
+    if (_pendingRelation.props.xCol  === undefined) _pendingRelation.props.xCol  = 0;
+    if (_pendingRelation.props.yCols === undefined) _pendingRelation.props.yCols = [1];
+
+    const headers = tblEl.props?.headers || [];
+
+    // Asse X con errore opzionale
+    const xRow = document.createElement('div');
+    xRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:4px;';
+    const xL = document.createElement('div');
+    xL.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:50px;'; xL.textContent = 'Asse X';
+    const xSel = document.createElement('select');
+    xSel.style.cssText = `flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+      color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+    headers.forEach((h,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=h||`Col ${i+1}`; if(i===_pendingRelation.props.xCol) o.selected=true; xSel.appendChild(o); });
+    xSel.addEventListener('change',()=>{ _pendingRelation.props.xCol=parseInt(xSel.value); });
+    xRow.appendChild(xL); xRow.appendChild(xSel); body.appendChild(xRow);
+
+    // Errore X
+    const xErrRow = document.createElement('div');
+    xErrRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:10px;padding-left:16px;';
+    const xErrL = document.createElement('div'); xErrL.style.cssText='font-size:10px;color:#a0a0b0;min-width:44px;flex-shrink:0;'; xErrL.textContent='errore X:';
+    const xErrSel = document.createElement('select');
+    xErrSel.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+    const xNoneOpt = document.createElement('option'); xNoneOpt.value=-1; xNoneOpt.textContent='— nessuna —'; xErrSel.appendChild(xNoneOpt);
+    headers.forEach((h,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=h||`Col ${i+1}`; if(i===parseInt(_pendingRelation.props.xError??-1)) o.selected=true; xErrSel.appendChild(o); });
+    xErrSel.addEventListener('change',()=>{ _pendingRelation.props.xError=parseInt(xErrSel.value); });
+    xErrRow.appendChild(xErrL); xErrRow.appendChild(xErrSel); body.appendChild(xErrRow);
+
+    // Assi Y (multi-selezione)
+    const yL = document.createElement('div');
+    yL.style.cssText = 'font-size:10px;color:#a0a0b0;margin-bottom:4px;'; yL.textContent = 'Assi Y (puoi selezionare più colonne):';
+    body.appendChild(yL);
+    headers.forEach((h,i)=>{
+      if (i === parseInt(_pendingRelation.props.xCol ?? 0)) return; // escludi colonna X
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:4px;';
+      const ck = document.createElement('input'); ck.type='checkbox';
+      ck.checked = (_pendingRelation.props.yCols||[]).includes(i);
+      ck.style.cssText = 'accent-color:#f0c060;cursor:pointer;';
+      ck.addEventListener('change',()=>{
+        const yCols = _pendingRelation.props.yCols || [];
+        if (ck.checked) { if (!yCols.includes(i)) yCols.push(i); }
+        else { const idx=yCols.indexOf(i); if(idx>=0) yCols.splice(idx,1); }
+        _pendingRelation.props.yCols = yCols;
+      });
+      const lbl = document.createElement('label');
+      lbl.style.cssText='font-size:11px;color:#e8e8ec;cursor:pointer;font-family:IBM Plex Mono,monospace;';
+      lbl.textContent = h || `Col ${i+1}`;
+      lbl.prepend(ck); row.appendChild(lbl); body.appendChild(row);
+    });
+
+  } else if (type === 'table_prop') {
+    const tblEl    = a.type === 'data_table' ? a : b;
+    const targetEl = a.type === 'data_table' ? b : a;
+    const def = DEFS[targetEl.type];
+
+    if (_pendingRelation.props.propKey === undefined) _pendingRelation.props.propKey = '';
+    if (_pendingRelation.props.colIdx  === undefined) _pendingRelation.props.colIdx  = 0;
+
+    const desc = document.createElement('div');
+    desc.className = 'prop-hint'; desc.style.marginBottom = '10px';
+    desc.textContent = `Collega una colonna della tabella a una proprietà di "${def?.label || targetEl.type}".`;
+    body.appendChild(desc);
+
+    // Dropdown colonna
+    const colRow = document.createElement('div');
+    colRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+    const colLbl = document.createElement('div');
+    colLbl.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:70px;'; colLbl.textContent = 'Colonna';
+    const colSel = document.createElement('select');
+    colSel.style.cssText = `flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+      color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+    (tblEl.props?.headers || []).forEach((h, i) => {
+      const opt = document.createElement('option');
+      opt.value = i; opt.textContent = h || `Col ${i+1}`;
+      if (i === _pendingRelation.props.colIdx) opt.selected = true;
+      colSel.appendChild(opt);
+    });
+    colSel.addEventListener('change', () => { _pendingRelation.props.colIdx = parseInt(colSel.value); });
+    colRow.appendChild(colLbl); colRow.appendChild(colSel);
+    body.appendChild(colRow);
+
+    // Dropdown proprietà target (stesse dello slider)
+    const propMap = {
+      spring: ['k','L0'], rect_body:['mass'], point_mass:['mass'],
+      block:['mass'], sphere:['mass'], inclined_plane:['angle','base','height','length'],
+      lever:['d1','length'], axis_xy:['gravity'], floor:[],
+    };
+    const availProps = propMap[targetEl.type] || [];
+    if (availProps.length > 0) {
+      const propRow = document.createElement('div');
+      propRow.style.cssText = colRow.style.cssText;
+      const propLbl = document.createElement('div');
+      propLbl.style.cssText = colLbl.style.cssText; propLbl.textContent = 'Proprietà';
+      const propSel = document.createElement('select');
+      propSel.style.cssText = colSel.style.cssText;
+      availProps.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p; opt.textContent = p;
+        if (p === _pendingRelation.props.propKey) opt.selected = true;
+        propSel.appendChild(opt);
+      });
+      if (!_pendingRelation.props.propKey) _pendingRelation.props.propKey = availProps[0];
+      propSel.addEventListener('change', () => { _pendingRelation.props.propKey = propSel.value; });
+      propRow.appendChild(propLbl); propRow.appendChild(propSel);
+      body.appendChild(propRow);
+    }
+
+  } else if (type === 'option_prop') {
+    const targetEl = a.type === 'option_list' ? b : a;
+    const optEl    = a.type === 'option_list' ? a : b;
+    const def = DEFS[targetEl.type];
+
+    if (_pendingRelation.props.propKey === undefined) _pendingRelation.props.propKey = '';
+
+    const desc = document.createElement('div');
+    desc.className = 'prop-hint'; desc.style.marginBottom = '10px';
+    desc.textContent = `Scegli la proprietà di "${def?.label || targetEl.type}" da controllare.`;
+    body.appendChild(desc);
+
+    // Stesse prop dello slider
+    const propMap = {
+      spring:        ['k', 'L0'],
+      rect_body:     ['mass'], point_mass: ['mass'], block: ['mass'], sphere: ['mass'],
+      inclined_plane:['angle','base','height','length'],
+      lever:         ['d1', 'length'],
+      axis_xy:       ['gravity'],
+      floor:         [],
+    };
+    const availProps = propMap[targetEl.type] || [];
+    const selRow = document.createElement('div');
+    const selLbl = document.createElement('div');
+    selLbl.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:70px;';
+    selLbl.textContent = 'Proprietà';
+    const sel = document.createElement('select');
+    sel.style.cssText = `flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+      color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+    availProps.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p; opt.textContent = p;
+      if (p === _pendingRelation.props.propKey) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    if (!_pendingRelation.props.propKey && availProps.length > 0) {
+      _pendingRelation.props.propKey = availProps[0];
+      // Applica subito il valore della prima opzione selezionata
+      const curVal = parseFloat(optEl.props.options?.[optEl.props.selected ?? 0]?.value);
+      if (!isNaN(curVal)) targetEl.props[availProps[0]] = curVal;
+    }
+    sel.addEventListener('change', () => {
+      _pendingRelation.props.propKey = sel.value;
+      // Applica subito il valore corrente
+      const curVal2 = parseFloat(optEl.props.options?.[optEl.props.selected ?? 0]?.value);
+      if (!isNaN(curVal2)) targetEl.props[sel.value] = curVal2;
+    });
+    selRow.appendChild(selLbl); selRow.appendChild(sel);
+    body.appendChild(selRow);
+
+  } else if (type === 'display_prop') {
+    const targetEl = a.type === 'display' ? b : a;
+    const displayEl = a.type === 'display' ? a : b;
+    const def = DEFS[targetEl.type];
+
+    if (_pendingRelation.props.propKey === undefined) _pendingRelation.props.propKey = '';
+
+    const desc = document.createElement('div');
+    desc.className = 'prop-hint'; desc.style.marginBottom = '10px';
+    desc.textContent = `Scegli la proprietà di "${def?.label || targetEl.type}" da visualizzare.`;
+    body.appendChild(desc);
+
+    // Stesse proprietà dello slider_prop
+    const propMap = {
+      spring:        [
+        { key: 'k',        label: 'k',  title: 'Costante elastica', unit: 'N/m' },
+        { key: 'L0',       label: 'L₀', title: 'Lunghezza a riposo', unit: 'm' },
+        { key: '_L_calc',  label: 'L',  title: 'Lunghezza attuale',  unit: 'm' },
+        { key: '_delta_x', label: 'Δx', title: 'Allungamento',       unit: 'm' },
+        { key: '_F_el',    label: 'F',  title: 'Forza elastica',     unit: 'N' },
+      ],
+      rect_body:     [
+        { key: 'mass',   label: 'm',   title: 'Massa',              unit: 'kg'   },
+        { key: 'peso',   label: 'P',   title: 'Peso',               unit: 'N'    },
+        { key: '_N_plane', label: '|N|', title: 'Reazione normale',   unit: 'N'    },
+        { key: '_T_rope',  label: 'T',   title: 'Tensione fune',       unit: 'N'    },
+        { key: '_f_friction', label: 'f', title: 'Forza di attrito',   unit: 'N'    },
+        { key: '_f_type',  label: 'tipo', title: 'Tipo attrito', unit: ''    },
+        { key: '_Fx',    label: 'Fx',  title: 'Forza risultante x', unit: 'N'    },
+        { key: '_Fy',    label: 'Fy',  title: 'Forza risultante y', unit: 'N'    },
+        { key: '_F_mag', label: '|F|', title: 'Forza risultante',   unit: 'N'    },
+        { key: '_ax',    label: 'ax',  title: 'Accelerazione x',    unit: 'm/s²' },
+        { key: '_ay',    label: 'ay',  title: 'Accelerazione y',    unit: 'm/s²' },
+        { key: '_a_mag', label: '|a|', title: 'Accelerazione',      unit: 'm/s²' },
+      ],
+      point_mass:    [
+        { key: 'mass',   label: 'm',   title: 'Massa',              unit: 'kg'   },
+        { key: 'peso',   label: 'P',   title: 'Peso',               unit: 'N'    },
+        { key: '_N_plane', label: '|N|', title: 'Reazione normale',   unit: 'N'    },
+        { key: '_T_rope',  label: 'T',   title: 'Tensione fune',       unit: 'N'    },
+        { key: '_f_friction', label: 'f', title: 'Forza di attrito',   unit: 'N'    },
+        { key: '_f_type',  label: 'tipo', title: 'Tipo attrito', unit: ''    },
+        { key: '_Fx',    label: 'Fx',  title: 'Forza risultante x', unit: 'N'    },
+        { key: '_Fy',    label: 'Fy',  title: 'Forza risultante y', unit: 'N'    },
+        { key: '_F_mag', label: '|F|', title: 'Forza risultante',   unit: 'N'    },
+        { key: '_ax',    label: 'ax',  title: 'Accelerazione x',    unit: 'm/s²' },
+        { key: '_ay',    label: 'ay',  title: 'Accelerazione y',    unit: 'm/s²' },
+        { key: '_a_mag', label: '|a|', title: 'Accelerazione',      unit: 'm/s²' },
+      ],
+      block:         [
+        { key: 'mass',   label: 'm',   title: 'Massa',              unit: 'kg'   },
+        { key: 'peso',   label: 'P',   title: 'Peso',               unit: 'N'    },
+        { key: '_N_plane', label: '|N|', title: 'Reazione normale',   unit: 'N'    },
+        { key: '_T_rope',  label: 'T',   title: 'Tensione fune',       unit: 'N'    },
+        { key: '_f_friction', label: 'f', title: 'Forza di attrito',   unit: 'N'    },
+        { key: '_f_type',  label: 'tipo', title: 'Tipo attrito', unit: ''    },
+        { key: '_Fx',    label: 'Fx',  title: 'Forza risultante x', unit: 'N'    },
+        { key: '_Fy',    label: 'Fy',  title: 'Forza risultante y', unit: 'N'    },
+        { key: '_F_mag', label: '|F|', title: 'Forza risultante',   unit: 'N'    },
+        { key: '_ax',    label: 'ax',  title: 'Accelerazione x',    unit: 'm/s²' },
+        { key: '_ay',    label: 'ay',  title: 'Accelerazione y',    unit: 'm/s²' },
+        { key: '_a_mag', label: '|a|', title: 'Accelerazione',      unit: 'm/s²' },
+      ],
+      sphere:        [
+        { key: 'mass',   label: 'm',   title: 'Massa',              unit: 'kg'   },
+        { key: 'peso',   label: 'P',   title: 'Peso',               unit: 'N'    },
+        { key: '_N_plane', label: '|N|', title: 'Reazione normale',   unit: 'N'    },
+        { key: '_T_rope',  label: 'T',   title: 'Tensione fune',       unit: 'N'    },
+        { key: '_f_friction', label: 'f', title: 'Forza di attrito',   unit: 'N'    },
+        { key: '_f_type',  label: 'tipo', title: 'Tipo attrito', unit: ''    },
+        { key: '_Fx',    label: 'Fx',  title: 'Forza risultante x', unit: 'N'    },
+        { key: '_Fy',    label: 'Fy',  title: 'Forza risultante y', unit: 'N'    },
+        { key: '_F_mag', label: '|F|', title: 'Forza risultante',   unit: 'N'    },
+        { key: '_ax',    label: 'ax',  title: 'Accelerazione x',    unit: 'm/s²' },
+        { key: '_ay',    label: 'ay',  title: 'Accelerazione y',    unit: 'm/s²' },
+        { key: '_a_mag', label: '|a|', title: 'Accelerazione',      unit: 'm/s²' },
+      ],
+      inclined_plane:[
+        { key: 'angle',  label: 'θ',  title: 'Angolo',    unit: '°' },
+        { key: 'base',   label: 'b',  title: 'Base',       unit: 'm' },
+        { key: 'height', label: 'h',  title: 'Altezza',    unit: 'm' },
+        { key: 'length', label: 'l',  title: 'Lunghezza',  unit: 'm' },
+      ],
+      lever:         [
+        { key: 'd1',     label: 'd₁', title: 'Braccio sinistro', unit: 'm' },
+        { key: 'length', label: 'L',  title: 'Lunghezza leva',   unit: 'm' },
+      ],
+      axis_xy:       [{ key: 'gravity', label: 'g',  title: 'Accelerazione di gravità', unit: 'm/s²' }],
+    };
+    const rawProps = propMap[targetEl.type];
+    const scalarProps = rawProps
+      ? rawProps
+      : Object.keys(targetEl.props||{}).filter(k=>!k.startsWith('_')).map(k=>({key:k,label:k}));
+    const forces = targetEl.props?.forces || [];
+    const forceProps = [];
+    forces.forEach((f,i) => {
+      if (f.fx !== undefined) forceProps.push({ key:`forces[${i}].fx`, label:`F${i+1}.fx`, unit:'N' });
+      if (f.fy !== undefined) forceProps.push({ key:`forces[${i}].fy`, label:`F${i+1}.fy`, unit:'N' });
+      if (f.val !== undefined) forceProps.push({ key:`forces[${i}].val`, label:`F${i+1}`, unit:'N' });
+    });
+    const allProps = [...scalarProps, ...forceProps];
+
+    if (allProps.length === 0) {
+      const h = document.createElement('div'); h.className = 'prop-hint';
+      h.textContent = 'Nessuna proprietà disponibile.'; body.appendChild(h);
+    } else {
+      const selRow = document.createElement('div');
+      selRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:12px;';
+      const selLbl = document.createElement('div');
+      selLbl.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:70px;';
+      selLbl.textContent = 'Proprietà';
+      const sel = document.createElement('select');
+      sel.style.cssText = `flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+        color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+      allProps.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.key; opt.textContent = p.title || p.label;
+        if (p.key === _pendingRelation.props.propKey) opt.selected = true;
+        sel.appendChild(opt);
+      });
+
+      function applyDisplayProp(key) {
+        const p = allProps.find(x => x.key === key);
+        if (!p) return;
+        displayEl.props.label = p.label || '';
+        displayEl.props.title = p.title || '';
+        displayEl.props.unit  = p.unit  || '';
+      }
+
+      if (!_pendingRelation.props.propKey) {
+        _pendingRelation.props.propKey = allProps[0].key;
+        applyDisplayProp(allProps[0].key);
+      }
+      sel.addEventListener('change', () => {
+        _pendingRelation.props.propKey = sel.value;
+        applyDisplayProp(sel.value);
+      });
+      selRow.appendChild(selLbl); selRow.appendChild(sel);
+      body.appendChild(selRow);
+    }
+
+  } else if (type === 'slider_prop') {
+    const targetEl = a.type === 'slider' ? b : a;
+    const sliderEl = a.type === 'slider' ? a : b;
+    const def = DEFS[targetEl.type];
+
+    if (_pendingRelation.props.propKey === undefined) _pendingRelation.props.propKey = '';
+
+    const desc = document.createElement('div');
+    desc.className = 'prop-hint'; desc.style.marginBottom = '10px';
+    desc.textContent = `Scegli la proprietà di "${def?.label || targetEl.type}" da controllare.`;
+    body.appendChild(desc);
+
+    // Costruisce lista proprietà: scalari + forze
+    const propMap = {
+      spring:        ['k', 'L0'],
+      rect_body:     ['mass'],
+      point_mass:    ['mass'],
+      block:         ['mass'],
+      sphere:        ['mass'],
+      inclined_plane:['angle','base','height','length'],
+      lever:         ['d1', 'length'],
+      axis_xy:       ['gravity'],
+      floor:         [],
+    };
+    const scalarProps = propMap[targetEl.type] || [];
+
+    // Aggiungi forze applicate se presenti
+    const forces = targetEl.props?.forces || [];
+    const forceProps = [];
+    forces.forEach((f, i) => {
+      // Aggiungi sempre entrambe le modalità se la forza ha fx/fy
+      if (f.fx !== undefined || f.fy !== undefined) {
+        forceProps.push({ key: `forces[${i}].__cart`,  label: `F${i+1} → componenti (fx, fy)`, isGroup: true, idx: i, mode: 'cart' });
+        forceProps.push({ key: `forces[${i}].__polar`, label: `F${i+1} → polare (|F|, θ)`,    isGroup: true, idx: i, mode: 'polar' });
+      } else if (f.val !== undefined) {
+        forceProps.push({ key: `forces[${i}].val`, label: `F${i+1}`, unit: 'N' });
+      } else if (f.F !== undefined) {
+        forceProps.push({ key: `forces[${i}].F`, label: `F${i+1}.F`, unit: 'N' });
+      }
+    });
+
+    const allProps = [
+      ...scalarProps.map(p => ({ key: p, label: p })),
+      ...forceProps
+    ];
+
+    if (allProps.length === 0) {
+      const h = document.createElement('div'); h.className = 'prop-hint';
+      h.textContent = 'Nessuna proprietà disponibile per questo elemento.';
+      body.appendChild(h);
+    } else {
+      // Dropdown principale: proprietà
+      const selRow = document.createElement('div');
+      selRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+      const selLbl = document.createElement('div');
+      selLbl.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:70px;';
+      selLbl.textContent = 'Proprietà';
+      const sel = document.createElement('select');
+      sel.style.cssText = `flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+        color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+      allProps.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.key; opt.textContent = p.label;
+        if (p.key === _pendingRelation.props.propKey) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      if (!_pendingRelation.props.propKey) _pendingRelation.props.propKey = allProps[0].key;
+      selRow.appendChild(selLbl); selRow.appendChild(sel);
+      body.appendChild(selRow);
+
+      // Secondo dropdown: componente specifica (appare solo per forze gruppo)
+      const subRow = document.createElement('div');
+      subRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:12px;';
+      const subLbl = document.createElement('div');
+      subLbl.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:70px;';
+      subLbl.textContent = 'Componente';
+      const subSel = document.createElement('select');
+      subSel.style.cssText = sel.style.cssText;
+      subRow.appendChild(subLbl); subRow.appendChild(subSel);
+      body.appendChild(subRow);
+
+      const propHints = {
+        k:       { min:0,   max:500,  step:1,   label:'k'  },
+        L0:      { min:0.1, max:5,    step:0.1, label:'L₀' },
+        mass:    { min:0,   max:20,   step:0.1, label:'m'  },
+        angle:   { min:0,   max:89,   step:1,   label:'θ'  },
+        d1:      { min:0.1, max:9.9,  step:0.1, label:'d₁' },
+        length:  { min:1,   max:20,   step:0.5, label:'L'  },
+        gravity: { min:0,   max:30,   step:0.1, label:'g'  },
+      };
+
+      function updateSubSel(mainKey) {
+        subSel.innerHTML = '';
+        const p = allProps.find(x => x.key === mainKey);
+        if (p?.isGroup) {
+          subRow.style.display = 'flex';
+          const idx = p.idx;
+          const f = targetEl.props.forces[idx];
+          let subs = [];
+          if (p.mode === 'cart') {
+            subs = [
+              { key: `forces[${idx}].fx`, label: `fx`, unit: 'N' },
+              { key: `forces[${idx}].fy`, label: `fy`, unit: 'N' },
+            ];
+          } else {
+            subs = [
+              { key: `forces[${idx}].__mag`, label: `|F|` },
+              { key: `forces[${idx}].__ang`, label: `θ (°)` },
+            ];
+          }
+          subs.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.key; opt.textContent = s.label;
+            if (s.key === _pendingRelation.props.subKey) opt.selected = true;
+            subSel.appendChild(opt);
+          });
+          if (!_pendingRelation.props.subKey) _pendingRelation.props.subKey = subs[0].key;
+          applyHint(_pendingRelation.props.subKey, idx, p.mode);
+        } else {
+          subRow.style.display = 'none';
+          _pendingRelation.props.subKey = null;
+          applyHint(mainKey, null, null);
+        }
+      }
+
+      function applyHint(key, forceIdx, mode) {
+        // Virtual keys: __mag, __ang
+        const isVirtual = key?.includes('.__');
+        if (isVirtual) {
+          const idx = forceIdx ?? parseInt(key.match(/\[(\d+)\]/)?.[1]);
+          const f = targetEl.props?.forces?.[idx] || {};
+          if (key.includes('.__mag')) {
+            const mag = Math.hypot(parseFloat(f.fx)||0, parseFloat(f.fy)||0);
+            sliderEl.props.min=0; sliderEl.props.max=200; sliderEl.props.step=0.5;
+            sliderEl.props.value=mag; sliderEl.props.label='|F|';
+          } else if (key.includes('.__ang')) {
+            const ang = Math.atan2(parseFloat(f.fy)||0, parseFloat(f.fx)||0)*180/Math.PI;
+            sliderEl.props.min=-180; sliderEl.props.max=180; sliderEl.props.step=1;
+            sliderEl.props.value=parseFloat(ang.toFixed(1)); sliderEl.props.label='θ';
+          }
+        } else {
+          const forceMatch = key?.match(/^forces\[(\d+)\]\.(\w+)$/);
+          if (forceMatch) {
+            const idx2 = parseInt(forceMatch[1]);
+            const sub = forceMatch[2];
+            const curVal = parseFloat(targetEl.props?.forces?.[idx2]?.[sub]) || 0;
+            if (sub === 'fy' || sub === 'fx') {
+              sliderEl.props.min=-200; sliderEl.props.max=200; sliderEl.props.step=0.5;
+            } else {
+              sliderEl.props.min=0; sliderEl.props.max=200; sliderEl.props.step=0.5;
+            }
+            sliderEl.props.value=curVal;
+            sliderEl.props.label = sub === 'fx' ? 'Fx' : sub === 'fy' ? 'Fy' : `F${idx2+1}`;
+          } else {
+            const h = propHints[key];
+            if (h) {
+              sliderEl.props.min=h.min; sliderEl.props.max=h.max;
+              sliderEl.props.step=h.step; sliderEl.props.label=h.label;
+              sliderEl.props.value=parseFloat(targetEl.props?.[key])||(h.min+h.max)/2;
+            }
+          }
+        }
+      }
+
+      // Aggiorna subKey quando cambia il subSel
+      subSel.addEventListener('change', () => {
+        _pendingRelation.props.subKey = subSel.value;
+        const p = allProps.find(x => x.key === sel.value);
+        applyHint(subSel.value, p?.idx, p?.mode);
+      });
+
+      sel.addEventListener('change', () => {
+        _pendingRelation.props.propKey = sel.value;
+        _pendingRelation.props.subKey = null;
+        updateSubSel(sel.value);
+      });
+
+      updateSubSel(_pendingRelation.props.propKey);
+    }
+
+  } else if (type === 'body_on_lever') {
+    const leverEl = a.type === 'lever' ? a : b;
+    const lengthM = Math.max(0.5, parseFloat(leverEl.props?.length) || 10);
+    const d1Frac = (typeof getLeverFulcrumFrac === 'function') ? getLeverFulcrumFrac(leverEl) : 0.5;
+    const d1M = d1Frac * lengthM;
+
+    if (_pendingRelation.props.pos === undefined) {
+      _pendingRelation.props.pos = d1M.toFixed(2); // default: sul fulcro
+    }
+
+    const desc = document.createElement('div');
+    desc.className = 'prop-hint'; desc.style.marginBottom = '10px';
+    desc.textContent = `Distanza dal lato sinistro (0 ÷ ${lengthM.toFixed(1)} m). Fulcro a ${d1M.toFixed(2)} m.`;
+    body.appendChild(desc);
+
+    const posRow = document.createElement('div');
+    posRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:12px;';
+    const posLbl = document.createElement('div');
+    posLbl.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:60px;';
+    posLbl.textContent = 'Posizione';
+    const posInput = document.createElement('input');
+    posInput.type = 'number'; posInput.step = '0.1';
+    posInput.min = '0'; posInput.max = lengthM.toFixed(1);
+    posInput.value = parseFloat(_pendingRelation.props.pos).toFixed(2);
+    posInput.style.cssText = `flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+      color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+    const posUnit = document.createElement('span');
+    posUnit.style.cssText = 'font-size:10px;color:#606070;'; posUnit.textContent = 'm';
+
+    const armDisplay = document.createElement('div');
+    armDisplay.style.cssText = 'font-size:10px;color:#c8f060;margin-top:4px;';
+    const updateArm = (v) => {
+      const arm = v - d1M;
+      armDisplay.textContent = arm > 0.01 ? `→ braccio destro ${arm.toFixed(2)} m` :
+                               arm < -0.01 ? `← braccio sinistro ${Math.abs(arm).toFixed(2)} m` : '= sul fulcro';
+    };
+    updateArm(parseFloat(posInput.value));
+
+    posInput.addEventListener('input', () => {
+      const v = Math.max(0, Math.min(lengthM, parseFloat(posInput.value) || 0));
+      _pendingRelation.props.pos = v.toFixed(3);
+      updateArm(v);
+    });
+    posRow.appendChild(posLbl); posRow.appendChild(posInput); posRow.appendChild(posUnit);
+    body.appendChild(posRow);
+    body.appendChild(armDisplay);
+
+  } else if (type === 'body_on_floor') {
+    const floorEl = a.type === 'floor' ? a : b;
+    const xMin_f = parseFloat(floorEl.props?.xMin) ?? 0;
+    const xMax_f = parseFloat(floorEl.props?.xMax) ?? 10;
+    if (_pendingRelation.props.xOffset === undefined) _pendingRelation.props.xOffset = xMin_f;
+
+    const heightField = makeRelationField('Altezza dal pavimento', 'height', 'm', 'es. 0',
+      _pendingRelation.props);
+    body.appendChild(heightField);
+    body.appendChild(makeRelationField(
+      `Posizione x (${xMin_f} ÷ ${xMax_f} m)`,
+      'xOffset', 'm', `es. ${xMin_f}`, _pendingRelation.props
+    ));
+
+    // Separatore
+    const sep = document.createElement('div');
+    sep.style.cssText = 'height:1px;background:var(--border);margin:12px 0';
+    body.appendChild(sep);
+
+    // Sezione attrito — appare solo se h = 0
+    const frictionSection = document.createElement('div');
+    frictionSection.id = 'rel-friction-section';
+    body.appendChild(frictionSection);
+
+    function updateFrictionSection() {
+      const h = parseFloat(_pendingRelation.props.height);
+      const isOnFloor = isNaN(h) || h === 0;
+      frictionSection.innerHTML = '';
+      if (isOnFloor) {
+        const title = document.createElement('div');
+        title.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;
+          font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+          color:var(--accent2);margin-bottom:10px`;
+        title.textContent = 'Attrito';
+        frictionSection.appendChild(title);
+        frictionSection.appendChild(makeRelationField('Coeff. attrito statico μₛ', 'muS', '', 'es. 0.4',
+          _pendingRelation.props));
+        frictionSection.appendChild(makeRelationField('Coeff. attrito dinamico μₖ', 'muK', '', 'es. 0.3',
+          _pendingRelation.props));
+        const hint = document.createElement('div');
+        hint.className = 'relation-info';
+        hint.textContent = 'Lascia vuoto per superficie priva di attrito.';
+        frictionSection.appendChild(hint);
+      } else {
+        frictionSection.innerHTML = '';
+        // Pulisce i valori di attrito se il corpo è sollevato
+        delete _pendingRelation.props.muS;
+        delete _pendingRelation.props.muK;
+      }
+    }
+
+    // Aggancia l'aggiornamento all'input altezza
+    const heightInput = heightField.querySelector('input');
+    heightInput.addEventListener('input', updateFrictionSection);
+
+    // Esegui subito
+    updateFrictionSection();
+
+    const info = document.createElement('div');
+    info.className = 'relation-info';
+    info.style.marginTop = '10px';
+    info.textContent = 'h = 0 → appoggiato. h > 0 → sollevato.';
+    body.appendChild(info);
+
+    // Se ci sono molle ancorate al pavimento, proponi di agganciare anche a una molla
+    const floorEl2 = a.type === 'floor' ? a : b;
+    const bodyEl2  = a.type === 'floor' ? b : a;
+    const springOnFloorRels = relations.filter(r =>
+      r.type === 'spring_on_floor' && (r.aId === floorEl2.id || r.bId === floorEl2.id)
+    );
+    const springsOnFloor = springOnFloorRels.map(r =>
+      elements.find(e => e.id === (r.aId === floorEl2.id ? r.bId : r.aId))
+    ).filter(Boolean);
+
+    if (springsOnFloor.length > 0) {
+      const sep2 = document.createElement('div');
+      sep2.style.cssText = 'height:1px;background:var(--border);margin:12px 0';
+      body.appendChild(sep2);
+      const springTitle = document.createElement('div');
+      springTitle.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;
+        letter-spacing:0.08em;text-transform:uppercase;color:var(--accent2);margin-bottom:8px`;
+      springTitle.textContent = 'Molle sul pavimento';
+      body.appendChild(springTitle);
+      const springHint = document.createElement('div');
+      springHint.className = 'prop-hint'; springHint.style.marginBottom = '8px';
+      springHint.textContent = 'Vuoi agganciare il corpo anche a una molla?';
+      body.appendChild(springHint);
+
+      // Bottone "nessuna molla"
+      const btnNone = document.createElement('button');
+      btnNone.textContent = '✗ Solo pavimento';
+      btnNone.style.cssText = `width:100%;padding:6px;border-radius:4px;cursor:pointer;
+        font-family:'IBM Plex Mono',monospace;font-size:10px;margin-bottom:6px;
+        border:1px solid var(--border);background:transparent;color:var(--muted)`;
+      const allSpringBtns = [btnNone];
+
+      // Inizia senza selezione (no auto-select per evitare sovrascritture accidentali)
+      _pendingRelation.props.attachToSpring = false;
+      delete _pendingRelation.props.springId;
+
+      const setSelected = (btn, springId) => {
+        allSpringBtns.forEach(b => {
+          b.style.background = 'transparent';
+          b.style.borderColor = 'var(--border)';
+          b.style.color = 'var(--muted)';
+        });
+        btn.style.background = 'rgba(200,240,96,0.15)';
+        btn.style.borderColor = 'var(--accent)';
+        btn.style.color = 'var(--accent)';
+        if (springId) {
+          _pendingRelation.props.attachToSpring = true;
+          _pendingRelation.props.springId = springId;
+        } else {
+          _pendingRelation.props.attachToSpring = false;
+          delete _pendingRelation.props.springId;
+        }
+      };
+
+      btnNone.addEventListener('click', () => setSelected(btnNone, null));
+      body.appendChild(btnNone);
+
+      springsOnFloor.forEach((sp, i) => {
+        const btn = document.createElement('button');
+        const anchor_s = sp.props?.anchor || 'left';
+        const dirLabel = anchor_s === 'left' ? '← parete sx' : '→ parete dx';
+        btn.textContent = `✓ Molla ${i+1} (${dirLabel}, k=${sp.props?.k||'?'} N/m)`;
+        btn.style.cssText = `width:100%;padding:6px;border-radius:4px;cursor:pointer;
+          font-family:'IBM Plex Mono',monospace;font-size:10px;margin-bottom:4px;
+          border:1px solid var(--border);background:transparent;color:var(--muted)`;
+        allSpringBtns.push(btn);
+        btn.addEventListener('click', () => setSelected(btn, sp.id));
+        body.appendChild(btn);
+
+        // Se il corpo era già collegato a questa molla, pre-seleziona
+        const alreadyLinked = relations.some(r =>
+          r.type === 'spring_body' && (
+            (r.aId === sp.id && r.bId === bodyEl2.id) ||
+            (r.bId === sp.id && r.aId === bodyEl2.id)
+          )
+        );
+        if (alreadyLinked) setSelected(btn, sp.id);
+      });
+    }
+  } else if (type === 'body_on_plane') {
+    const plane = a.type === 'inclined_plane' ? a : b;
+    const geo   = getPlaneGeometry(plane);
+    if (!_pendingRelation.props.s) _pendingRelation.props.s = 0;
+
+    const lenField = makeRelationField(
+      `Posizione sul piano s (0 ÷ ${geo.lenM.toFixed(2)} m)`,
+      's', 'm', 'es. 0', _pendingRelation.props
+    );
+    body.appendChild(lenField);
+
+    // Separatore + attrito (sempre visibile)
+    const sep = document.createElement('div');
+    sep.style.cssText = 'height:1px;background:var(--border);margin:12px 0';
+    body.appendChild(sep);
+
+    const attrTitle = document.createElement('div');
+    attrTitle.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;
+      font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+      color:var(--accent2);margin-bottom:10px`;
+    attrTitle.textContent = 'Attrito';
+    body.appendChild(attrTitle);
+
+    body.appendChild(makeRelationField('Coeff. attrito statico μₛ',  'muS', '', 'es. 0.4', _pendingRelation.props));
+    body.appendChild(makeRelationField('Coeff. attrito dinamico μₖ', 'muK', '', 'es. 0.3', _pendingRelation.props));
+
+    const hint = document.createElement('div');
+    hint.className = 'relation-info';
+    hint.textContent = 'Lascia vuoto per piano privo di attrito.';
+    body.appendChild(hint);
+
+    // Se c'è una molla ancorata al piano, proponi di agganciare anche alla molla
+    const planeEl_bm = a.type === 'inclined_plane' ? a : b;
+    const bodyEl_bm  = a.type === 'inclined_plane' ? b : a;
+    const springOnPlaneRels = relations.filter(r =>
+      r.type === 'spring_on_plane' && (r.aId === planeEl_bm.id || r.bId === planeEl_bm.id)
+    );
+    const springsOnPlane = springOnPlaneRels.map(r =>
+      elements.find(e => e.id === (r.aId === planeEl_bm.id ? r.bId : r.aId))
+    ).filter(Boolean);
+
+    if (springsOnPlane.length > 0) {
+      const sep_bm = document.createElement('div');
+      sep_bm.style.cssText = 'height:1px;background:var(--border);margin:12px 0';
+      body.appendChild(sep_bm);
+      const bmTitle = document.createElement('div');
+      bmTitle.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;
+        letter-spacing:0.08em;text-transform:uppercase;color:var(--accent2);margin-bottom:8px`;
+      bmTitle.textContent = 'Molle sul piano';
+      body.appendChild(bmTitle);
+      const bmHint = document.createElement('div');
+      bmHint.className = 'prop-hint'; bmHint.style.marginBottom = '8px';
+      bmHint.textContent = 'Vuoi agganciare il corpo anche a una molla sul piano?';
+      body.appendChild(bmHint);
+
+      _pendingRelation.props.attachToSpring = false;
+      delete _pendingRelation.props.springId;
+
+      const allBmBtns = [];
+      const setSelectedBm = (btn, springId) => {
+        allBmBtns.forEach(b => { b.style.background='transparent'; b.style.borderColor='var(--border)'; b.style.color='var(--muted)'; });
+        btn.style.background = 'rgba(200,240,96,0.15)';
+        btn.style.borderColor = 'var(--accent)';
+        btn.style.color = 'var(--accent)';
+        if (springId) { _pendingRelation.props.attachToSpring = true; _pendingRelation.props.springId = springId; }
+        else { _pendingRelation.props.attachToSpring = false; delete _pendingRelation.props.springId; }
+      };
+      const btnNoneBm = document.createElement('button');
+      btnNoneBm.textContent = '✗ Solo piano';
+      btnNoneBm.style.cssText = `width:100%;padding:6px;border-radius:4px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10px;margin-bottom:6px;border:1px solid var(--border);background:transparent;color:var(--muted)`;
+      allBmBtns.push(btnNoneBm);
+      btnNoneBm.addEventListener('click', () => setSelectedBm(btnNoneBm, null));
+      body.appendChild(btnNoneBm);
+
+      springsOnPlane.forEach((sp, i) => {
+        const btn = document.createElement('button');
+        const anc = sp.props?.anchor || 'left';
+        btn.textContent = `✓ Molla ${i+1} (parete ${anc==='left'?'in basso':'in alto'}, k=${sp.props?.k||'?'} N/m)`;
+        btn.style.cssText = `width:100%;padding:6px;border-radius:4px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10px;margin-bottom:4px;border:1px solid var(--border);background:transparent;color:var(--muted)`;
+        allBmBtns.push(btn);
+        btn.addEventListener('click', () => setSelectedBm(btn, sp.id));
+        body.appendChild(btn);
+        const alreadyLinked = relations.some(r =>
+          r.type === 'spring_body' && ((r.aId===sp.id&&r.bId===bodyEl_bm.id)||(r.bId===sp.id&&r.aId===bodyEl_bm.id))
+        );
+        if (alreadyLinked) setSelectedBm(btn, sp.id);
+      });
+    }
+  } else if (type === 'body_on_wall') {
+    const wall = a.type === 'wall' ? a : b;
+    const geo  = getWallGeometry(wall);
+    const yMin = parseFloat(wall.props?.yMin) ?? 0;
+    const yMax = parseFloat(wall.props?.yMax) ?? 10;
+    if (_pendingRelation.props.s === undefined) _pendingRelation.props.s = 0;
+
+    body.appendChild(makeRelationField(
+      `Posizione y (${yMin} ÷ ${yMax} m) — 0 = origine`,
+      's', 'm', `es. ${yMin}`, _pendingRelation.props
+    ));
+
+    const sep = document.createElement('div');
+    sep.style.cssText = 'height:1px;background:var(--border);margin:12px 0';
+    body.appendChild(sep);
+
+    const attrTitle = document.createElement('div');
+    attrTitle.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;
+      font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+      color:var(--accent2);margin-bottom:10px`;
+    attrTitle.textContent = 'Attrito';
+    body.appendChild(attrTitle);
+
+    body.appendChild(makeRelationField('Coeff. attrito statico μₛ',  'muS', '', 'es. 0.4', _pendingRelation.props));
+    body.appendChild(makeRelationField('Coeff. attrito dinamico μₖ', 'muK', '', 'es. 0.3', _pendingRelation.props));
+
+    const hint = document.createElement('div');
+    hint.className = 'relation-info';
+    hint.textContent = 'N orizzontale (corpo spinto contro la parete), attrito verticale (opposto al peso).';
+    body.appendChild(hint);
+
+    // Se c'è una molla ancorata alla parete, proponi di agganciare anche alla molla
+    const wallEl_bw = a.type === 'wall' ? a : b;
+    const bodyEl_bw = a.type === 'wall' ? b : a;
+    const springOnWallRels = relations.filter(r =>
+      r.type === 'spring_on_wall' && (r.aId === wallEl_bw.id || r.bId === wallEl_bw.id)
+    );
+    const springsOnWall = springOnWallRels.map(r =>
+      elements.find(e => e.id === (r.aId === wallEl_bw.id ? r.bId : r.aId))
+    ).filter(Boolean);
+
+    if (springsOnWall.length > 0) {
+      const sep_sw = document.createElement('div');
+      sep_sw.style.cssText = 'height:1px;background:var(--border);margin:12px 0';
+      body.appendChild(sep_sw);
+      const swTitle = document.createElement('div');
+      swTitle.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;
+        letter-spacing:0.08em;text-transform:uppercase;color:var(--accent2);margin-bottom:8px`;
+      swTitle.textContent = 'Molle sulla parete';
+      body.appendChild(swTitle);
+      const swHint = document.createElement('div');
+      swHint.className = 'prop-hint'; swHint.style.marginBottom = '8px';
+      swHint.textContent = 'Vuoi agganciare il corpo anche a una molla verticale?';
+      body.appendChild(swHint);
+
+      _pendingRelation.props.attachToSpring = false;
+      delete _pendingRelation.props.springId;
+
+      const allSwBtns = [];
+      const setSelectedSw = (btn, springId) => {
+        allSwBtns.forEach(b => {
+          b.style.background = 'transparent';
+          b.style.borderColor = 'var(--border)';
+          b.style.color = 'var(--muted)';
+        });
+        btn.style.background = 'rgba(200,240,96,0.15)';
+        btn.style.borderColor = 'var(--accent)';
+        btn.style.color = 'var(--accent)';
+        if (springId) {
+          _pendingRelation.props.attachToSpring = true;
+          _pendingRelation.props.springId = springId;
+        } else {
+          _pendingRelation.props.attachToSpring = false;
+          delete _pendingRelation.props.springId;
+        }
+      };
+
+      const btnNoneSw = document.createElement('button');
+      btnNoneSw.textContent = '✗ Solo parete';
+      btnNoneSw.style.cssText = `width:100%;padding:6px;border-radius:4px;cursor:pointer;
+        font-family:'IBM Plex Mono',monospace;font-size:10px;margin-bottom:6px;
+        border:1px solid var(--border);background:transparent;color:var(--muted)`;
+      allSwBtns.push(btnNoneSw);
+      btnNoneSw.addEventListener('click', () => setSelectedSw(btnNoneSw, null));
+      body.appendChild(btnNoneSw);
+
+      springsOnWall.forEach((sp, i) => {
+        const btn = document.createElement('button');
+        const anc = sp.props?.anchor || 'top';
+        const dirLabel = anc === 'top' ? '↑ parete alto' : '↓ parete basso';
+        btn.textContent = `✓ Molla ${i+1} (${dirLabel}, k=${sp.props?.k||'?'} N/m)`;
+        btn.style.cssText = `width:100%;padding:6px;border-radius:4px;cursor:pointer;
+          font-family:'IBM Plex Mono',monospace;font-size:10px;margin-bottom:4px;
+          border:1px solid var(--border);background:transparent;color:var(--muted)`;
+        allSwBtns.push(btn);
+        btn.addEventListener('click', () => setSelectedSw(btn, sp.id));
+        body.appendChild(btn);
+        const alreadyLinked = relations.some(r =>
+          r.type === 'spring_body' &&
+          ((r.aId === sp.id && r.bId === bodyEl_bw.id) || (r.bId === sp.id && r.aId === bodyEl_bw.id))
+        );
+        if (alreadyLinked) setSelectedSw(btn, sp.id);
+      });
+    }
+
+  } else if (type === 'spring_spring') {
+    if (!_pendingRelation.props.layout) _pendingRelation.props.layout = 'parallel';
+
+    const info = document.createElement('div');
+    info.className = 'relation-info'; info.style.marginBottom = '12px';
+    info.textContent = 'Collega due molle in serie o parallelo.';
+    body.appendChild(info);
+
+    // Toggle serie/parallelo
+    const modeRow = document.createElement('div');
+    modeRow.className = 'prop-toggle-row';
+    const btnPar = document.createElement('button');
+    btnPar.className = 'prop-toggle-btn' + (_pendingRelation.props.layout === 'parallel' ? ' active' : '');
+    btnPar.textContent = '∥ Parallelo';
+    const btnSer = document.createElement('button');
+    btnSer.className = 'prop-toggle-btn' + (_pendingRelation.props.layout === 'series' ? ' active' : '');
+    btnSer.textContent = '— Serie';
+    modeRow.appendChild(btnPar); modeRow.appendChild(btnSer);
+    body.appendChild(modeRow);
+
+    const descDiv = document.createElement('div');
+    descDiv.className = 'relation-info'; descDiv.style.marginTop = '10px';
+    function updateDesc() {
+      descDiv.textContent = _pendingRelation.props.layout === 'parallel'
+        ? 'Parallelo: parete comune, barra comune in basso. Stessa deformazione per tutte le molle.'
+        : 'Serie: la seconda molla si attacca all\'estremo libero della prima. La forza è uguale in tutte.';
+    }
+    updateDesc();
+    body.appendChild(descDiv);
+
+    btnPar.addEventListener('click', () => {
+      _pendingRelation.props.layout = 'parallel';
+      btnPar.classList.add('active'); btnSer.classList.remove('active');
+      updateDesc();
+    });
+    btnSer.addEventListener('click', () => {
+      _pendingRelation.props.layout = 'series';
+      btnSer.classList.add('active'); btnPar.classList.remove('active');
+      updateDesc();
+    });
+
+  } else if (type === 'spring_body') {
+    const spring = a.type === 'spring' ? a : b;
+    const anchor = spring.props?.anchor || 'left';
+    const horiz  = anchor === 'left' || anchor === 'right';
+    const anchorLabel = { left: 'sinistra', right: 'destra', top: 'alto', bottom: 'basso' }[anchor];
+
+    const info = document.createElement('div');
+    info.className = 'relation-info';
+    info.style.marginBottom = '8px';
+    info.textContent = `Il corpo si collegherà all'estremo libero della molla (parete: ${anchorLabel}).`;
+    body.appendChild(info);
+
+    const hint2 = document.createElement('div');
+    hint2.className = 'relation-info';
+    hint2.style.marginTop = '8px';
+    hint2.textContent = horiz
+      ? 'La forza elastica agirà orizzontalmente sul corpo.'
+      : 'La forza elastica agirà verticalmente sul corpo.';
+    body.appendChild(hint2);
+
+  } else if (type === 'rope_body') {
+    const rope = a.type === 'rope' ? a : b;
+
+    // Controlla se la fune ha una carrucola
+    const hasPulley = relations.some(r => r.type === 'rope_on_pulley' &&
+      (r.aId === rope.id || r.bId === rope.id));
+
+    // Controlla se c'è già un corpo sul piano (left/right) o un corpo appeso
+    const hasPlaneBody = relations.some(r => r.type === 'rope_body' &&
+      (r.aId === rope.id || r.bId === rope.id) &&
+      (r.props?.anchor === 'left' || r.props?.anchor === 'right'));
+    const hasHanging = relations.some(r => r.type === 'rope_body' &&
+      (r.aId === rope.id || r.bId === rope.id) &&
+      (r.props?.anchor === 'hanging' || r.props?.anchor === 'hanging_left' || r.props?.anchor === 'hanging_right'));
+
+    // Atwood: carrucola + già un corpo appeso → offri hanging_left/hanging_right
+    const isAtwood = hasPulley && hasHanging && !hasPlaneBody;
+
+    const info = document.createElement('div');
+    info.className = 'relation-info'; info.style.marginBottom = '8px';
+    info.textContent = isAtwood
+      ? 'Macchina di Atwood: scegli il lato da cui pende il corpo.'
+      : 'Collega il corpo all\'estremità della fune.';
+    body.appendChild(info);
+
+    if (!_pendingRelation.props.anchor) {
+      _pendingRelation.props.anchor = isAtwood ? 'hanging_left' : 'left';
+    }
+
+    const modeRow = document.createElement('div');
+    modeRow.className = 'prop-toggle-row';
+
+    const setActive = (val) => {
+      _pendingRelation.props.anchor = val;
+      modeRow.querySelectorAll('.prop-toggle-btn').forEach(b => b.classList.remove('active'));
+      modeRow.querySelectorAll('.prop-toggle-btn').forEach(b => {
+        if (b.dataset.val === val) b.classList.add('active');
+      });
+    };
+
+    const addBtn = (label, val) => {
+      const btn = document.createElement('button');
+      btn.className = 'prop-toggle-btn' + (_pendingRelation.props.anchor === val ? ' active' : '');
+      btn.textContent = label;
+      btn.dataset.val = val;
+      btn.addEventListener('click', () => setActive(val));
+      modeRow.appendChild(btn);
+    };
+
+    if (isAtwood) {
+      addBtn('← Sinistra appeso', 'hanging_left');
+      addBtn('→ Destra appeso',   'hanging_right');
+    } else {
+      addBtn('← Sinistra', 'left');
+      addBtn('→ Destra',   'right');
+      if (hasPulley && !hasHanging) {
+        addBtn('↓ Appeso', 'hanging');
+      }
+    }
+
+    body.appendChild(modeRow);
+
+    const hint = document.createElement('div');
+    hint.className = 'prop-hint'; hint.style.marginTop = '8px';
+    hint.textContent = isAtwood
+      ? 'I due corpi pendono ai lati opposti della carrucola (macchina di Atwood).'
+      : hasPulley
+        ? 'Sinistra/Destra: lato della fune sul piano. Appeso: corpo che pende dalla carrucola.'
+        : 'La fune si allunga automaticamente per coprire la distanza tra i due corpi.';
+    body.appendChild(hint);
+
+  } else if (type === 'rope_on_floor') {
+    const info = document.createElement('div');
+    info.className = 'relation-info';
+    info.textContent = 'La fune è appoggiata al pavimento.';
+    body.appendChild(info);
+
+  } else if (type === 'rope_spring') {
+    const info = document.createElement('div');
+    info.className = 'relation-info';
+    info.textContent = 'La fune è agganciata all\'estremo superiore della molla. La molla deve essere agganciata al pavimento con spring_on_floor.';
+    body.appendChild(info);
+
+  } else {
+    const info = document.createElement('div');
+    info.className = 'relation-info';
+    info.textContent = 'Questi elementi si muoveranno insieme come gruppo.';
+    body.appendChild(info);
+  }
+
+  overlay.style.display = 'flex';
+}
+
+function makeRelationField(label, key, unit, placeholder, props) {
+  const div = document.createElement('div');
+  div.className = 'relation-field';
+  const lbl = document.createElement('label');
+  lbl.textContent = label + (unit ? ` [${unit}]` : '');
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.inputMode = 'decimal';
+  inp.placeholder = placeholder;
+  inp.value = (props[key] !== undefined && props[key] !== '') ? String(props[key]) : '';
+  inp.addEventListener('input', () => {
+    const n = parseFloat(inp.value.trim());
+    props[key] = isNaN(n) ? inp.value : n;
+  });
+  inp.addEventListener('blur', () => {
+    if (key === 'height' || key === 'muS' || key === 'muK') {
+      const n = parseFloat(inp.value.trim());
+      const clamped = isNaN(n) ? 0 : Math.max(0, n);
+      props[key] = clamped;
+      inp.value = String(clamped);
+    }
+    // s e xOffset possono essere negativi
+    if (key === 's' || key === 'xOffset') {
+      const n = parseFloat(inp.value.trim());
+      props[key] = isNaN(n) ? 0 : n;
+      inp.value = isNaN(n) ? '0' : String(n);
+    }
+  });
+  div.appendChild(lbl); div.appendChild(inp);
+  return div;
+}
+
+function closeRelationModal() {
+  document.getElementById('relation-overlay').style.display = 'none';
+  _pendingRelation = null;
+}
+
+// ─── Serie: riposiziona spB all'estremo libero di spA ────────────────────────
+function getSpringFreeEnd(sp) {
+  const anchor = sp.props?.anchor || 'left';
+  const nC=8, tA=10, tF=8, bz=nC*6;
+  const L0 = parseFloat(sp.props?.L0), Lc = parseFloat(sp.props?._L_calc);
+  const ref = getRefSystem();
+  const horiz = anchor === 'left' || anchor === 'right';
+  const ML=50,W=340,MR=24,MB=50,H=300,MT=24;
+  const hX = Math.max(0.1, parseFloat(ref?.props?.halfX)||5);
+  const hY = Math.max(0.1, parseFloat(ref?.props?.halfY)||5);
+  const sX = ref ? (W-ML-MR)/(2*hX) : 18;
+  const sY = ref ? (H-MB-MT)/(2*hY) : 18;
+  const sc = horiz ? sX : sY;
+  const vS = Math.max(1, parseFloat(sp.props?.visScale)||5);
+  const dx = (!isNaN(Lc)&&!isNaN(L0)) ? Lc-L0 : 0;
+  const zig = Math.max(nC*3, Math.round(bz + dx*sc*vS));
+  const freeLocal = tA + zig + tF;
+  if (anchor === 'left')   return { x: sp.x + 8 + freeLocal, y: sp.y + 16 };
+  if (anchor === 'right')  return { x: sp.x,                  y: sp.y + 16 };
+  if (anchor === 'top')    return { x: sp.x + 16, y: sp.y + 8 + freeLocal };
+  /* bottom */             return { x: sp.x + 16, y: sp.y };
+}
+
+function applySeriesPosition(spA, spB) {
+  const anchor = spA.props?.anchor || 'left';
+  const free = getSpringFreeEnd(spA);
+  const horiz = anchor === 'left' || anchor === 'right';
+  // Usa _wPx/_hPx se disponibili (calcolati dal render precedente)
+  // altrimenti stima dalla lunghezza a riposo
+  const nC=8,tA=10,tF=8,bz=nC*6;
+  const L0b=parseFloat(spB.props?.L0), Lcb=parseFloat(spB.props?._L_calc);
+  const ref=getRefSystem();
+  const hX=Math.max(0.1,parseFloat(ref?.props?.halfX)||5);
+  const hY=Math.max(0.1,parseFloat(ref?.props?.halfY)||5);
+  const scH=ref?(266)/(2*hX):18, scV=ref?(226)/(2*hY):18;
+  const sc=horiz?scH:scV;
+  const vS=Math.max(1,parseFloat(spB.props?.visScale)||5);
+  const dxb=(!isNaN(Lcb)&&!isNaN(L0b))?Lcb-L0b:0;
+  const zigB=Math.max(nC*3,Math.round(bz+dxb*sc*vS));
+  const freeLocalB=tA+zigB+tF;
+  const wB = spB._wPx || (horiz ? freeLocalB+14 : 32);
+  const hB = spB._hPx || (horiz ? 32 : freeLocalB+14);
+
+  if (anchor === 'left') {
+    spB.x = free.x;
+    spB.y = free.y - 16;
+  } else if (anchor === 'right') {
+    // Il muro di spB è a spB.x + wB - 8, deve coincidere con spA.x (estremo libero di spA)
+    // → spB.x + wB - 8 = spA.x → spB.x = spA.x - wB + 8
+    spB.x = spA.x - wB + 8;
+    spB.y = free.y - 16;
+  } else if (anchor === 'top') {
+    spB.x = free.x - 16;
+    spB.y = free.y;
+  } else {
+    // Il muro di spB è a spB.y + hB - 8, deve coincidere con spA.y
+    // → spB.y = spA.y - hB + 8
+    spB.x = free.x - 16;
+    spB.y = spA.y - hB + 8;
+  }
+}
+
+// Ricostruisce la catena serie ad ogni render
+function applySeriesChains() {
+  for (const el of elements) { if (el.type === 'spring') el._seriesRole = null; }
+
+  const seriesRels = relations.filter(r => r.type === 'spring_spring' && r.props?.layout === 'series');
+  if (!seriesRels.length) return;
+
+  // Grafo non orientato
+  const adj = {};
+  for (const r of seriesRels) {
+    if (!adj[r.aId]) adj[r.aId] = [];
+    if (!adj[r.bId]) adj[r.bId] = [];
+    adj[r.aId].push(r.bId);
+    adj[r.bId].push(r.aId);
+  }
+
+  // Trova le catene (componenti connesse) tramite flood-fill
+  const visited = new Set();
+  const chains = [];
+  for (const r of seriesRels) {
+    for (const startId of [r.aId, r.bId]) {
+      if (visited.has(startId)) continue;
+      const chain = [];
+      const queue = [startId];
+      while (queue.length) {
+        const cur = queue.shift();
+        if (visited.has(cur)) continue;
+        visited.add(cur);
+        const sp = elements.find(e => e.id === cur);
+        if (sp) chain.push(sp);
+        (adj[cur]||[]).forEach(id => { if (!visited.has(id)) queue.push(id); });
+      }
+      if (chain.length > 1) chains.push(chain);
+    }
+  }
+
+  for (const chain of chains) {
+    const anchor = chain[0].props?.anchor || 'left';
+    const getOrig = (sp, axis) => {
+      if (axis === 'x') return sp._origSeriesX ?? sp.x;
+      return sp._origSeriesY ?? sp.y;
+    };
+    if (anchor === 'left')   chain.sort((a,b) => getOrig(a,'x') - getOrig(b,'x'));
+    if (anchor === 'right')  chain.sort((a,b) => getOrig(b,'x') - getOrig(a,'x'));
+    if (anchor === 'top')    chain.sort((a,b) => getOrig(a,'y') - getOrig(b,'y'));
+    if (anchor === 'bottom') chain.sort((a,b) => getOrig(b,'y') - getOrig(a,'y'));
+
+    // Assegna ruoli
+    chain.forEach((sp, i) => {
+      sp._seriesRole = i === 0 ? 'first' : (i === chain.length-1 ? 'last' : 'middle');
+    });
+
+    // Posiziona ogni molla all'estremo libero della precedente
+    for (let i = 1; i < chain.length; i++) {
+      applySeriesPosition(chain[i-1], chain[i]);
+    }
+  }
+}
+
+function confirmRelation() {
+  if (!_pendingRelation) return;
+  const { aId, bId, type, props } = _pendingRelation;
+  relations = relations.filter(r =>
+    !((r.aId === aId && r.bId === bId) || (r.aId === bId && r.bId === aId))
+  );
+
+  // Per display_prop: un display mostra un solo valore — rimuove qualsiasi display_prop esistente sullo stesso display
+  if (type === 'display_prop') {
+    const dispId = (elements.find(e => e.id === aId && e.type === 'display') ? aId : bId);
+    relations = relations.filter(r =>
+      !(r.type === 'display_prop' && (r.aId === dispId || r.bId === dispId))
+    );
+  }
+
+  relations.push({ id: ++idCounter, aId, bId, type, props });
+
+  // spring_on_plane: posiziona la molla sul piano inclinato
+  if (type === 'spring_on_plane') {
+    const planeEl = elements.find(e => e.id === aId && e.type === 'inclined_plane') ||
+                    elements.find(e => e.id === bId && e.type === 'inclined_plane');
+    const springEl = elements.find(e => e.id === aId && e.type === 'spring') ||
+                     elements.find(e => e.id === bId && e.type === 'spring');
+    if (planeEl && springEl) {
+      applySpringOnPlane(springEl, planeEl, props);
+    }
+  }
+
+  // body_on_plane con attachToSpring: crea anche il vincolo spring_body
+  if (type === 'body_on_plane' && props.attachToSpring && props.springId) {
+    const springEl_bp = elements.find(e => e.id === props.springId);
+    const bodyEl_bp = elements.find(e => (e.id === aId || e.id === bId) && e.type !== 'inclined_plane');
+    if (springEl_bp && bodyEl_bp) {
+      relations = relations.filter(r =>
+        !(r.type === 'spring_body' && (r.aId === bodyEl_bp.id || r.bId === bodyEl_bp.id))
+      );
+      relations.push({ id: ++idCounter, aId: springEl_bp.id, bId: bodyEl_bp.id, type: 'spring_body', props: {} });
+    }
+  }
+
+  // spring_on_wall: posiziona la molla sulla parete alla quota Y specificata
+  if (type === 'spring_on_wall') {
+    const wallEl = elements.find(e => e.id === aId && e.type === 'wall') ||
+                   elements.find(e => e.id === bId && e.type === 'wall');
+    const springEl = elements.find(e => e.id === aId && e.type === 'spring') ||
+                     elements.find(e => e.id === bId && e.type === 'spring');
+    if (wallEl && springEl) {
+      applySpringOnWall(springEl, wallEl, props);
+    }
+  }
+
+  // body_on_wall con attachToSpring: crea anche il vincolo spring_body
+  if (type === 'body_on_wall' && props.attachToSpring && props.springId) {
+    const springEl_bw = elements.find(e => e.id === props.springId);
+    const bodyEl_bw = elements.find(e => (e.id === aId || e.id === bId) && e.type !== 'wall');
+    if (springEl_bw && bodyEl_bw) {
+      relations = relations.filter(r =>
+        !(r.type === 'spring_body' && (r.aId === bodyEl_bw.id || r.bId === bodyEl_bw.id))
+      );
+      relations.push({ id: ++idCounter, aId: springEl_bw.id, bId: bodyEl_bw.id, type: 'spring_body', props: {} });
+    }
+  }
+
+  // spring_on_floor: posiziona la molla sul pavimento alla posizione X specificata
+  if (type === 'spring_on_floor') {
+    const floorEl = elements.find(e => e.id === aId && e.type === 'floor') ||
+                    elements.find(e => e.id === bId && e.type === 'floor');
+    const springEl = elements.find(e => e.id === aId && e.type === 'spring') ||
+                     elements.find(e => e.id === bId && e.type === 'spring');
+    if (floorEl && springEl) {
+      const xAnchor = parseFloat(props.xAnchor) || 0;
+      const xMin_f = parseFloat(floorEl.props?.xMin) ?? 0;
+      const xMax_f = parseFloat(floorEl.props?.xMax) ?? 10;
+      const ref_sf = getRefSystem();
+      const ML_sf=50, W_sf=340, MR_sf=24;
+      const hX_sf = Math.max(0.1, parseFloat(ref_sf?.props?.halfX)||5);
+      const scaleX_sf = ref_sf ? (W_sf-ML_sf-MR_sf)/(2*hX_sf) : 18;
+      const lenM_sf = xMax_f - xMin_f;
+      const lenPx_sf = floorEl._wPx ?? Math.max(10, Math.round(lenM_sf * scaleX_sf));
+      const xPx_sf = ((xAnchor - xMin_f) / lenM_sf) * lenPx_sf;
+
+      const floorSurfaceY = floorEl.y + 10;
+      const anchor_sf = springEl.props?.anchor || 'left';
+      const wPx_sf = springEl._wPx || 80;
+      const hPx_sf = springEl._hPx || 32;
+
+      if (anchor_sf === 'bottom') {
+        // Molla verticale con pavimento in basso — centro X allineato al punto xAnchor
+        springEl.x = floorEl.x + xPx_sf - wPx_sf / 2;
+        // Bordo inferiore della molla (trattino pavimento) a floorSurfaceY
+        springEl.y = floorSurfaceY - hPx_sf;
+      } else if (anchor_sf === 'left') {
+        springEl.x = floorEl.x + xPx_sf - 8;
+        springEl.y = floorSurfaceY - hPx_sf;
+      } else if (anchor_sf === 'right') {
+        springEl.x = floorEl.x + xPx_sf - wPx_sf + 8;
+        springEl.y = floorSurfaceY - hPx_sf;
+      }
+    }
+  }
+
+  // pulley_on_plane: posiziona la carrucola al vertice del piano inclinato
+  if (type === 'pulley_on_plane') {
+    const planeEl = elements.find(e => e.id === aId && e.type === 'inclined_plane') ||
+                    elements.find(e => e.id === bId && e.type === 'inclined_plane');
+    const pulleyEl = elements.find(e => e.id === aId && e.type === 'pulley_simple') ||
+                     elements.find(e => e.id === bId && e.type === 'pulley_simple');
+    if (planeEl && pulleyEl) {
+      const geo = getPlaneGeometry(planeEl);
+      const vertexX = planeEl.x + geo.x1;
+      const vertexY = planeEl.y + geo.y1;
+      pulleyEl.props = pulleyEl.props || {};
+      pulleyEl.props.anchor = 'vertex';
+      pulleyEl.x = vertexX - 30;
+      pulleyEl.y = vertexY - 30;
+    }
+  }
+
+  // pulley_on_floor: posiziona la carrucola sopra il pavimento
+  if (type === 'pulley_on_floor') {
+    const floorEl  = elements.find(e => e.id === aId && e.type === 'floor') ||
+                     elements.find(e => e.id === bId && e.type === 'floor');
+    const pulleyEl = elements.find(e => e.id === aId && e.type === 'pulley_simple') ||
+                     elements.find(e => e.id === bId && e.type === 'pulley_simple');
+    if (floorEl && pulleyEl) {
+      const xOffset  = parseFloat(props.xOffset)  || 0;
+      const height   = parseFloat(props.height)   || 0;
+      const xMin_f   = parseFloat(floorEl.props?.xMin) ?? 0;
+      const xMax_f   = parseFloat(floorEl.props?.xMax) ?? 10;
+      const ref_pf   = getRefSystem();
+      const hX_pf    = Math.max(0.1, parseFloat(ref_pf?.props?.halfX) || 5);
+      const scaleX_pf = (340 - 50 - 24) / (2 * hX_pf);
+      const lenM_pf  = xMax_f - xMin_f;
+      const lenPx_pf = floorEl._wPx ?? Math.max(10, Math.round(lenM_pf * scaleX_pf));
+      const xPx_pf   = ((xOffset - xMin_f) / lenM_pf) * lenPx_pf;
+      const heightPx = height * scaleX_pf;
+
+      const pulleyW  = pulleyEl._wPx || 60;
+      const pulleyH  = pulleyEl._hPx || 70;
+      const floorSurfaceY = floorEl.y + 10;
+      const anchor = pulleyEl.props?.anchor || 'bottom';
+
+      // Centra orizzontalmente su xOffset
+      pulleyEl.x = floorEl.x + xPx_pf - pulleyW / 2;
+
+      // Posizione Y in base all'anchor — la carrucola mantiene il suo tipo
+      if (anchor === 'bottom') {
+        // Supporto in basso, ruota in alto → base appoggiata al piano + height
+        pulleyEl.y = floorSurfaceY - pulleyH - heightPx;
+      } else if (anchor === 'top') {
+        // Supporto in alto (soffitto), ruota in basso → posizionata sopra il piano
+        // Il basso della carrucola è a floorSurfaceY - heightPx
+        pulleyEl.y = floorSurfaceY - pulleyH - heightPx;
+      } else {
+        // left/right — posiziona comunque rispetto al piano
+        pulleyEl.y = floorSurfaceY - pulleyH - heightPx;
+      }
+    }
+  }
+
+  // rope_on_pulley: posiziona la fune agganciata alla carrucola
+  if (type === 'rope_on_pulley') {
+    const pulleyEl = elements.find(e => e.id === aId && e.type === 'pulley_simple') ||
+                     elements.find(e => e.id === bId && e.type === 'pulley_simple');
+    const ropeEl   = elements.find(e => e.id === aId && e.type === 'rope') ||
+                     elements.find(e => e.id === bId && e.type === 'rope');
+    if (pulleyEl && ropeEl) {
+      const side = props.side || 'left';
+      const pulleyW = pulleyEl._wPx || 60;
+      const pulleyH = pulleyEl._hPx || 70;
+      const pCX = pulleyEl.x + pulleyW / 2; // centro X carrucola
+      const pCY = pulleyEl.y + (pulleyEl.props?.anchor === 'bottom' ? 20 : pulleyH - 20); // centro ruota
+
+      // Posiziona la fune sul lato sinistro o destro della carrucola
+      if (side === 'left') {
+        ropeEl.x = pCX - 20 - (ropeEl._wPx || 10) / 2;
+      } else {
+        ropeEl.x = pCX + 20 - (ropeEl._wPx || 10) / 2;
+      }
+      ropeEl.y = pCY;
+      // Salva il punto di aggancio per il disegno
+      ropeEl._pulleyAnchor = { x: side === 'left' ? pCX - 20 : pCX + 20, y: pCY, side };
+    }
+  }
+  if (type === 'rope_on_floor') {
+    const floorEl = elements.find(e => e.id === aId && e.type === 'floor') ||
+                    elements.find(e => e.id === bId && e.type === 'floor');
+    const ropeEl  = elements.find(e => e.id === aId && e.type === 'rope') ||
+                    elements.find(e => e.id === bId && e.type === 'rope');
+    if (floorEl && ropeEl) {
+      const floorSurfaceY = floorEl.y + 10;
+      ropeEl.y = floorSurfaceY - ropeEl._hPx / 2 - 5;
+      ropeEl.x = floorEl.x + 20;
+    }
+  }
+
+  // rope_spring: aggancia la fune all'estremo libero della molla verticale
+  if (type === 'rope_spring') {
+    const springEl = elements.find(e => e.id === aId && e.type === 'spring') ||
+                     elements.find(e => e.id === bId && e.type === 'spring');
+    const ropeEl   = elements.find(e => e.id === aId && e.type === 'rope') ||
+                     elements.find(e => e.id === bId && e.type === 'rope');
+    if (springEl && ropeEl) {
+      const anchor_rs = springEl.props?.anchor || 'bottom';
+      const wPx_rs = springEl._wPx || 32;
+      const hPx_rs = springEl._hPx || 80;
+      // Estremo libero: opposto all'ancoraggio
+      // anchor='bottom' → parete in basso → estremo libero in ALTO (springEl.y)
+      // anchor='top'    → parete in alto  → estremo libero in BASSO (springEl.y + hPx)
+      const freeX = springEl.x + wPx_rs / 2;
+      const freeY = (anchor_rs === 'bottom') ? springEl.y : springEl.y + hPx_rs;
+      ropeEl._springAnchor = { x: freeX, y: freeY };
+    }
+  }
+
+  // rope_body: corpo agganciato all'estremità della fune
+  // La fune si allunga per coprire la distanza tra i due corpi collegati
+  if (type === 'rope_body') {
+    // niente da fare qui — il posizionamento avviene in applyRelationPositions
+  }
+
+  // body_on_floor con attachToSpring: crea anche il vincolo spring_body
+  if (type === 'body_on_floor' && props.attachToSpring && props.springId) {
+    const springEl3 = elements.find(e => e.id === props.springId);
+    const bodyEl3   = elements.find(e => e.id === aId && e.type !== 'floor') ||
+                      elements.find(e => e.id === bId && e.type !== 'floor');
+    if (springEl3 && bodyEl3) {
+      // Rimuovi eventuale vincolo spring_body precedente su questo corpo
+      relations = relations.filter(r =>
+        !(r.type === 'spring_body' && (r.aId === bodyEl3.id || r.bId === bodyEl3.id))
+      );
+      // Crea vincolo spring_body
+      relations.push({ id: ++idCounter, aId: springEl3.id, bId: bodyEl3.id, type: 'spring_body', props: {} });
+    }
+  }
+
+  // Per molle in parallelo: crea relazioni tra tutte le coppie del gruppo (grafo completo)
+  if (type === 'spring_spring' && props.layout === 'parallel') {
+    const spA = elements.find(e => e.id === aId);
+    const spB = elements.find(e => e.id === bId);
+    if (spA && spB) {
+      // Flood-fill per trovare tutte le molle del gruppo
+      const visited = new Set();
+      const queue = [aId, bId];
+      while (queue.length) {
+        const sid = queue.shift();
+        if (visited.has(sid)) continue;
+        visited.add(sid);
+        for (const r2 of relations) {
+          if (r2.type !== 'spring_spring' || r2.props?.layout !== 'parallel') continue;
+          if (r2.aId === sid && !visited.has(r2.bId)) queue.push(r2.bId);
+          if (r2.bId === sid && !visited.has(r2.aId)) queue.push(r2.aId);
+        }
+      }
+      const allIds = [...visited];
+      // Crea relazioni tra tutte le coppie (grafo completo)
+      for (let i = 0; i < allIds.length; i++) {
+        for (let j = i + 1; j < allIds.length; j++) {
+          const ia = allIds[i], ib = allIds[j];
+          const exists = relations.some(r =>
+            r.type === 'spring_spring' &&
+            ((r.aId === ia && r.bId === ib) || (r.aId === ib && r.bId === ia))
+          );
+          if (!exists) {
+            relations.push({ id: ++idCounter, aId: ia, bId: ib, type: 'spring_spring', props: { layout: 'parallel' } });
+          }
+        }
+      }
+      const allSp = [...visited].map(id => elements.find(e => e.id === id)).filter(Boolean);
+      const anchor = spA.props?.anchor || 'left';
+      const horiz  = anchor === 'left' || anchor === 'right';
+      const GAP = 44;
+
+      // Salva y/x PRIMA dello spostamento parallelo
+      allSp.forEach(s => {
+        if (s._preParallelY == null) s._preParallelY = s.y;
+        if (s._preParallelX == null) s._preParallelX = s.x;
+      });
+
+      if (!horiz) {
+        // Verticale: allinea y (stessa parete), distribuisci x uniformemente
+        const yRef = Math.min(...allSp.map(s => s.y));
+        allSp.forEach((s, i) => { s.y = yRef; s.x = allSp[0].x + i * GAP; });
+      } else {
+        // Orizzontale: allinea x (stessa parete), distribuisci y uniformemente
+        const xRef = Math.min(...allSp.map(s => s.x));
+        allSp.forEach((s, i) => { s.x = xRef; s.y = allSp[0].y + i * GAP; });
+      }
+    }
+  }
+
+  // Per molle in serie
+  if (type === 'spring_spring' && props.layout === 'series') {
+    const spA = elements.find(e => e.id === aId);
+    const spB = elements.find(e => e.id === bId);
+    if (spA && spB) {
+      const anchor = spA.props?.anchor || 'left';
+      spB.props.anchor = anchor;
+      // Salva posizione originale (pre-serie) se non già salvata
+      if (spA._origSeriesX == null) { spA._origSeriesX = spA.x; spA._origSeriesY = spA.y; }
+      if (spB._origSeriesX == null) { spB._origSeriesX = spB.x; spB._origSeriesY = spB.y; }
+      // La relazione non ha firstId/secondId — applySeriesChains ordinerà per posizione originale
+      props.firstId = null;
+      props.secondId = null;
+    }
+  }
+
+  applyRelationPositions();
+  closeRelationModal();
+  render();
+  updatePropsPanel(true);
+}
+
+function deleteCurrentRelation() {
+  if (!_pendingRelation) return;
+  const { aId, bId, type } = _pendingRelation;
+  relations = relations.filter(r =>
+    !((r.aId === aId && r.bId === bId) || (r.aId === bId && r.bId === aId))
+  );
+  // Se era spring_spring: verifica se i due peer sono rimasti soli
+  if (type === 'spring_spring') {
+    for (const pid of [aId, bId]) {
+      const group = parallelGroup(pid);
+      if (group.length <= 1) {
+        relations = relations.filter(r =>
+          !(r.type === 'spring_spring' && (r.aId === pid || r.bId === pid))
+        );
+        const sp = elements.find(e => e.id === pid);
+        if (sp) {
+          sp._inParallel = false;
+          sp._prevHPx = sp._hPx;
+          sp._prevWPx = sp._wPx;
+          delete sp._preParallelY; delete sp._preParallelX;
+        }
+      }
+    }
+  }
+  closeRelationModal();
+  render();
+}
+
+// Init modal buttons
+document.getElementById('relation-close').addEventListener('click', closeRelationModal);
+document.getElementById('relation-btn-ok').addEventListener('click', confirmRelation);
+document.getElementById('relation-btn-del').addEventListener('click', deleteCurrentRelation);
+
+function clearCanvas() {
+  // Dialog di conferma
+  const existing = document.getElementById('clear-confirm-modal');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'clear-confirm-modal';
+  overlay.style.cssText = `
+    position:fixed;inset:0;background:rgba(0,0,0,0.6);
+    display:flex;align-items:center;justify-content:center;z-index:1000;
+  `;
+
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    background:#1e1e24;border:1px solid #3a3a44;border-radius:10px;
+    padding:28px 32px;max-width:340px;width:90%;
+    font-family:'IBM Plex Mono',monospace;color:#e8e8ec;
+    box-shadow:0 8px 32px rgba(0,0,0,0.5);
+  `;
+
+  const icon = document.createElement('div');
+  icon.style.cssText = 'font-size:32px;text-align:center;margin-bottom:12px;';
+  icon.textContent = '⚠️';
+
+  const title = document.createElement('div');
+  title.style.cssText = 'font-size:14px;font-weight:bold;text-align:center;margin-bottom:8px;color:#f0f0f8;';
+  title.textContent = 'Cancella tutto?';
+
+  const msg = document.createElement('div');
+  msg.style.cssText = 'font-size:11px;color:#a0a0b0;text-align:center;margin-bottom:24px;line-height:1.6;';
+  msg.textContent = 'Tutti gli elementi e i vincoli verranno eliminati. Questa operazione non è reversibile.';
+
+  const btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:10px;justify-content:center;';
+
+  const btnCancel = document.createElement('button');
+  btnCancel.textContent = 'Annulla';
+  btnCancel.style.cssText = `
+    flex:1;padding:9px 0;border-radius:6px;cursor:pointer;
+    background:none;border:1px solid #3a3a44;
+    color:#a0a0b0;font-family:'IBM Plex Mono',monospace;font-size:11px;
+    transition:border-color 0.15s;
+  `;
+  btnCancel.onmouseenter = () => btnCancel.style.borderColor = '#606070';
+  btnCancel.onmouseleave = () => btnCancel.style.borderColor = '#3a3a44';
+  btnCancel.addEventListener('click', () => overlay.remove());
+
+  const btnConfirm = document.createElement('button');
+  btnConfirm.textContent = '🗑 Cancella tutto';
+  btnConfirm.style.cssText = `
+    flex:1;padding:9px 0;border-radius:6px;cursor:pointer;
+    background:rgba(240,80,80,0.15);border:1px solid #f05050;
+    color:#f08080;font-family:'IBM Plex Mono',monospace;font-size:11px;
+    transition:all 0.15s;
+  `;
+  btnConfirm.onmouseenter = () => { btnConfirm.style.background='rgba(240,80,80,0.25)'; btnConfirm.style.color='#f8a0a0'; };
+  btnConfirm.onmouseleave = () => { btnConfirm.style.background='rgba(240,80,80,0.15)'; btnConfirm.style.color='#f08080'; };
+  btnConfirm.addEventListener('click', () => {
+    overlay.remove();
+    elements = [];
+    relations = [];
+    selectedId = null;
+    // Reset slides
+    if (typeof _slidesMode !== 'undefined' && _slidesMode && typeof exitSlidesMode === 'function') {
+      exitSlidesMode();
+      document.getElementById('slides-bar').style.display = 'none';
+    }
+    if (typeof _slides !== 'undefined') {
+      _slides.length = 0;
+      _slides.push({ id: Date.now(), title: 'Slide 1', elements: [], relations: [], idCounter: 1 });
+      _currentSlide = 0;
+    }
+    render();
+    showHint();
+    updatePropsPanel();
+    updateRefSystemBtn();
+  });
+
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.addEventListener('keydown', function esc(e) {
+    if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', esc); }
+  });
+
+  btnRow.appendChild(btnCancel);
+  btnRow.appendChild(btnConfirm);
+  modal.appendChild(icon);
+  modal.appendChild(title);
+  modal.appendChild(msg);
+  modal.appendChild(btnRow);
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  btnCancel.focus();
+}
+
+// ═══ MODULE: elements.js ═══
+// ─── Add / delete / select ───────────────────────────────────────────────────
+function addReferenceSystem(type) {
+  const existing = elements.find(e => DEFS[e.type]?.isRefSystem);
+  if (existing) {
+    showToast('⚠️ È già presente un sistema di riferimento nella scena');
+    selectedId = existing.id;
+    render();
+    updatePropsPanel();
+    return;
+  }
+  addElement(type || 'axis_xy');
+}
+
+function updateRefSystemBtn() {
+  const has = elements.some(e => DEFS[e.type]?.isRefSystem);
+  const btn = document.getElementById('btn-axis-xy');
+  if (!btn) return;
+  btn.disabled = has;
+  btn.style.opacity = has ? '0.4' : '';
+  btn.title = has ? 'Sistema di riferimento già presente in questa slide' : '';
+}
+
+function addElement(type) {
+  const def = DEFS[type];
+  const cw = canvas.clientWidth, ch = canvas.clientHeight;
+  const pan = (typeof getCanvasPan === 'function') ? getCanvasPan() : { x: 0, y: 0 };
+  const x = Math.round(cw/2 - def.w/2 + (Math.random()-0.5)*40 - pan.x);
+  const y = Math.round(ch/2 - def.h/2 + (Math.random()-0.5)*40 - pan.y);
+  let props = null;
+  if (type === 'velocity')   props = { value: '' };
+  if (type === 'axis_xy')    props = { gravity: '', halfX: 5, halfY: 5, flipX: false, flipY: false };
+  if (type === 'axis_xyz')   props = { gravity: '', halfX: 5, halfY: 5, halfZ: 5, flipX: false, flipY: false, flipZ: false };
+  if (type === 'floor')          props = { xMin: 0, xMax: 10, visible: true };
+  if (type === 'wall')           props = { yMin: 0, yMax: 10, visible: true, flipX: false };
+  if (type === 'inclined_plane') props = { inputMode: 'angle+base', angle: 30, base: 5, height: '', length: '', flipX: false, visible: true };
+  if (type === 'lever')         props = { length: 10, fulcrumPos: 0.5, theta: 0 };
+  if (type === 'slider')        props = { min: 0, max: 10, step: 0.1, value: 5, label: 'k', color: '#f0a060', title: '' };
+  if (type === 'display')       props = { label: 'valore', color: '#60c0f0', title: '', decimals: 3, unit: '' };
+  if (type === 'option_list')   props = { options: [{label:'Opzione 1', value:1},{label:'Opzione 2', value:2}], selected: 0, color: '#ffffff', title: '', showValue: false };
+  if (type === 'data_table')    props = { title: '', color: '#60c0f0', headers: ['Colonna 1', 'Colonna 2'], rows: [['', '']], colWidth: 90, selectedRow: -1, pageSize: 5, currentPage: 0, rowBg: '', dataColor: '', gridColor: '' };
+  if (type === 'chart')         props = { title: '', color: '#f0c060', chartType: 'line', width: 280, height: 200, xCol: 0, yCol: 1, smooth: true, xLabel: '', yLabel: '', showGrid: false, yErrors: {}, showRegression: false };
+  if (type === 'image')         props = { title: '', width: 200, height: 150, src: '', fit: 'contain' };
+  if (type === 'arrow')         props = { label: '', color: '#f06060', strokeWidth: 2, dx: 100, dy: 0, headSize: 10, labelColor: '', labelSize: 13, labelBold: false, labelItalic: false };
+  if (type === 'stats')         props = { title: 'Statistiche', color: '#a0e0a0', colIdx: 0, decimals: 3, showMedian: false, showCI: false, rowBg: '', dataColor: '', gridColor: '', fontSize: 11 };
+  if (type === 'link')          props = { label: '', url: '', color: '#60c0f0', fontSize: 13 };
+  if (type === 'display')       props = { color: '#60c0f0', title: '', decimals: 2 };
+  if (type === 'spring')         props = { anchor: 'left', k: '', L0: '', forces: [], springMode: 'auto', dx: '', visScale: 5, showRest: false, showF: false, visible: true };
+  if (type === 'pulley_simple')  props = { anchor: 'top' };
+  if (type === 'rope')           props = { forceF: '', forceAngle: '', visible: true };
+  if (type === 'point_mass' || type === 'rect_body') props = {
+    mass: '',
+    v0Mode: 'comp', v0x: '', v0y: '', v0Mod: '', v0Angle: '',
+    v0s: '', // velocità lungo ipotenusa piano inclinato
+    forces: [],
+    showV0: false, showF: false, showA: false, showR: false,
+    showN: true, showFriction: true,
+    visible: true
+  };
+  elements.push({ id: ++idCounter, type, x, y, ...(props ? { props } : {}) });
+  hideHint();
+  render();
+  selectElement(idCounter);
+  updateRefSystemBtn();
+}
+
+function deleteElement(id) {
+  // Sgancia tutti i figli agganciati a questo elemento
+  for (const el of elements) {
+    if (el.parentId === id) {
+      delete el.parentId;
+      delete el.offsetX;
+      delete el.offsetY;
+    }
+  }
+
+  // Prima di eliminare: se questa molla ha un vincolo spring_body
+  // e fa parte di un gruppo parallelo, trasferisci il vincolo a un'altra molla del gruppo
+  const bodyRel = relations.find(r => r.type === 'spring_body' && (r.aId === id || r.bId === id));
+  if (bodyRel) {
+    const grp = parallelGroup(id).filter(s => s.id !== id);
+    if (grp.length > 0) {
+      // Trasferisci il vincolo alla prima molla rimasta del gruppo
+      const newSpringId = grp[0].id;
+      if (bodyRel.aId === id) bodyRel.aId = newSpringId;
+      else bodyRel.bId = newSpringId;
+    }
+  }
+
+  // Prima di eliminare: trova i gruppi paralleli a cui appartiene questo elemento
+  // e rimuovi le relazioni spring_spring se il gruppo diventa di 1 sola molla
+  const affectedGroups = new Set();
+  for (const r of relations) {
+    if (r.type === 'spring_spring' && (r.aId === id || r.bId === id)) {
+      const peerId = r.aId === id ? r.bId : r.aId;
+      affectedGroups.add(peerId);
+    }
+  }
+
+  // Rimuovi le relazioni che coinvolgono l'elemento eliminato
+  relations = relations.filter(r => r.aId !== id && r.bId !== id);
+  elements = elements.filter(e => e.id !== id);
+
+  // Rimuovi relazioni orfane rimaste (sicurezza extra)
+  const existingIdsD = new Set(elements.map(e => e.id));
+  relations = relations.filter(r => existingIdsD.has(r.aId) && existingIdsD.has(r.bId));
+
+  // Ricalcola tutti i gruppi paralleli rimasti e pulisci i singleton
+  const visited = new Set();
+  for (const el of elements) {
+    if (el.type !== 'spring' || visited.has(el.id)) continue;
+    const group = parallelGroup(el.id);
+    group.forEach(s => visited.add(s.id));
+    if (group.length === 1) {
+      const sp = group[0];
+      // Solo se aveva relazioni parallele con l'elemento eliminato
+      if (affectedGroups.has(sp.id)) {
+        relations = relations.filter(r =>
+          !(r.type === 'spring_spring' && r.props?.layout === 'parallel' &&
+            (r.aId === sp.id || r.bId === sp.id))
+        );
+        sp._inParallel = false;
+        sp._prevHPx = sp._hPx;
+        sp._prevWPx = sp._wPx;
+        delete sp._preParallelY; delete sp._preParallelX;
+      }
+    }
+  }
+
+  if (selectedId === id) selectedId = null;
+  render();
+  updateRefSystemBtn();
+  updatePropsPanel();
+}
+
+function selectElement(id) {
+  selectedId = id;
+  render();
+  updatePropsPanel();
+  if (id !== null) openPropsPanel();
+}
+
+// ═══ MODULE: render.js ═══
+// ─── Canvas render ────────────────────────────────────────────────────────────
+const canvas = document.getElementById('canvas');
+
+let _rendering = false;
+function render() {
+  if (_rendering) return;
+  _rendering = true;
+  try {
+  canvas.innerHTML = '';
+
+  // Pulisci cache solver carrucola
+  if (typeof clearPulleyCache === 'function') clearPulleyCache();
+
+  // Rimuovi elementi invalidi e relazioni orfane/nulle
+  elements = elements.filter(e => e && e.type && e.id != null);
+  const existingIds = new Set(elements.map(e => e.id));
+  relations = relations.filter(r => r && r.aId != null && r.bId != null && existingIds.has(r.aId) && existingIds.has(r.bId));
+
+  // Calcola _inParallel PRIMA di tutto
+  for (const el of elements) {
+    if (el.type !== 'spring') { el._inParallel = false; continue; }
+    el._inParallel = relations.some(r =>
+      r.type === 'spring_spring' && r.props?.layout === 'parallel' &&
+      (r.aId === el.id || r.bId === el.id) &&
+      existingIds.has(r.aId) && existingIds.has(r.bId)
+    );
+
+  }
+
+  // Salva _L_calc prima del primo passaggio (per calcolare dL nel secondo passaggio)
+  const _L_calc_prev = {};
+  for (const sp of elements) {
+    if (sp.type === 'spring') _L_calc_prev[sp.id] = parseFloat(sp.props?._L_calc) || parseFloat(sp.props?.L0) || 0;
+  }
+
+  // Aggiorna _L_calc per le molle in modalità auto
+  // Per le serie: prima calcola F dalla molla con il corpo, poi propaga
+  const seriesChainsDone = new Set();
+  for (const sp of elements) {
+    if (sp.type !== 'spring') continue;
+    const mode = sp.props?.springMode || 'auto';
+
+    // ── Modalità forces: Σforze → Δx = F/k ───────────────────────────────────
+    if (mode === 'forces') {
+      const k_f = parseFloat(sp.props?.k);
+      const L0_f = parseFloat(sp.props?.L0);
+      if (!isNaN(k_f) && k_f > 0 && !isNaN(L0_f) && L0_f > 0) {
+        const forces = sp.props.forces || [];
+        if (forces.length > 0 && forces.some(f => f.val !== '' && f.val != null)) {
+          let Ftot = 0;
+          forces.forEach(f => { Ftot += parseFloat(f.val) || 0; });
+          sp.props._L_calc = L0_f + Ftot / k_f;
+        }
+        // Se forces vuoto: preserva _L_calc corrente
+      }
+      continue;
+    }
+
+    // ── Modalità dx: Δx → L = L0 + Δx ───────────────────────────────────────
+    if (mode === 'dx') {
+      // Se la molla è collegata a una fune (rope_spring), gestisci dopo
+      const hasRopeSpring = relations.some(r => r.type === 'rope_spring' && (r.aId === sp.id || r.bId === sp.id));
+      if (!hasRopeSpring) {
+        const L0_d = parseFloat(sp.props?.L0);
+        const dx_d = parseFloat(sp.props?.dx);
+        if (!isNaN(L0_d) && L0_d > 0 && !isNaN(dx_d)) {
+          sp.props._L_calc = L0_d + dx_d;
+        }
+        continue;
+      }
+      // Se ha rope_spring: cade nel blocco rope_spring sotto
+    }
+
+    if (mode !== 'auto') {
+      // Eccezione: se la molla ha rope_spring, deve essere gestita comunque
+      const hasRopeSpring2 = relations.some(r => r.type === 'rope_spring' && (r.aId === sp.id || r.bId === sp.id));
+      if (!hasRopeSpring2) continue;
+    }
+
+    // Se in serie: gestisci tutta la catena insieme, una volta sola
+    if (sp._seriesRole) {
+      // Trova tutta la catena
+      const seriesRelsAuto = relations.filter(r => r.type === 'spring_spring' && r.props?.layout === 'series');
+      const adjAuto = {};
+      for (const r of seriesRelsAuto) {
+        if (!adjAuto[r.aId]) adjAuto[r.aId] = [];
+        if (!adjAuto[r.bId]) adjAuto[r.bId] = [];
+        adjAuto[r.aId].push(r.bId);
+        adjAuto[r.bId].push(r.aId);
+      }
+      const visAuto = new Set(), chainAuto = [];
+      const qAuto = [sp.id];
+      while (qAuto.length) {
+        const cur = qAuto.shift();
+        if (visAuto.has(cur)) continue;
+        visAuto.add(cur);
+        const spA = elements.find(e => e.id === cur);
+        if (spA) chainAuto.push(spA);
+        (adjAuto[cur]||[]).forEach(id => { if (!visAuto.has(id)) qAuto.push(id); });
+      }
+      const chainKey = chainAuto.map(s=>s.id).sort().join('-');
+      if (seriesChainsDone.has(chainKey)) continue;
+      seriesChainsDone.add(chainKey);
+
+      // Cerca il corpo agganciato a qualsiasi molla della catena
+      let F2series = 0;
+      let foundBody = false;
+      for (const spC of chainAuto) {
+        const springRelC = relations.find(r => r.type === 'spring_body' && (r.aId === spC.id || r.bId === spC.id));
+        const bodyElC = springRelC ? elements.find(e => e.id === (springRelC.aId === spC.id ? springRelC.bId : springRelC.aId)) : null;
+        if (!bodyElC) continue;
+        foundBody = true;
+
+        // Se il corpo è in sistema funi, la catena serie è gestita dal secondo passaggio
+        if (typeof getRopeSystemResultNoSpring === 'function') {
+          const sysResCheck = getRopeSystemResultNoSpring();
+          if (sysResCheck?.[`body_${bodyElC.id}`]) { foundBody = false; break; }
+        }
+        const ref2 = getRefSystem();
+        const g2 = parseFloat(ref2?.props?.gravity) || 0;
+        const m2 = parseFloat(bodyElC.props?.mass) || 0;
+        const anchor2 = spC.props?.anchor || 'left';
+        const horiz2 = anchor2 === 'left' || anchor2 === 'right';
+        const pesoFy2 = (g2 > 0 && m2 > 0) ? -m2 * g2 : 0;
+        let Fext2 = 0;
+        (bodyElC.props?.forces || []).forEach(f => {
+          if (horiz2) Fext2 += parseFloat(f.fx) || 0;
+          else        Fext2 += parseFloat(f.fy) || 0;
+        });
+        if (anchor2 === 'top')         F2series = -(pesoFy2 + Fext2);
+        else if (anchor2 === 'bottom') F2series = +(pesoFy2 + Fext2);
+        else if (anchor2 === 'left')   F2series = Fext2;
+        else                           F2series = -Fext2;
+        break;
+      }
+      if (!foundBody) {
+        // Cerca forze dirette sulla molla con _seriesRole (modalità forces)
+        for (const spC of chainAuto) {
+          if (spC.props?.springMode === 'forces' && Array.isArray(spC.props?.forces)) {
+            let Fdir = 0;
+            spC.props.forces.forEach(f => { Fdir += parseFloat(f.val) || 0; });
+            F2series = Fdir;
+            foundBody = true;
+            break;
+          }
+        }
+      }
+      if (!foundBody) {
+        chainAuto.forEach(s => { const L0s = parseFloat(s.props?.L0); if (!isNaN(L0s)) s.props._L_calc = L0s; });
+        continue;
+      }
+      // Propaga Δxᵢ = F/kᵢ a ogni molla
+      chainAuto.forEach(s => {
+        const ks = parseFloat(s.props?.k);
+        const L0s = parseFloat(s.props?.L0);
+        if (!isNaN(ks) && ks > 0 && !isNaN(L0s) && L0s > 0) {
+          s.props._L_calc = L0s + F2series / ks;
+        }
+      });
+      continue;
+    }
+
+    const k  = parseFloat(sp.props?.k);
+    const L0 = parseFloat(sp.props?.L0);
+    if (isNaN(k) || k <= 0 || isNaN(L0) || L0 <= 0) continue;
+
+    // ── Caso rope_spring: molla agganciata a fune con corpo appeso ────────────
+    const ropeSpringRel2 = relations.find(r => r.type === 'rope_spring' && (r.aId === sp.id || r.bId === sp.id));
+    if (ropeSpringRel2) {
+      const ropeEl2 = elements.find(e => e.id === (ropeSpringRel2.aId === sp.id ? ropeSpringRel2.bId : ropeSpringRel2.aId));
+      if (ropeEl2) {
+        // Cerca corpo hanging sulla stessa fune
+        let hangRel2 = relations.find(r => r.type === 'rope_body' &&
+          (r.aId === ropeEl2.id || r.bId === ropeEl2.id) && r.props?.anchor === 'hanging');
+
+        // Se non trovato, cerca sull'altra fune della stessa carrucola
+        if (!hangRel2) {
+          const pulleyRel_rs = relations.find(r =>
+            r.type === 'rope_on_pulley' && (r.aId === ropeEl2.id || r.bId === ropeEl2.id)
+          );
+          if (pulleyRel_rs) {
+            const pulleyId_rs = pulleyRel_rs.aId === ropeEl2.id ? pulleyRel_rs.bId : pulleyRel_rs.aId;
+            const otherRopeRels_rs = relations.filter(r =>
+              r.type === 'rope_on_pulley' && r.id !== pulleyRel_rs.id &&
+              (r.aId === pulleyId_rs || r.bId === pulleyId_rs)
+            );
+            for (const orr_rs of otherRopeRels_rs) {
+              const otherRopeId_rs = orr_rs.aId === pulleyId_rs ? orr_rs.bId : orr_rs.aId;
+              hangRel2 = relations.find(r =>
+                r.type === 'rope_body' &&
+                (r.aId === otherRopeId_rs || r.bId === otherRopeId_rs) &&
+                r.props?.anchor === 'hanging'
+              );
+              if (hangRel2) break;
+            }
+          }
+        }
+
+        if (hangRel2) {
+          const hangBody2b = elements.find(e =>
+            (e.id === hangRel2.aId || e.id === hangRel2.bId) && e.type !== 'rope'
+          );
+          if (hangBody2b) {
+            const ref_rs = getRefSystem();
+            const g_rs = Math.abs(parseFloat(ref_rs?.props?.gravity) || 9.81);
+            const m_rs = parseFloat(hangBody2b.props?.mass) || 0;
+            if (m_rs > 0) {
+              const T_rs = m_rs * g_rs;
+              sp.props._L_calc = L0 + T_rs / k;
+              continue;
+            }
+          }
+        }
+      }
+      sp.props._L_calc = L0;
+      continue;
+    }
+
+    const springRel2 = relations.find(r => r.type === 'spring_body' && (r.aId === sp.id || r.bId === sp.id));
+    const bodyEl2 = springRel2 ? elements.find(e => e.id === (springRel2.aId === sp.id ? springRel2.bId : springRel2.aId)) : null;
+    if (!bodyEl2) { sp.props._L_calc = L0; continue; }
+
+    // Se il corpo è in un sistema di funi, la molla è gestita ESCLUSIVAMENTE
+    // dal secondo passaggio — salta qui indipendentemente da springMode
+    if (typeof getRopeSystemResultNoSpring === 'function') {
+      const sysResCheck = getRopeSystemResultNoSpring();
+      if (sysResCheck?.[`body_${bodyEl2.id}`]) continue;
+    }
+
+    const ref2 = getRefSystem();
+    const g2 = parseFloat(ref2?.props?.gravity) || 0;
+    const m2 = parseFloat(bodyEl2.props?.mass) || 0;
+    const anchor2 = sp.props?.anchor || 'left';
+    const horiz2  = anchor2 === 'left' || anchor2 === 'right';
+    let Fext2 = 0;
+    (bodyEl2.props?.forces || []).forEach(f => {
+      if (horiz2) Fext2 += parseFloat(f.fx) || 0;
+      else        Fext2 += parseFloat(f.fy) || 0;
+    });
+    // Aggiungi forza fune al corpo (se presente)
+    if (typeof getRopeForceOnBody === 'function') {
+      const ropeF2 = getRopeForceOnBody(bodyEl2);
+      if (ropeF2) {
+        if (horiz2) Fext2 += ropeF2.fx;
+        else        Fext2 += ropeF2.fy;
+      }
+    }
+    // Aggiungi tensioni sistema di funi
+    if (typeof getRopeSystemForceOnBody === 'function') {
+      const sysF2 = getRopeSystemForceOnBody(bodyEl2);
+      if (sysF2) {
+        if (horiz2) Fext2 += sysF2.fx;
+        // verticale: funi orizzontali non contribuiscono a Fy
+      }
+    }
+    let F2 = 0;
+    const pesoFy2 = (g2 > 0 && m2 > 0) ? -m2 * g2 : 0;
+    if (anchor2 === 'top') {
+      const Fnet_down = pesoFy2 + Fext2;
+      F2 = -Fnet_down;
+    } else if (anchor2 === 'bottom') {
+      const Fnet_down = pesoFy2 + Fext2;
+      F2 = +Fnet_down;
+    } else if (anchor2 === 'left') {
+      F2 = Fext2;
+    } else {
+      F2 = -Fext2;
+    }
+
+    // Per molla orizzontale: attrito pavimento
+    if (horiz2) {
+      const floorRelF = relations.find(r =>
+        r.type === 'body_on_floor' && (r.aId === bodyEl2.id || r.bId === bodyEl2.id)
+      );
+      if (floorRelF) {
+        const muS = parseFloat(floorRelF.props?.muS);
+        const muK = parseFloat(floorRelF.props?.muK);
+        // N = peso + componente verticale forze esterne (forza a 45° ha Fy)
+        let Fext_y2 = 0;
+        (bodyEl2.props?.forces || []).forEach(f => { Fext_y2 += parseFloat(f.fy) || 0; });
+        // Aggiungi componente verticale forza fune
+        if (typeof getRopeForceOnBody === 'function') {
+          const ropeF2y = getRopeForceOnBody(bodyEl2);
+          if (ropeF2y) Fext_y2 += ropeF2y.fy;
+        }
+        // Funi orizzontali del sistema non contribuiscono a Fy
+        const Ny2 = Math.abs(pesoFy2 + Fext_y2);
+        const v0x2 = parseFloat(bodyEl2.props?.v0x) || 0;
+        const isMoving2 = Math.abs(v0x2) > 1e-9;
+        if (!isMoving2 && !isNaN(muS) && muS > 0) {
+          const fsMax = muS * Ny2;
+          if (Math.abs(F2) <= fsMax) {
+            F2 = 0;
+          } else {
+            const fk = (!isNaN(muK) && muK > 0) ? muK * Ny2 : fsMax;
+            F2 = F2 - Math.sign(F2) * fk;
+          }
+        } else if (isMoving2 && !isNaN(muK) && muK > 0) {
+          const fk = muK * Ny2;
+          F2 = F2 - Math.sign(v0x2) * fk;
+        }
+      }
+    }
+    // Per molla verticale: attrito parete
+    if (!horiz2) {
+      F2 = calcSpringFnetWithWall(sp, bodyEl2, anchor2, Fext2, pesoFy2);
+    }
+
+    // Per molla sul piano inclinato: usa calcSpringFnetOnPlane
+    const planeRelSp = relations.find(r =>
+      r.type === 'spring_on_plane' && (r.aId === sp.id || r.bId === sp.id)
+    );
+    if (planeRelSp) {
+      F2 = calcSpringFnetOnPlane(sp, bodyEl2);
+    }
+    // Se in parallelo: usa k_eq per calcolare Δx, poi propaga a tutto il gruppo
+    if (sp._inParallel) {
+      const group2 = parallelGroup(sp.id);
+      // Se qualsiasi molla del gruppo è già in forces/dx, skip — la propagazione finale gestirà
+      if (group2.some(s => (s.props?.springMode||'auto') !== 'auto')) continue;
+      if (group2[0]?.id !== sp.id) continue;
+      // Se il corpo è in sistema funi, gestito dal secondo passaggio
+      if (typeof getRopeSystemResultNoSpring === 'function') {
+        const sysResCheck = getRopeSystemResultNoSpring();
+        if (sysResCheck?.[`body_${bodyEl2.id}`]) continue;
+      }
+      const keq2 = group2.reduce((sum, s) => sum + (parseFloat(s.props?.k) || 0), 0);
+      if (keq2 <= 0) continue;
+      sp.props._L_calc = L0 + F2 / keq2;
+      group2.forEach(s => { if (s.id !== sp.id) s.props._L_calc = sp.props._L_calc; });
+    } else {
+      sp.props._L_calc = L0 + F2 / k;
+    }
+  }
+
+  // Secondo passaggio: calcola _L_calc analitico per molle in sistema di funi
+  // Usa la tensione T già calcolata dal solver (senza dipendere da _L_calc precedente)
+  // Per molla con corpo in sistema di funi con a=0:
+  //   equilibrio corpo: Fx_pure + T_net + F_molla = 0
+  //   F_molla = -(Fx_pure + T_net)
+  //   k*(L-L0) = |F_molla| con segno corretto per anchor
+  if (typeof getRopeSystemResultNoSpring === 'function') {
+    const sysRes = getRopeSystemResultNoSpring(); // tensioni senza dipendenza da _L_calc
+    if (sysRes) {
+      for (const sp of elements) {
+        if (sp.type !== 'spring' || (sp.props?.springMode||'auto') !== 'auto') continue;
+        const springRel2b = relations.find(r => r.type === 'spring_body' &&
+          (r.aId === sp.id || r.bId === sp.id));
+        const bodyEl2b = springRel2b ? elements.find(e =>
+          e.id === (springRel2b.aId === sp.id ? springRel2b.bId : springRel2b.aId)) : null;
+        if (!bodyEl2b) continue;
+        const sysEntry = sysRes[`body_${bodyEl2b.id}`];
+        if (!sysEntry) continue;
+        const anchor2b = sp.props?.anchor || 'left';
+        const horiz2b  = anchor2b === 'left' || anchor2b === 'right';
+        if (!horiz2b) continue;
+
+        const k2b  = parseFloat(sp.props?.k);
+        const L02b = parseFloat(sp.props?.L0);
+        if (isNaN(k2b) || k2b <= 0 || isNaN(L02b)) continue;
+
+        const { chain: ch2, tensions: t2, ropesBetween: rb2, bodyData: bd2 } = sysEntry;
+        const bidx = ch2.bodies.findIndex(b => b.id === bodyEl2b.id);
+        if (bidx < 0) continue;
+        const isLeftmost = bidx === 0;
+
+        // Calcola T direttamente dalle forze sui corpi senza molla
+        // La fune è tesa solo se la forza netta sugli altri corpi tende a separare la catena
+        // Per isLeftmost (molla a sinistra): tesa se sumFx_altri > 0 (B tira A verso destra)
+        // Per !isLeftmost (molla a destra): tesa se sumFx_altri < 0 (B tira A verso sinistra)
+        let sumFx_others = 0;
+        ch2.bodies.forEach(b => {
+          if (b.id === bodyEl2b.id) return; // escludi corpo con molla
+          const pb = b.props || {};
+          (pb.forces || []).forEach(f => { sumFx_others += parseFloat(f.fx) || 0; });
+          if (typeof getRopeForceOnBody === 'function') {
+            const rf = getRopeForceOnBody(b); if (rf) sumFx_others += rf.fx;
+          }
+        });
+        // Forze pure sul corpo con molla
+        const p2b = bodyEl2b.props || {};
+        let Fx_pure = 0;
+        (p2b.forces || []).forEach(f => { Fx_pure += parseFloat(f.fx) || 0; });
+        if (typeof getRopeForceOnBody === 'function') {
+          const rf = getRopeForceOnBody(bodyEl2b);
+          if (rf) Fx_pure += rf.fx;
+        }
+
+        // Fune tesa solo se i corpi tendono a SEPARARSI:
+        const ropeIsTaut = isLeftmost ? sumFx_others > 1e-9 : sumFx_others < -1e-9;
+
+        // Calcola T analiticamente dalla fisica:
+        let T_actual = 0;
+        if (ropeIsTaut) {
+          if (isLeftmost) {
+            let friction_others = 0;
+            ch2.bodies.forEach(b => {
+              if (b.id === bodyEl2b.id) return;
+              const bd = bd2?.[ch2.bodies.indexOf(b)];
+              if (bd) friction_others += Math.abs(bd.friction ?? 0);
+            });
+            T_actual = Math.max(0, sumFx_others - friction_others);
+          } else {
+            let friction_others = 0;
+            ch2.bodies.forEach(b => {
+              if (b.id === bodyEl2b.id) return;
+              const bd = bd2?.[ch2.bodies.indexOf(b)];
+              if (bd) friction_others += Math.abs(bd.friction ?? 0);
+            });
+            T_actual = Math.max(0, Math.abs(sumFx_others) - friction_others);
+          }
+        }
+
+        // dx per la molla
+        let dx2b;
+        if (ropeIsTaut) {
+          if (isLeftmost) {
+            dx2b = (T_actual + Fx_pure) / k2b;
+          } else {
+            dx2b = (T_actual - Fx_pure) / k2b;
+          }
+        } else {
+          dx2b = (anchor2b === 'left') ? Fx_pure / k2b : -Fx_pure / k2b;
+        }
+
+        const stato = dx2b > 1e-6 ? 'ALLUNGATA' : dx2b < -1e-6 ? 'COMPRESSA' : 'RIPOSO';
+        const prevL = _L_calc_prev[sp.id] ?? L02b;
+        sp.props._L_calc = L02b + dx2b;
+        // Marca slack solo la fune adiacente alla molla
+        // Le altre funi hanno già il loro stato dal solver
+        const ropeAdjacentToSpring = isLeftmost
+          ? ch2.ropes.find(r => (sysEntry.ropesBetween[0]?.id === r.id))  // fune tra corpo[0] e corpo[1]
+          : ch2.ropes.find(r => (sysEntry.ropesBetween[ch2.bodies.length-2]?.id === r.id)); // ultima fune
+        if (ropeAdjacentToSpring) ropeAdjacentToSpring._isSlack = !ropeIsTaut;
+
+        // Salva i dati per il terzo passaggio (dopo applyRelationPositions)
+        if (!window._springRopeUpdates) window._springRopeUpdates = [];
+        window._springRopeUpdates.push({ sp, bodyEl2b, dx2b, anchor2b, ch2, ropeIsTaut, isLeftmost });
+      }
+    }
+  }
+
+  // Propaga _L_calc alle molle parallele
+  // Tutte le molle del gruppo devono avere lo stesso _L_calc (stessa deformazione)
+  // Il master è la molla con modalità più esplicita: forces > dx > auto
+  const propagatedGroups = new Set();
+  for (const sp of elements) {
+    if (sp.type !== 'spring' || !sp._inParallel) continue;
+    const group3 = parallelGroup(sp.id);
+    const gKey = group3.map(s=>s.id).sort().join('-');
+    if (propagatedGroups.has(gKey)) continue;
+    propagatedGroups.add(gKey);
+    // Seleziona il master: prima molle con valore reale, poi per priorità mode
+    const hasValue = s => {
+      const m = s.props?.springMode || 'auto';
+      if (m === 'forces') return Array.isArray(s.props?.forces) && s.props.forces.some(f => f.val !== '' && f.val != null && !isNaN(parseFloat(f.val)));
+      if (m === 'dx') return !isNaN(parseFloat(s.props?.dx));
+      return true;
+    };
+    const modePriority = m => m === 'forces' ? 2 : m === 'dx' ? 1 : 0;
+    const master = group3
+      .filter(s => s.props?._L_calc != null && !isNaN(parseFloat(s.props._L_calc)))
+      .sort((a, b) => {
+        const av = hasValue(a) ? 1 : 0, bv = hasValue(b) ? 1 : 0;
+        if (bv !== av) return bv - av;
+        return modePriority(b.props?.springMode||'auto') - modePriority(a.props?.springMode||'auto');
+      })[0];
+    if (master) {
+      group3.forEach(s => { s.props._L_calc = master.props._L_calc; });
+    }
+  }
+
+  // Aggiorna le dimensioni della molla subito dopo _L_calc
+  for (const sp of elements) {
+    if (sp.type !== 'spring') continue;
+    const ref_sp = getRefSystem();
+    const ML_sp=50,W_sp=340,MR_sp=24,MB_sp=50,H_sp=300,MT_sp=24;
+    const axisW_sp=W_sp-ML_sp-MR_sp, axisH_sp=H_sp-MB_sp-MT_sp;
+    const hX_sp=Math.max(0.1,parseFloat(ref_sp?.props?.halfX)||5);
+    const hY_sp=Math.max(0.1,parseFloat(ref_sp?.props?.halfY)||5);
+    const sX_sp=ref_sp?axisW_sp/(2*hX_sp):18;
+    const sY_sp=ref_sp?axisH_sp/(2*hY_sp):18;
+    const sIso_sp=Math.min(sX_sp,sY_sp);
+    const anchor_sp2 = sp.props?.anchor || 'left';
+    const horiz_sp2 = anchor_sp2 === 'left' || anchor_sp2 === 'right';
+    const nCoils_sp=8, tailAnchor_sp=10, tailFree_sp=8;
+    const baseZig_sp=nCoils_sp*6;
+    const L0_sp=parseFloat(sp.props?.L0);
+    const Lc_sp=parseFloat(sp.props?._L_calc);
+    const visScaleSp=Math.max(1,parseFloat(sp.props?.visScale)||5);
+    const scale_sp2 = horiz_sp2 ? sX_sp : sY_sp; // stessa del draw
+    let zig_sp=baseZig_sp;
+    if (!isNaN(L0_sp) && L0_sp>1e-9) {
+      const dx_sp=(!isNaN(Lc_sp))?Lc_sp-L0_sp:0;
+      zig_sp=Math.max(nCoils_sp*3, Math.round(baseZig_sp + dx_sp*scale_sp2*visScaleSp));
+    }
+    const sLen_sp=tailAnchor_sp+zig_sp+tailFree_sp;
+    if (horiz_sp2) { sp._wPx=sLen_sp+14; sp._hPx=32; }
+    else           { sp._wPx=32; sp._hPx=sLen_sp+14; }
+    DEFS.spring.w=sp._wPx; DEFS.spring.h=sp._hPx;
+  }
+
+  // Pre-calcola le dimensioni degli elementi variabili PRIMA di usare def.w/h
+  for (const el of elements) {
+    if (el.type === 'floor') {
+      const ref = getRefSystem();
+      const ML = 50, W = 340, MR = 24;
+      const axisW = W - ML - MR;
+      const halfX = Math.max(0.1, parseFloat(ref?.props?.halfX) || 5);
+      const scaleX = ref ? axisW / (2 * halfX) : 22;
+      const xMin = parseFloat(el.props?.xMin) ?? 0;
+      const xMax = parseFloat(el.props?.xMax) ?? 10;
+      const lenPx = Math.max(10, Math.round((xMax - xMin) * scaleX));
+      DEFS.floor.w = lenPx;
+      el._wPx = lenPx;
+    }
+    if (el.type === 'wall') {
+      const ref = getRefSystem();
+      const MB = 50, H = 300, MT = 24;
+      const axisH = H - MB - MT;
+      const halfY = Math.max(0.1, parseFloat(ref?.props?.halfY) || 5);
+      const scaleY = ref ? axisH / (2 * halfY) : 13;
+      const yMin = parseFloat(el.props?.yMin) ?? 0;
+      const yMax = parseFloat(el.props?.yMax) ?? 10;
+      const lenPx = Math.max(20, Math.round((yMax - yMin) * scaleY));
+      DEFS.wall.h = lenPx;
+      el._hPx = lenPx;
+      DEFS.wall.w = 14;
+    }
+    if (el.type === 'inclined_plane') {
+      const ref = getRefSystem();
+      const ML=50,W=340,MR=24,MB=50,H=300,MT=24;
+      const axisW=W-ML-MR, axisH=H-MB-MT;
+      const halfX=Math.max(0.1,parseFloat(ref?.props?.halfX)||5);
+      const halfY=Math.max(0.1,parseFloat(ref?.props?.halfY)||5);
+      const scaleX=ref?axisW/(2*halfX):18;
+      const scaleY=ref?axisH/(2*halfY):18;
+      const scaleIso=Math.min(scaleX,scaleY);
+      const { basePx, heightPx } = getInclinedPlaneDims(el, scaleIso, scaleIso);
+      el._wPx = Math.max(20, basePx);
+      el._hPx = Math.max(10, heightPx);
+      DEFS.inclined_plane.w = el._wPx;
+      DEFS.inclined_plane.h = el._hPx;
+    }
+    if (el.type === 'spring') {
+      const ref = getRefSystem();
+      const ML=50,W=340,MR=24,MB=50,H=300,MT=24;
+      const axisW=W-ML-MR, axisH=H-MB-MT;
+      const halfX=Math.max(0.1,parseFloat(ref?.props?.halfX)||5);
+      const halfY=Math.max(0.1,parseFloat(ref?.props?.halfY)||5);
+      const sX=ref?axisW/(2*halfX):18;
+      const sY=ref?axisH/(2*halfY):18;
+      const anchor = el.props?.anchor || 'left';
+      const nCoils = 8, tailAnchor = 10, tailFree = 8;
+      const L0s = parseFloat(el.props?.L0);
+      const Ls  = parseFloat(el.props?._L_calc);
+      const horiz = anchor === 'left' || anchor === 'right';
+      const scale_sp = horiz ? sX : sY;
+      // Stessa formula del draw: L0→baseZig, Δx amplificato di visScale
+      const visScale_sp = Math.max(1, parseFloat(el.props?.visScale) || 5);
+      const baseZigPx_sp = nCoils * 6;
+      const dxVal_sp = (!isNaN(Ls) && !isNaN(L0s)) ? (Ls - L0s) : 0;
+      const zigLen = Math.max(nCoils * 3, Math.round(baseZigPx_sp + dxVal_sp * scale_sp * visScale_sp));
+      const springLen = tailAnchor + zigLen + tailFree;
+
+      const newHPx = horiz ? 32 : springLen + 14;
+      const newWPx = horiz ? springLen + 14 : 32;
+
+
+
+      if (horiz) {
+        el._wPx = newWPx;
+        el._hPx = 32;
+        if (anchor === 'right' && el._prevWPx != null && el._prevWPx !== newWPx) {
+          el.x += el._prevWPx - newWPx;
+          el._wallXCanvas = el.x + el._wPx - 8; // aggiorna dopo compensazione
+        }
+        el._prevWPx = newWPx;
+      } else {
+        el._wPx = 32;
+        el._hPx = newHPx;
+        if (anchor === 'bottom' && el._prevHPx != null && el._prevHPx !== newHPx) {
+          el.y += el._prevHPx - newHPx;
+          el._wallYCanvas = el.y + el._hPx - 8; // aggiorna dopo compensazione
+        }
+        el._prevHPx = newHPx;
+      }
+      DEFS.spring.w = el._wPx;
+      DEFS.spring.h = el._hPx;
+    }
+  }
+
+  // Aggiorna posizione molle sul piano PRIMA di applyRelationPositions
+  for (const el of elements) {
+    if (el.type === 'spring') updateSpringOnPlanePosition(el);
+  }
+
+  // Aggiorna posizione carrucole sul piano inclinato PRIMA di applyRelationPositions
+  for (const rel of relations) {
+    if (rel.type !== 'pulley_on_plane') continue;
+    const planeEl2 = elements.find(e => e.id === rel.aId && e.type === 'inclined_plane') ||
+                     elements.find(e => e.id === rel.bId && e.type === 'inclined_plane');
+    const pulleyEl2 = elements.find(e => e.id === rel.aId && e.type === 'pulley_simple') ||
+                      elements.find(e => e.id === rel.bId && e.type === 'pulley_simple');
+    if (planeEl2 && pulleyEl2) {
+      const geo2 = getPlaneGeometry(planeEl2);
+      // Cerca il corpo connesso per determinare _rEff
+      const ropeRel2 = relations.find(r2 => r2.type === 'rope_on_pulley' &&
+        (r2.aId === pulleyEl2.id || r2.bId === pulleyEl2.id));
+      if (ropeRel2) {
+        const ropeEl2 = elements.find(e => e.id === (ropeRel2.aId === pulleyEl2.id ? ropeRel2.bId : ropeRel2.aId));
+        if (ropeEl2) {
+          const bodyRel2 = relations.find(r2 => r2.type === 'rope_body' &&
+            (r2.aId === ropeEl2.id || r2.bId === ropeEl2.id) &&
+            (r2.props?.anchor === 'left' || r2.props?.anchor === 'right'));
+          if (bodyRel2) {
+            const bodyEl2 = elements.find(e => e.id === (bodyRel2.aId === ropeEl2.id ? bodyRel2.bId : bodyRel2.aId));
+            if (bodyEl2) {
+              const defB2 = DEFS[bodyEl2.type];
+              pulleyEl2._rEff = defB2 ? defB2.h / 2 : 16;
+            }
+          }
+          // Se non trovato corpo, cerca molla sul piano (rope_spring)
+          if (!pulleyEl2._rEff) {
+            // Cerca su tutte le funi della stessa carrucola
+            const allPulleyRopes = relations.filter(r2 => r2.type === 'rope_on_pulley' &&
+              (r2.aId === pulleyEl2.id || r2.bId === pulleyEl2.id));
+            for (const pr2 of allPulleyRopes) {
+              const rId2 = pr2.aId === pulleyEl2.id ? pr2.bId : pr2.aId;
+              const springRel2 = relations.find(r2 => r2.type === 'rope_spring' &&
+                (r2.aId === rId2 || r2.bId === rId2));
+              if (springRel2) {
+                const springEl2 = elements.find(e =>
+                  e.id === (springRel2.aId === rId2 ? springRel2.bId : springRel2.aId)
+                );
+                if (springEl2 && springEl2._hPx) {
+                  pulleyEl2._rEff = springEl2._hPx / 2;
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+      // Raggio effettivo (default 20 se non ancora trovato)
+      const rEff2 = pulleyEl2._rEff || 20;
+      // Bounding box = 2*rEff x 2*rEff, centrato sul vertice
+      const vertexX2 = planeEl2.x + geo2.x1;
+      const vertexY2 = planeEl2.y + geo2.y1;
+      pulleyEl2.x = vertexX2 - rEff2;
+      pulleyEl2.y = vertexY2 - rEff2;
+      pulleyEl2._wPx = rEff2 * 2;
+      pulleyEl2._hPx = rEff2 * 2;
+      if (pulleyEl2.props) pulleyEl2.props.anchor = 'vertex';
+    }
+  }
+
+  // Ricalcola posizioni corpo dopo aggiornamento dimensioni molla
+  // Aggiorna _hPx/_wPx delle molle da _L_calc PRIMA di applyRelationPositions
+  // Questo garantisce che il corpo segua la molla anche quando cambia gravity/forces
+  for (const sp of elements) {
+    if (sp.type !== 'spring') continue;
+    const L0s = parseFloat(sp.props?.L0);
+    const Lcs = parseFloat(sp.props?._L_calc);
+    if (isNaN(L0s) || isNaN(Lcs)) continue;
+    const anchor_s = sp.props?.anchor || 'top';
+    const horiz_s = anchor_s === 'left' || anchor_s === 'right';
+    const ref_s = getRefSystem();
+    const halfX_s = parseFloat(ref_s?.props?.halfX) || 5;
+    const halfY_s = parseFloat(ref_s?.props?.halfY) || 5;
+    const scaleX_s = 266 / (2 * halfX_s);
+    const scaleY_s = 226 / (2 * halfY_s);
+    const scale_s = horiz_s ? scaleX_s : scaleY_s;
+    const visScale_s = Math.max(1, parseFloat(sp.props?.visScale) || 5);
+    const nC=8, tA=10, tF=8, bz=nC*6;
+    const dx_s = Lcs - L0s;
+    const zig_s = Math.max(nC*3, Math.round(bz + dx_s * scale_s * visScale_s));
+    const freeLocal_s = tA + zig_s + tF;
+    const totalPx = freeLocal_s + 14;
+    if (horiz_s) sp._wPx = totalPx;
+    else         sp._hPx = totalPx;
+  }
+
+  applySeriesChains();      // prima: posiziona le molle in serie
+  applyRelationPositions(); // poi: posiziona i corpi in base alle molle già aggiornate
+
+  // Terzo passaggio: posiziona i corpi della catena fune rispetto al corpo con molla
+  // Saltato durante il drag del sistema di riferimento (i corpi restano fermi)
+  if (window._springRopeUpdates?.length && !window._isDraggingRef) {
+    const ref_3 = getRefSystem();
+    const hX_3  = Math.max(0.1, parseFloat(ref_3?.props?.halfX) || 5);
+    const scaleX_3 = (340 - 50 - 24) / (2 * hX_3);
+    const DEFS_r3 = window.DEFS || {};
+
+    // Snapshot di TUTTE le posizioni dei corpi PRIMA di qualsiasi modifica del terzo passaggio
+    // applyRelationPositions ha già posizionato tutto — questa è la posizione "di riposo"
+    const xRestSnapshot = {};
+    elements.forEach(el => {
+      const def = DEFS_r3[el.type] || { w: 30, h: 30 };
+      xRestSnapshot[el.id] = el.x + def.w / 2;
+    });
+
+    for (const { sp, bodyEl2b, dx2b, anchor2b, ch2, ropeIsTaut, isLeftmost } of window._springRopeUpdates) {
+      const DEFS_r = window.DEFS || {};
+      const defA = DEFS_r[bodyEl2b.type] || { w: 30, h: 30 };
+
+      // Ottieni tensioni per decidere quali corpi spostare
+      const sysRes3 = (typeof getRopeSystemResultNoSpring === 'function') ? getRopeSystemResultNoSpring() : null;
+      const sysEntry3 = sysRes3?.[`body_${bodyEl2b.id}`];
+      const tensions3 = sysEntry3?.tensions || {};
+      const ropesBetween3 = sysEntry3?.ropesBetween || [];
+
+      // xOffset fisico di A (il corpo con molla) — aggiornato da applyRelationPositions
+      const floorRelA = relations.find(r =>
+        r.type === 'body_on_floor' && (r.aId === bodyEl2b.id || r.bId === bodyEl2b.id)
+      );
+      const floorElA = floorRelA ? elements.find(e =>
+        e.id === (floorRelA.aId === bodyEl2b.id ? floorRelA.bId : floorRelA.aId)
+      ) : null;
+      if (!floorElA) continue;
+
+      ch2.bodies.forEach((b) => {
+        if (b.id === bodyEl2b.id) return;
+        const defB = DEFS_r[b.type] || { w: 30, h: 30 };
+        const bIdx = ch2.bodies.findIndex(bi => bi.id === b.id);
+
+        // Verifica se la fune verso questo corpo è tesa
+        let ropeToSpring;
+        if (isLeftmost) {
+          ropeToSpring = ropesBetween3[bIdx - 1];
+        } else {
+          ropeToSpring = ropesBetween3[bIdx];
+        }
+        const T_rope = ropeToSpring ? (tensions3[ropeToSpring.id] ?? 0) : 0;
+        const thisRopeTaut = T_rope > 1e-9;
+
+        // La fune sposta B se:
+        // 1. ropeIsTaut E thisRopeTaut (forze esterne tendono a separare i corpi) OPPURE
+        // 2. dx2b > 0 (A si sposta verso destra verso B, trascinandolo fisicamente)
+        //    In questo caso la fune è tesa per contatto, non per forze esterne
+        // La fune sposta B se:
+        // 1. ropeIsTaut E thisRopeTaut (forze esterne su B/C tirano la fune) OPPURE
+        // 2. dx2b < 0 (molla COMPRESSA: A va verso la parete a sinistra, trascina B e C)
+        //    La fune è tesa perché A si allontana da B
+        // NB: dx2b > 0 (allungamento): A va verso B → fune si allenta → B e C fermi
+        const draggedByA = dx2b < -1e-6;
+        const pulledByForces = ropeIsTaut && thisRopeTaut;
+
+        if (!draggedByA && !pulledByForces) {
+          return;
+        }
+
+        // xOffset fisico di B
+        const floorRelB = relations.find(r =>
+          r.type === 'body_on_floor' && (r.aId === b.id || r.bId === b.id)
+        );
+        if (!floorRelB) return;
+
+        // Posizione pixel di B a riposo — dalla snapshot prima di modifiche
+        // In questo momento b.x è ancora posizionato da applyRelationPositions
+        const xB_rest_center = xRestSnapshot[b.id] ?? (b.x + defB.w / 2);
+
+        // Posizione pixel di A corrente
+        const xA_px = bodyEl2b.x + defA.w / 2;
+
+        // Posizione pixel di A a riposo = posizione corrente ± spostamento della molla in pixel
+        // Formula: dx_pixels = dx2b * scaleX * visScale
+        // anchor=left:  A si sposta a destra quando dx>0 → rest è a sinistra → xA_rest = xA_px - dxPx
+        // anchor=right: A si sposta a sinistra quando dx>0 → rest è a destra → xA_rest = xA_px + dxPx
+        const visScale_3 = Math.max(1, parseFloat(sp.props?.visScale) || 5);
+        const dxPx = dx2b * scaleX_3 * visScale_3;
+        const xA_rest_center = anchor2b === 'left' ? xA_px - dxPx : xA_px + dxPx;
+
+        // Distanza fissa B-A a riposo (pixel)
+        const distPx_fixed = xB_rest_center - xA_rest_center;
+
+        // Posizione finale di B = A corrente + distanza fissa
+        const finalBx = xA_px + distPx_fixed - defB.w / 2;
+        b.x = finalBx;
+      });
+    }
+    window._springRopeUpdates = [];
+  }
+
+  // Aggiorna posizione funi DOPO applyRelationPositions (dipende dalla posizione dei corpi)
+  for (const el of elements) {
+    if (el.type === 'rope') {
+      try { updateRopePosition(el); } catch(e) { /* relazione orfana — skip */ }
+    }
+  }
+
+  // Indicatori relazioni (linee tratteggiate) rimossi per pulizia visiva
+
+  // Set degli id coinvolti in relazioni (per badge)
+  const relatedIds = new Set(relations.flatMap(r => [r.aId, r.bId]));
+
+  // Pre-calcola _vecMaxMag per tutti i corpi (usato dalla molla per la scala vettori)
+  const BODY_TYPES = ['point_mass', 'rect_body', 'block', 'sphere'];
+  for (const el of elements) {
+    if (!BODY_TYPES.includes(el.type)) continue;
+    const p = el.props; if (!p) continue;
+    const ref_pm = getRefSystem();
+    const g_pm = parseFloat(ref_pm?.props?.gravity) || 0;
+    const m_pm = parseFloat(p.mass) || 0;
+    const pesoMag_pm = (g_pm > 0 && m_pm > 0) ? m_pm * g_pm : 0;
+    const mags_pm = [];
+    // Riferimento fisso per scala peso: usa slider max se disponibile,
+    // altrimenti il massimo peso mai visto (crescente, non decresce)
+    let massRefMax = m_pm;
+    const massSliderRel = relations.find(r =>
+      r.type === 'slider_prop' && (r.aId === el.id || r.bId === el.id) && r.props?.propKey === 'mass'
+    );
+    if (massSliderRel) {
+      const sliderEl = elements.find(e => e.id === (massSliderRel.aId === el.id ? massSliderRel.bId : massSliderRel.aId));
+      if (sliderEl?.type === 'slider') massRefMax = parseFloat(sliderEl.props?.max) || m_pm;
+    } else {
+      // Senza slider: usa il massimo storico (così ridurre la massa riduce il vettore)
+      el._refMaxMass = Math.max(m_pm, el._refMaxMass || 0);
+      massRefMax = el._refMaxMass;
+    }
+    const pesoRef_pm = (g_pm > 0 && massRefMax > 0) ? massRefMax * g_pm : pesoMag_pm;
+    if (pesoRef_pm > 1e-9) mags_pm.push(pesoRef_pm);
+    (p.forces||[]).forEach(f => {
+      const fmag = Math.hypot(parseFloat(f.fx)||0, parseFloat(f.fy)||0);
+      if (fmag > 1e-9) mags_pm.push(fmag);
+    });
+    // Includi la forza elastica della molla
+    const springF_pm = getSpringForce(el);
+    if (springF_pm && Math.abs(springF_pm.F) > 1e-9) mags_pm.push(Math.abs(springF_pm.F));
+    el._vecMaxMag = mags_pm.length > 0 ? Math.max(...mags_pm) : 1;
+  }
+
+  // ── Disegna funi PRIMA degli elementi (sotto) ─────────────────────────────
+  // Pre-pass: setta _showReaction sulle molle PRIMA del loop principale
+  for (const el of elements) {
+    if (!BODY_TYPES.includes(el.type)) continue;
+    if (el.props?.visible !== false) continue;
+    // Molla
+    const springRel2 = relations.find(r => r.type === 'spring_body' && (r.aId === el.id || r.bId === el.id));
+    if (springRel2) {
+      const springEl2 = elements.find(e => e.id === (springRel2.aId === el.id ? springRel2.bId : springRel2.aId));
+      if (springEl2 && springEl2.props?.visible !== false) springEl2.props._showReaction = true;
+    }
+    // Piano inclinato
+    const planeRel = relations.find(r => r.type === 'body_on_plane' && (r.aId === el.id || r.bId === el.id));
+    if (planeRel) {
+      const planeEl2 = elements.find(e => e.id === (planeRel.aId === el.id ? planeRel.bId : planeRel.aId));
+      if (planeEl2 && planeEl2.props?.visible !== false) {
+        // Ricalcola sempre planeN con la geo aggiornata (angolo può essere cambiato)
+        let freshPlaneN = null;
+        if (typeof computeTotalForcesWithWall === 'function') {
+          try { const r = computeTotalForcesWithWall(el); freshPlaneN = r.planeN || null; } catch(e) {}
+        }
+        planeEl2.props._showBodyReaction = { planeN: freshPlaneN, rel: planeRel, bodyEl: el, contactLocal: el._contactLocal || null };
+      }
+    }
+  }
+
+  // Pre-pass: molla nascosta su piano inclinato → reazione sul piano
+  for (const el of elements) {
+    if (el.type !== 'spring') continue;
+    if (el.props?.visible !== false) continue;
+    const spPlaneRel = relations.find(r => r.type === 'spring_on_plane' && (r.aId === el.id || r.bId === el.id));
+    if (!spPlaneRel) continue;
+    const planeEl3 = elements.find(e => e.id === (spPlaneRel.aId === el.id ? spPlaneRel.bId : spPlaneRel.aId));
+    if (!planeEl3 || planeEl3.props?.visible === false) continue;
+    // Ricalcola _F_el dalla _L_calc aggiornata
+    const k3 = parseFloat(el.props?.k);
+    const L0_3 = parseFloat(el.props?.L0);
+    const Lc3 = parseFloat(el.props?._L_calc);
+    if (!isNaN(k3) && !isNaN(L0_3) && !isNaN(Lc3)) {
+      el.props._delta_x = Lc3 - L0_3;
+      el.props._F_el = k3 * (Lc3 - L0_3);
+    }
+    if (!planeEl3.props._showSpringReactions) planeEl3.props._showSpringReactions = [];
+    planeEl3.props._showSpringReactions.push({ springEl: el, rel: spPlaneRel });
+  }
+
+  const ropeLayer = svgEl('g', { 'pointer-events': 'none', class: 'rope-layer' });
+  for (const rel of relations) {
+    if (rel.type === 'body_body') drawRope(ropeLayer, rel);
+  }
+  canvas.appendChild(ropeLayer);
+
+  // Disegna prima tutti gli elementi NON-rope, poi le funi sopra (catturano i click)
+  const ropeEls = elements.filter(e => e.type === 'rope');
+  const otherEls = elements.filter(e => e.type !== 'rope');
+  // Aggiungi gruppi vettori del corpo rettangolare ruotato (sopra tutto)
+
+  for (const el of [...otherEls, ...ropeEls]) {
+    const def = DEFS[el.type];
+
+    // Molle collegate a una leva: skip completo, la leva le disegna
+    if (el.type === 'spring' && relations.some(r =>
+      r.type === 'spring_on_lever' && (r.aId === el.id || r.bId === el.id)
+    )) continue;
+
+    // Molla nascosta: disco grigio nel gruppo principale
+    if (el.type === 'spring' && el.props?.visible === false) {
+      const drawWrap2 = svgEl('g', { visibility: 'hidden' });
+      try { def.draw(drawWrap2, el); } catch(e) {}
+      const elW2 = el._wPx ?? def.w;
+      const elH2 = el._hPx ?? def.h;
+      const pan2 = (typeof getCanvasPan === 'function') ? getCanvasPan() : { x:0, y:0 };
+      const px2 = el.x + pan2.x, py2 = el.y + pan2.y;
+      const gDot = svgEl('g', {
+        class: 'diagram-element' + (el.id === selectedId ? ' selected' : ''),
+        transform: `translate(${px2}, ${py2})`,
+        'data-id': el.id,
+      });
+      const hw2 = elW2/2, hh2 = elH2/2;
+      gDot.appendChild(svgEl('rect', { x:-6, y:-6, width:elW2+12, height:elH2+12,
+        fill:'rgba(0,0,0,0)', rx:4 }));
+      gDot.appendChild(svgEl('circle', { cx:hw2, cy:hh2, r:10,
+        fill:'rgba(180,180,200,0.25)', stroke:'rgba(200,200,220,0.4)', 'stroke-width':'1', 'pointer-events':'none' }));
+      canvas.appendChild(gDot);
+      continue;
+    }
+
+    const elW = el._wPx ?? def.w;
+    const elH = el._hPx ?? def.h;
+    const isBound = !!el.parentId;
+    const isRelated = relatedIds.has(el.id);
+    let cls = 'diagram-element';
+    if (el.id === selectedId) cls += ' selected';
+    if (isBound) cls += ' bound';
+
+    const pan = (typeof getCanvasPan === 'function') ? getCanvasPan() : { x: 0, y: 0 };
+    const px = el.x + pan.x;
+    const py = el.y + pan.y;
+
+    // Elemento nascosto: disco grigio separato, niente draw normale
+    if (el.props?.visible === false) {
+      const tmpG = svgEl('g', { visibility: 'hidden' });
+      try { def.draw(tmpG, el); } catch(e) {}
+      const elW2 = el._wPx ?? def.w;
+      const elH2 = el._hPx ?? def.h;
+      const dotG = svgEl('g', {
+        class: 'diagram-element' + (el.id === selectedId ? ' selected' : ''),
+        transform: el._rotation
+          ? `translate(${px}, ${py}) rotate(${el._rotation.angle}, ${el._rotation.cx}, ${el._rotation.cy})`
+          : `translate(${px}, ${py})`,
+        'data-id': el.id,
+      });
+      dotG.appendChild(svgEl('rect', { x:-6, y:-6, width:elW2+12, height:elH2+12,
+        fill:'rgba(0,0,0,0)', rx:4 }));
+      dotG.appendChild(svgEl('circle', { cx:elW2/2, cy:elH2/2, r:10,
+        fill:'rgba(180,180,200,0.25)', stroke:'rgba(200,200,220,0.4)', 'stroke-width':'1', 'pointer-events':'none' }));
+      canvas.appendChild(dotG);
+      continue;
+    }
+
+    const g = svgEl('g', {
+      class: cls,
+      transform: el._rotation
+        ? `translate(${px}, ${py}) rotate(${el._rotation.angle}, ${el._rotation.cx}, ${el._rotation.cy})`
+        : `translate(${px}, ${py})`,
+      'data-id': el.id,
+    });
+
+    // Hit area e outline — per arrow usiamo bbox reale
+    if (el.type === 'arrow') {
+      const adx = parseFloat(el.props?.dx) || 0;
+      const ady = parseFloat(el.props?.dy) || 0;
+      const pad = 8;
+      const ax = Math.min(0, adx) - pad, ay = Math.min(0, ady) - pad;
+      const aw = Math.abs(adx) + pad*2, ah = Math.abs(ady) + pad*2;
+      const hit = svgEl('rect', { x: ax, y: ay, width: aw, height: ah, fill: 'rgba(0,0,0,0)', rx: 4, 'pointer-events': 'all' });
+      g.appendChild(hit);
+      const outline = svgEl('rect', { class: 'el-outline', x: ax, y: ay, width: aw, height: ah, rx: 4, fill: 'none', stroke: 'none' });
+      g.appendChild(outline);
+    } else {
+      const hit = svgEl('rect', {
+        x: -6, y: -6,
+        width: elW + 12, height: elH + 12,
+        fill: 'rgba(0,0,0,0)', rx: 6,
+        'pointer-events': 'all'
+      });
+      g.appendChild(hit);
+
+      // Per la fune: aggiungi hit line lungo la diagonale
+      if (el.type === 'rope' && el._lx !== undefined) {
+        const hitLine = svgEl('line', {
+          x1: el._lx - el.x, y1: el._ly - el.y,
+          x2: el._rx - el.x, y2: el._ry - el.y,
+          stroke: 'rgba(0,0,0,0)',
+          'stroke-width': 16,
+          'pointer-events': 'all'
+        });
+        g.appendChild(hitLine);
+      }
+
+      const outline = svgEl('rect', {
+        class: 'el-outline',
+        x: -4, y: -4,
+        width: elW + 8, height: elH + 8,
+        rx: 5, fill: 'none', stroke: 'none'
+      });
+      g.appendChild(outline);
+    }
+
+    if (isBound) {
+      const badge = svgEl('g', {'pointer-events': 'none'});
+      const bc = svgEl('circle', {cx: -2, cy: -2, r: 6, fill: '#c8f060', opacity: 0.9});
+      const bt = svgEl('text', {x: -2, y: 2, 'text-anchor': 'middle', 'font-size': '7',
+        fill: '#1a2a00', 'font-family': 'monospace', 'font-weight': 'bold'});
+      bt.textContent = '⬡';
+      badge.appendChild(bc); badge.appendChild(bt);
+      g.appendChild(badge);
+    }
+
+    try { def.draw(g, el); } catch(e) { console.warn('Draw error el='+el.id+':', e.message); }
+
+    // Delete button — per arrow vicino alla punta, altrimenti in alto a destra
+    let delTransform;
+    if (el.type === 'arrow') {
+      const adx = parseFloat(el.props?.dx) || 0;
+      const ady = parseFloat(el.props?.dy) || 0;
+      delTransform = `translate(${adx + (adx >= 0 ? 4 : -18)}, ${ady - 14})`;
+    } else {
+      delTransform = `translate(${elW - 4}, -14)`;
+    }
+    const delG = svgEl('g', {
+      class: 'delete-btn',
+      transform: delTransform,
+      'data-action': 'delete',
+      'data-id': el.id
+    });
+    const delC = svgEl('circle', {cx: 9, cy: 6, r: 9, fill:'#cc3333', stroke:'#ff5555', 'stroke-width':1});
+    const delT = svgEl('text', {x:9, y:11, 'text-anchor':'middle', 'font-size':'11',
+      fill:'#ff6666', 'font-family':'monospace', 'font-weight':'bold', 'pointer-events':'none'});
+    delT.textContent = '✕';
+    delG.appendChild(delC); delG.appendChild(delT);
+    g.appendChild(delG);
+
+    canvas.appendChild(g);
+  }
+
+  // Aggiungi i gruppi vettori del corpo rettangolare ruotato (devono stare sopra tutto)
+  if (window._pendingVecGroups) {
+    for (const vg of window._pendingVecGroups) canvas.appendChild(vg);
+    window._pendingVecGroups = [];
+  }
+
+  // Aggiorna display_prop DOPO il loop (così _L_calc è già calcolato)
+  // Calcola forza risultante e accelerazione per tutti i corpi con display collegati
+  const BODY_TYPES2 = ['rect_body','point_mass','block','sphere'];
+  const displayTargetIds = new Set(
+    relations
+      .filter(r => r.type === 'display_prop')
+      .map(r => {
+        const dispEl2 = elements.find(e => e.id === r.aId && e.type === 'display')
+                     || elements.find(e => e.id === r.bId && e.type === 'display');
+        return dispEl2 ? (r.aId === dispEl2.id ? r.bId : r.aId) : null;
+      })
+      .filter(Boolean)
+  );
+  for (const el of elements) {
+    if (!BODY_TYPES2.includes(el.type)) continue;
+    if (!displayTargetIds.has(el.id)) continue;
+    if (typeof computeTotalForcesWithWall !== 'function') continue;
+    try {
+      const { Fx, Fy, m, planeN } = computeTotalForcesWithWall(el);
+      // Salva tensione fune se presente
+      if (typeof getPulleyForceOnBodyCorrect === 'function') {
+        const tf = getPulleyForceOnBodyCorrect(el);
+        el.props._T_rope = tf ? parseFloat(Math.abs(tf.T).toFixed(4)) : null;
+        if (el.props._T_rope === null && typeof getPulleyForceOnHangingBodyCorrect === 'function') {
+          const th = getPulleyForceOnHangingBodyCorrect(el);
+          el.props._T_rope = th ? parseFloat(Math.abs(th.T).toFixed(4)) : null;
+        }
+      }
+      el.props._Fx    = parseFloat(Fx.toFixed(4));
+      el.props._Fy    = parseFloat(Fy.toFixed(4));
+      el.props._F_mag = parseFloat(Math.hypot(Fx, Fy).toFixed(4));
+      // Salva planeN per reazione vincolare quando il corpo è nascosto
+      el.props._planeN = planeN || null;
+      el.props._N_plane = (planeN && planeN.NValid) ? parseFloat(planeN.NMag.toFixed(4)) : 0;
+      // Forza d'attrito (statico o dinamico)
+      const fr = planeN?.friction;
+      el.props._f_friction = (fr && planeN.NValid) ? parseFloat(Math.abs(fr.value).toFixed(4)) : 0;
+      el.props._friction_type = (fr && planeN.NValid) ? fr.type : null;
+      el.props._friction_type_n = (!fr || !planeN.NValid) ? 0 : (fr.type === 'static' ? 1 : 2);
+      // Label in italiano
+      el.props._friction_type_label = (!fr || !planeN.NValid) ? '' : (fr.type === 'static' ? 'statico' : 'dinamico');
+      if (m > 0) {
+        el.props._ax    = parseFloat((Fx / m).toFixed(4));
+        el.props._ay    = parseFloat((Fy / m).toFixed(4));
+        el.props._a_mag = parseFloat((Math.hypot(Fx, Fy) / m).toFixed(4));
+      } else {
+        el.props._ax    = 0;
+        el.props._ay    = 0;
+        el.props._a_mag = 0;
+      }
+    } catch(e) {}
+  }
+  for (const rel of relations) {
+    if (rel.type !== 'display_prop') continue;
+    const dispEl = elements.find(e => e.id === rel.aId && e.type === 'display')
+                || elements.find(e => e.id === rel.bId && e.type === 'display');
+    const targetEl = elements.find(e => e.id === (rel.aId === dispEl?.id ? rel.bId : rel.aId));
+    if (!dispEl || !targetEl) continue;
+    const pk = rel.props?.propKey;
+    if (!pk) continue;
+    const fm = pk.match(/^forces\[(\d+)\]\.(\w+)$/);
+    if (fm) {
+      dispEl.props._displayValue = parseFloat(targetEl.props?.forces?.[parseInt(fm[1])]?.[fm[2]]);
+    } else if (pk === '_delta_x') {
+      const Lc = parseFloat(targetEl.props?._L_calc);
+      const L0 = parseFloat(targetEl.props?.L0);
+      dispEl.props._displayValue = (!isNaN(Lc) && !isNaN(L0)) ? Lc - L0 : NaN;
+    } else if (pk === '_F_el') {
+      const Lc = parseFloat(targetEl.props?._L_calc);
+      const L0 = parseFloat(targetEl.props?.L0);
+      const k  = parseFloat(targetEl.props?.k);
+      dispEl.props._displayValue = (!isNaN(Lc) && !isNaN(L0) && !isNaN(k)) ? k * (Lc - L0) : NaN;
+    } else if (pk === '_N_plane') {
+      dispEl.props._displayValue = parseFloat(targetEl.props?._N_plane ?? NaN);
+    } else if (pk === '_T_rope') {
+      dispEl.props._displayValue = parseFloat(targetEl.props?._T_rope ?? NaN);
+    } else if (pk === '_f_friction') {
+      dispEl.props._displayValue = parseFloat(targetEl.props?._f_friction ?? NaN);
+    } else if (pk === '_f_type') {
+      dispEl.props._displayValue = targetEl.props?._friction_type_n ?? 0;
+      dispEl.props._displayText = targetEl.props?._friction_type_label ?? '';
+    } else if (pk === 'peso') {      const m = parseFloat(targetEl.props?.mass);
+      const ref = elements.find(e => DEFS[e.type]?.isRefSystem);
+      const g = parseFloat(ref?.props?.gravity ?? 9.81);
+      dispEl.props._displayValue = (!isNaN(m) && !isNaN(g)) ? -(m * g) : NaN;
+    } else {
+      dispEl.props._displayValue = parseFloat(targetEl.props?.[pk]);
+    }
+    // Ridisegna il display con il valore aggiornato
+    const gDisp = canvas.querySelector(`g[data-id="${dispEl.id}"]`);
+    if (gDisp) {
+      gDisp.innerHTML = '';
+      try { DEFS.display.draw(gDisp, dispEl); } catch(e) {}
+    }
+  }
+
+  // Overlay cliccabili per molle su leva
+  if (window._leverSpringOverlays?.length) {
+    const panO = (typeof getCanvasPan === 'function') ? getCanvasPan() : { x: 0, y: 0 };
+    for (const { springEl, leverEl, attachX, attachY, springLpx, side } of window._leverSpringOverlays) {
+      const sign = side === 'below' ? 1 : -1;
+      const zigH = 10;
+      const overlay = svgEl('g', {
+        class: 'diagram-element' + (selectedId === springEl.id ? ' selected' : ''),
+        'data-id': springEl.id,
+        transform: `translate(${leverEl.x + panO.x + attachX}, ${leverEl.y + panO.y + attachY})`
+      });
+      const hitR = svgEl('rect', {
+        x: -(zigH+4), y: sign > 0 ? -4 : -(springLpx+4),
+        width: (zigH+4)*2, height: springLpx+8,
+        fill: 'rgba(0,0,0,0)', 'pointer-events': 'all'
+      });
+      const outR = svgEl('rect', {
+        class: 'el-outline',
+        x: -(zigH+4), y: sign > 0 ? -4 : -(springLpx+4),
+        width: (zigH+4)*2, height: springLpx+8,
+        rx: 5, fill: 'none', stroke: 'none'
+      });
+      const dG = svgEl('g', { class:'delete-btn',
+        transform:`translate(${zigH+4},${sign>0?-14:-(springLpx+14)})`,
+        'data-action':'delete','data-id':springEl.id });
+      const dC = svgEl('circle',{cx:9,cy:6,r:9,fill:'#cc3333',stroke:'#ff5555','stroke-width':1});
+      const dT = svgEl('text',{x:9,y:11,'text-anchor':'middle','font-size':'11',
+        fill:'#ff6666','font-family':'monospace','font-weight':'bold','pointer-events':'none'});
+      dT.textContent = '✕';
+      dG.appendChild(dC); dG.appendChild(dT);
+      overlay.appendChild(hitR); overlay.appendChild(outR); overlay.appendChild(dG);
+      canvas.appendChild(overlay);
+    }
+    window._leverSpringOverlays = [];
+  }
+
+  // ── Decorazioni visive per molle collegate ─────────────────────────────────
+  const drawnSpringGroups = new Set();
+  for (const rel of relations) {
+    if (rel.type !== 'spring_spring') continue;
+    const spA = elements.find(e => e.id === rel.aId);
+    const spB = elements.find(e => e.id === rel.bId);
+    if (!spA || !spB) continue;
+
+    const layout = rel.props?.layout || 'parallel';
+
+    // Calcola chiave transitiva del gruppo (flood-fill) per evitare doppioni
+    const existIds2 = new Set(elements.map(e => e.id));
+    const visited0 = new Set();
+    const q0 = [rel.aId];
+    while (q0.length) {
+      const sid0 = q0.shift();
+      if (visited0.has(sid0)) continue;
+      if (!existIds2.has(sid0)) continue;
+      visited0.add(sid0);
+      for (const r2 of relations) {
+        if (r2.type !== 'spring_spring' || r2.props?.layout !== layout) continue;
+        if (!existIds2.has(r2.aId) || !existIds2.has(r2.bId)) continue;
+        if (r2.aId === sid0 && !visited0.has(r2.bId)) q0.push(r2.bId);
+        if (r2.bId === sid0 && !visited0.has(r2.aId)) q0.push(r2.aId);
+      }
+    }
+    // Se il gruppo ha solo 1 molla (relazione orfana), salta
+    if (visited0.size <= 1) continue;
+    const groupKey = [...visited0].sort().join('-') + ':' + layout;
+    if (drawnSpringGroups.has(groupKey)) continue;
+    drawnSpringGroups.add(groupKey);
+
+    const anchor = spA.props?.anchor || 'left';
+    const horiz  = anchor === 'left' || anchor === 'right';
+    const col    = '#60c8f0';
+    const panD = (typeof getCanvasPan === 'function') ? getCanvasPan() : { x: 0, y: 0 };
+    const deco = svgEl('g', {
+      'pointer-events': 'none',
+      'data-deco': 'parallel',
+      transform: `translate(${panD.x}, ${panD.y})`
+    });
+
+    if (layout === 'parallel') {
+      // Raccoglie tutte le molle del gruppo parallelo tramite flood-fill
+      const allSprings = [];
+      const visited = new Set();
+      const queue = [spA.id, spB.id];
+      while (queue.length) {
+        const sid = queue.shift();
+        if (visited.has(sid)) continue;
+        if (!existIds2.has(sid)) continue;
+        visited.add(sid);
+        const s = elements.find(e => e.id === sid);
+        if (s) allSprings.push(s);
+        for (const r2 of relations) {
+          if (r2.type !== 'spring_spring' || r2.props?.layout !== 'parallel') continue;
+          if (!existIds2.has(r2.aId) || !existIds2.has(r2.bId)) continue;
+          if (r2.aId === sid && !visited.has(r2.bId)) queue.push(r2.bId);
+          if (r2.bId === sid && !visited.has(r2.aId)) queue.push(r2.aId);
+        }
+      }
+
+      // Se il gruppo ha solo 1 molla (relazioni orfane), non disegnare la decorazione
+      if (allSprings.length <= 1) { continue; }
+
+      // Helper: calcola posizione estremo libero in pixel locale
+      const getZig = sp => {
+        const nC=8,tA=10,tF=8,bz=nC*6;
+        const L0=parseFloat(sp.props?.L0), Lc=parseFloat(sp.props?._L_calc);
+        const ref_g=getRefSystem();
+        const sX_g=(340-50-24)/(2*Math.max(0.1,parseFloat(ref_g?.props?.halfX)||5));
+        const sY_g=(300-50-24)/(2*Math.max(0.1,parseFloat(ref_g?.props?.halfY)||5));
+        const sc = (anchor==='left'||anchor==='right') ? sX_g : sY_g;
+        const vS=Math.max(1,parseFloat(sp.props?.visScale)||5);
+        const dx=(!isNaN(Lc)&&!isNaN(L0))?Lc-L0:0;
+        return { zig: Math.max(nC*3,Math.round(bz+dx*sc*vS)), tA, tF };
+      };
+
+      if (anchor === 'top' || anchor === 'bottom') {
+        // ── Verticale parallelo ──
+        // yFree: per top = sp.y+8+tA+zig+tF, per bottom = sp.y (top del bbox)
+        const getFreeY = sp => {
+          const {zig,tA,tF}=getZig(sp);
+          return anchor==='top' ? sp.y+8+tA+zig+tF : sp.y;
+        };
+        const getWallY = sp => anchor==='top' ? sp.y+8 : sp.y+(sp._hPx||80)-8;
+
+        const yFrees = allSprings.map(getFreeY);
+        const yBar   = anchor==='top' ? Math.max(...yFrees) : Math.min(...yFrees);
+
+        const xLeft  = Math.min(...allSprings.map(s=>s.x)) - 4;
+        const xRight = Math.max(...allSprings.map(s=>s.x+(s._wPx||32))) + 4;
+        // xMid = media dei centri delle molle (non dei bordi bbox con padding)
+        const xMid   = allSprings.reduce((sum,s)=>sum+s.x+16, 0) / allSprings.length;
+
+        // Parete comune (tratteggiata): linea + tacchette su tutta la larghezza
+        const yWall  = anchor==='top'
+          ? Math.min(...allSprings.map(s=>s.y+8))
+          : Math.max(...allSprings.map(s=>s.y+(s._hPx||80)-8));
+        deco.appendChild(svgEl('line',{x1:xLeft,y1:yWall,x2:xRight,y2:yWall,
+          stroke:col,'stroke-width':2}));
+        // Tacchette parete
+        const tickDir = anchor==='top' ? -1 : 1;
+        for(let x=xLeft+6;x<xRight;x+=8)
+          deco.appendChild(svgEl('line',{x1:x,y1:yWall,x2:x-5,y2:yWall+tickDir*6,
+            stroke:col,'stroke-width':1}));
+
+        // Nascondi le pareti singole delle molle (overlay bianco sopra) — non fattibile
+        // → meglio disegnare solo la barra comune e il connettore
+        // Barra comune all'estremo libero
+        deco.appendChild(svgEl('line',{x1:xLeft,y1:yBar,x2:xRight,y2:yBar,
+          stroke:col,'stroke-width':2.5}));
+        // Lineetta di aggancio: verso il basso per anchor=top, verso l'alto per anchor=bottom
+        const attachDir = anchor==='top' ? 1 : -1;
+        deco.appendChild(svgEl('line',{x1:xMid,y1:yBar,x2:xMid,y2:yBar+attachDir*16,
+          stroke:col,'stroke-width':2}));
+
+      } else {
+        // ── Orizzontale parallelo ──
+        const getFreeX = sp => {
+          const {zig,tA,tF}=getZig(sp);
+          return anchor==='left' ? sp.x+8+tA+zig+tF : sp.x;
+        };
+        const xFrees = allSprings.map(getFreeX);
+        const xBar   = anchor==='left' ? Math.max(...xFrees) : Math.min(...xFrees);
+        const yTop   = Math.min(...allSprings.map(s=>s.y)) - 4;
+        const yBot   = Math.max(...allSprings.map(s=>s.y+(s._hPx||32))) + 4;
+        const yMid   = (yTop+yBot)/2;
+
+        // Parete comune
+        const xWall = anchor==='left'
+          ? Math.min(...allSprings.map(s=>s.x+8))
+          : Math.max(...allSprings.map(s=>s.x+(s._wPx||80)-8));
+        deco.appendChild(svgEl('line',{x1:xWall,y1:yTop,x2:xWall,y2:yBot,
+          stroke:col,'stroke-width':2}));
+        const tickDir2 = anchor==='left' ? -1 : 1;
+        for(let y=yTop+6;y<yBot;y+=8)
+          deco.appendChild(svgEl('line',{x1:xWall,y1:y,x2:xWall+tickDir2*6,y2:y-5,
+            stroke:col,'stroke-width':1}));
+
+        // Barra comune
+        deco.appendChild(svgEl('line',{x1:xBar,y1:yTop,x2:xBar,y2:yBot,
+          stroke:col,'stroke-width':2.5}));
+        // Lineetta di aggancio: verso destra per anchor=left, verso sinistra per anchor=right
+        const attachDirH = anchor==='left' ? 1 : -1;
+        deco.appendChild(svgEl('line',{x1:xBar,y1:yMid,x2:xBar+attachDirH*16,y2:yMid,
+          stroke:col,'stroke-width':2}));
+      }
+    } else {
+      // ── Serie: il pallino di giunzione è già disegnato dalla molla successiva
+      // Non disegnare nulla qui — la posizione è gestita da applySeriesChains
+    }
+
+    canvas.appendChild(deco);
+  }
+
+  // ── Disegna vettori forza sulle funi con estremo libero ───────────────────
+  for (const el of elements) {
+    if (el.type !== 'rope' || el._rx === undefined) continue;
+    if (el.props?.visible === false) continue; // nascosta → T sul corpo, non F sulla fune
+    const F   = parseFloat(el.props?.forceF) || 0;
+    const ang = parseFloat(el.props?.forceAngle) || 0;
+    if (Math.abs(F) < 1e-9) continue;
+
+    const freeEnd = getRopeFreeEnd(el);
+    if (!freeEnd) continue;
+
+    // Punto libero della fune
+    const fx = freeEnd === 'right' ? el._rx : el._lx;
+    const fy = freeEnd === 'right' ? el._ry : el._ly;
+
+    // Usa la scala vettori del corpo collegato se disponibile
+    const ropeBodyRel = relations.find(r => r.type === 'rope_body' && (r.aId === el.id || r.bId === el.id));
+    const ropeBody = ropeBodyRel ? elements.find(e => e.id === (ropeBodyRel.aId === el.id ? ropeBodyRel.bId : ropeBodyRel.aId)) : null;
+    const MAX_LEN = window._vectorScale || 70;
+    const MIN_LEN = Math.max(10, MAX_LEN * 0.2);
+    const maxMag = ropeBody?._vecMaxMag || F;
+    const scale = MAX_LEN / maxMag;
+    const vecLen_rv = Math.max(MIN_LEN, F * scale);
+
+    // Direzione SVG
+    const ref_rv = getRefSystem();
+    const flipY_rv = ref_rv?.props?.flipY;
+    const angRad = ang * Math.PI / 180;
+    const angSVG = flipY_rv ? angRad : -angRad;
+    const ux = Math.cos(angSVG), uy = Math.sin(angSVG);
+    const ex = fx + ux * vecLen_rv;
+    const ey = fy + uy * vecLen_rv;
+
+    const col = '#ff6b6b';
+    const vecG = svgEl('g', { 'pointer-events': 'none' });
+    arrow(vecG, fx, fy, ex, ey, col);
+    // Label solo "F"
+    const LOFF = 8;
+    const lx_lbl = ex + ux * LOFF;
+    const ly_lbl = ey + uy * LOFF;
+    text(vecG, lx_lbl, ly_lbl + 4, 'F', col, '13px', 'middle');
+    canvas.appendChild(vecG);
+
+    // ── Se corpo nascosto: mostra -T sul punto di aggancio alla fune (3° principio) ──
+    if (ropeBody && ropeBody.props?.visible === false) {
+      const attachEnd = freeEnd === 'right' ? 'left' : 'right';
+      const ax = attachEnd === 'left' ? el._lx : el._rx;
+      const ay = attachEnd === 'left' ? el._ly : el._ry;
+      // -T: direzione opposta alla forza (verso il corpo)
+      const ex2 = ax - ux * vecLen_rv;
+      const ey2 = ay - uy * vecLen_rv;
+      const vecG2 = svgEl('g', { 'pointer-events': 'none' });
+      arrow(vecG2, ax, ay, ex2, ey2, '#ff9060');
+      text(vecG2, ex2 - ux * 8, ey2 - uy * 8 + 4, '−T', '#ff9060', '13px', 'middle');
+      canvas.appendChild(vecG2);
+    }
+  }
+
+  // ── T sul corpo quando fune nascosta ──────────────────────────────────────
+  for (const ropeEl of elements) {
+    if (ropeEl.type !== 'rope' || ropeEl.props?.visible !== false) continue;
+    if (ropeEl._lx === undefined) continue;
+    const F   = parseFloat(ropeEl.props?.forceF) || 0;
+    const ang = parseFloat(ropeEl.props?.forceAngle) || 0;
+    if (Math.abs(F) < 1e-9) continue;
+
+    const freeEnd2 = getRopeFreeEnd(ropeEl);
+    if (!freeEnd2) continue;
+
+    // Corpo collegato (estremo non libero)
+    const attachAnchor = freeEnd2 === 'right' ? 'left' : 'right';
+    const bodyRel2 = relations.find(r => r.type === 'rope_body' &&
+      (r.aId === ropeEl.id || r.bId === ropeEl.id) &&
+      (r.props?.anchor === attachAnchor || (!r.props?.anchor && attachAnchor === 'left')));
+    const bodyEl2 = bodyRel2 ? elements.find(e => e.id === (bodyRel2.aId === ropeEl.id ? bodyRel2.bId : bodyRel2.aId)) : null;
+    if (!bodyEl2 || bodyEl2.props?.visible === false) continue;
+
+    // Punto di aggancio sul corpo
+    const attachX = attachAnchor === 'left' ? ropeEl._lx : ropeEl._rx;
+    const attachY = attachAnchor === 'left' ? ropeEl._ly : ropeEl._ry;
+
+    // Scala vettori
+    const MAX_LEN2 = window._vectorScale || 70;
+    const MIN_LEN2 = Math.max(10, MAX_LEN2 * 0.2);
+    const maxMag2 = bodyEl2._vecMaxMag || F;
+    const vecLen2 = Math.max(MIN_LEN2, F * (MAX_LEN2 / maxMag2));
+
+    // Direzione SVG della forza
+    const ref_rv2 = getRefSystem();
+    const flipY_rv2 = ref_rv2?.props?.flipY;
+    const angRad2 = ang * Math.PI / 180;
+    const angSVG2 = flipY_rv2 ? angRad2 : -angRad2;
+    const ux2 = Math.cos(angSVG2), uy2 = Math.sin(angSVG2);
+    const ex3 = attachX + ux2 * vecLen2;
+    const ey3 = attachY + uy2 * vecLen2;
+
+    const col2 = '#c8f060';
+    const vecG3 = svgEl('g', { 'pointer-events': 'none' });
+    arrow(vecG3, attachX, attachY, ex3, ey3, col2);
+    text(vecG3, ex3 + ux2 * 8, ey3 + uy2 * 8 + 4, 'T', col2, '13px', 'middle');
+    canvas.appendChild(vecG3);
+  }
+
+  // ── Mostra tensione T sulla fune (sistema con entrambe estremità collegate) ─
+  if (typeof getRopeSystemTension === 'function') {
+    for (const el of elements) {
+      if (el.type !== 'rope' || el._lx === undefined) continue;
+      if (el.props?.visible === false) continue;
+      // label rimossa — la tensione appare nel riepilogo
+    }
+  }
+
+  updateStatus();
+  if (typeof updateChartOverlays === 'function') updateChartOverlays();
+  } finally { _rendering = false; }
+}
+
+// ═══ MODULE: ui-helpers.js ═══
+// ─── Helpers UI ──────────────────────────────────────────────────────────────
+function makeReadonlyField(label, valueStr, unit) {
+  const row = document.createElement('div');
+  row.className = 'prop-row';
+  const lbl = document.createElement('div');
+  lbl.className = 'prop-label';
+  lbl.textContent = label;
+  const wrap = document.createElement('div');
+  wrap.className = 'prop-input-wrap readonly';
+  const val = document.createElement('span');
+  val.className = 'prop-input';
+  val.style.cssText = "font-family:'IBM Plex Mono',monospace;font-size:13px";
+  val.textContent = valueStr;
+  const u = document.createElement('span');
+  u.className = 'prop-unit';
+  u.textContent = unit;
+  wrap.appendChild(val); wrap.appendChild(u);
+  row.appendChild(lbl); row.appendChild(wrap);
+  return row;
+}
+
+function addSep(container) {
+  const sep = document.createElement('div');
+  sep.style.cssText = 'height:1px;background:var(--border);margin:8px 0';
+  container.appendChild(sep);
+}
+
+function addSectionLabel(container, label) {
+  const el = document.createElement('div');
+  el.className = 'prop-label';
+  el.style.marginBottom = '6px';
+  el.textContent = label;
+  container.appendChild(el);
+}
+
+function makeFlipToggle(el, key, axisLabel) {
+  const row = document.createElement('div');
+  row.className = 'prop-row';
+  row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:8px';
+  const lbl = document.createElement('div');
+  lbl.className = 'prop-label';
+  lbl.style.marginBottom = '0';
+  lbl.textContent = axisLabel;
+  const toggle = document.createElement('div');
+  toggle.style.cssText = 'display:flex;gap:4px';
+
+  function makeBtn(label, isFlipped) {
+    const btn = document.createElement('button');
+    btn.textContent = label;
+    const active = (el.props[key] === true) === isFlipped;
+    btn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:9px;
+      padding:3px 7px;border-radius:3px;cursor:pointer;
+      border:1px solid ${active ? 'var(--accent)' : 'var(--border)'};
+      background:${active ? 'rgba(200,240,96,0.15)' : 'transparent'};
+      color:${active ? 'var(--accent)' : 'var(--muted)'};transition:all 0.1s`;
+    btn.addEventListener('click', () => {
+      el.props[key] = isFlipped;
+      render();
+      refreshTotals(el);
+      // rebuild flip toggles
+      const fields = document.getElementById('props-fields');
+      if (fields && _lastPropsPanelId === el.id) {
+        _lastPropsPanelId = null;
+        updatePropsPanel();
+      }
+    });
+    return btn;
+  }
+
+  toggle.appendChild(makeBtn('→ / ↑', false));
+  toggle.appendChild(makeBtn('← / ↓', true));
+  row.appendChild(lbl); row.appendChild(toggle);
+  return row;
+}
+
+
+// ─── Render misto testo + LaTeX ───────────────────────────────────────────────
+function renderMixedLatex(text, color, fontSize) {
+  if (typeof katex === 'undefined') return escapeHtml(text);
+
+  // Gestisce $$...$$ (display) e $...$ (inline)
+  const parts = [];
+  let remaining = text;
+  const re = /(\$\$[\s\S]+?\$\$|\$[^\$]+?\$)/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = re.exec(text)) !== null) {
+    // Testo prima della formula
+    if (match.index > lastIndex) {
+      parts.push({ type: 'text', content: text.slice(lastIndex, match.index) });
+    }
+    const raw = match[0];
+    const isDisplay = raw.startsWith('$$');
+    const formula = isDisplay ? raw.slice(2, -2) : raw.slice(1, -1);
+    parts.push({ type: 'latex', formula, display: isDisplay });
+    lastIndex = match.index + raw.length;
+  }
+  if (lastIndex < text.length) {
+    parts.push({ type: 'text', content: text.slice(lastIndex) });
+  }
+
+  return parts.map(p => {
+    if (p.type === 'text') {
+      return `<span style="font-family:'IBM Plex Mono',monospace">${escapeHtml(p.content)}</span>`;
+    }
+    try {
+      return katex.renderToString(p.formula, {
+        displayMode: p.display,
+        throwOnError: false,
+        output: 'html',
+        trust: false,
+      });
+    } catch(e) {
+      return escapeHtml(p.formula);
+    }
+  }).join('');
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ═══ MODULE: ui-props.js ═══
+// ─── Pannello proprietà toggle ────────────────────────────────────────────────
+function openPropsPanel() {
+  document.getElementById('props-panel').classList.remove('collapsed');
+}
+function closePropsPanel() {
+  document.getElementById('props-panel').classList.add('collapsed');
+}
+let _lastPropsPanelId = null; // traccia quale elemento è aperto
+
+function updatePropsPanel(forceRebuild = false) {
+  const empty   = document.getElementById('props-empty');
+  const content = document.getElementById('props-content');
+  const header  = document.getElementById('props-header');
+  const fields  = document.getElementById('props-fields');
+
+  const el = elements.find(e => e.id === selectedId);
+
+  if (!el || !el.props) {
+    empty.style.display = 'flex';
+    content.style.display = 'none';
+    _lastPropsPanelId = null;
+    return;
+  }
+
+  empty.style.display = 'none';
+  content.style.display = 'block';
+  header.textContent = DEFS[el.type]?.label || el.type;
+
+  // Ricostruisce il DOM solo se l'elemento cambia
+  if (_lastPropsPanelId !== el.id || forceRebuild) {
+    _lastPropsPanelId = el.id;
+    fields.innerHTML = '';
+
+    if (el.type === 'velocity') {
+      fields.appendChild(makePropField(el, 'value', 'Velocità', 'm/s', 'es. 3.5'));
+    }
+
+    if (el.type === 'display') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'padding:14px 16px';
+      addSectionLabel(wrap, 'Display');
+
+      // Titolo
+      const tRow = document.createElement('div');
+      tRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const tL = document.createElement('div');
+      tL.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:60px;'; tL.textContent = 'Titolo';
+      const tI = document.createElement('input');
+      tI.type = 'text'; tI.value = el.props?.title || ''; tI.placeholder = 'es. Forza';
+      tI.style.cssText = `flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+        color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+      tI.addEventListener('input', () => { el.props.title = tI.value; render(); });
+      tRow.appendChild(tL); tRow.appendChild(tI); wrap.appendChild(tRow);
+
+      // Colore
+      const cRow = document.createElement('div');
+      cRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const cL = document.createElement('div');
+      cL.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:60px;'; cL.textContent = 'Colore';
+      const cI = document.createElement('input');
+      cI.type = 'color'; cI.value = el.props?.color || '#60c0f0';
+      cI.style.cssText = 'width:40px;height:24px;border:none;background:none;cursor:pointer;padding:0;';
+      cI.addEventListener('input', () => { el.props.color = cI.value; render(); });
+      cRow.appendChild(cL); cRow.appendChild(cI); wrap.appendChild(cRow);
+
+      // Decimali
+      wrap.appendChild(makePropField(el, 'decimals', 'Decimali', '', '2', true, () => render()));
+
+      // Proprietà collegata
+      const rel = relations.find(r => r.type === 'display_prop' && (r.aId === el.id || r.bId === el.id));
+      if (rel) {
+        const tgt = elements.find(e => e.id === (rel.aId === el.id ? rel.bId : rel.aId));
+        const info = document.createElement('div');
+        info.style.cssText = 'font-size:10px;color:#60c0f0;margin-top:10px;padding:6px 8px;background:rgba(96,192,240,0.06);border-radius:4px;';
+        info.textContent = `→ ${DEFS[tgt?.type]?.label || '?'}.${rel.props?.propLabel || rel.props?.propKey || '?'}${rel.props?.unit ? ' ['+rel.props.unit+']' : ''}`;
+        wrap.appendChild(info);
+      } else {
+        const h = document.createElement('div'); h.className = 'prop-hint';
+        h.textContent = 'Collega a un elemento con Ctrl+click per visualizzarne una proprietà.';
+        wrap.appendChild(h);
+      }
+
+      fields.appendChild(wrap);
+      return;
+    }
+
+    if (el.type === 'link') {
+      const wrap = document.createElement('div'); wrap.style.cssText='padding:14px 16px';
+      addSectionLabel(wrap, 'Link');
+
+      // URL
+      const urlRow = document.createElement('div'); urlRow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const urlL = document.createElement('div'); urlL.style.cssText='font-size:10px;color:#a0a0b0;min-width:60px;'; urlL.textContent='URL';
+      const urlI = document.createElement('input'); urlI.type='text'; urlI.value=el.props?.url||''; urlI.placeholder='https://...';
+      urlI.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+      urlI.addEventListener('change',()=>{ el.props.url=urlI.value.trim(); render(); });
+      urlRow.appendChild(urlL); urlRow.appendChild(urlI); wrap.appendChild(urlRow);
+
+      // Label custom
+      const lblRow = document.createElement('div'); lblRow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const lblL = document.createElement('div'); lblL.style.cssText='font-size:10px;color:#a0a0b0;min-width:60px;'; lblL.textContent='Testo';
+      const lblI = document.createElement('input'); lblI.type='text'; lblI.value=el.props?.label||''; lblI.placeholder='(mostra URL se vuoto)';
+      lblI.style.cssText=urlI.style.cssText;
+      lblI.addEventListener('change',()=>{ el.props.label=lblI.value; render(); });
+      lblRow.appendChild(lblL); lblRow.appendChild(lblI); wrap.appendChild(lblRow);
+
+      addSep(wrap);
+      // Colore e font size
+      const cRow = document.createElement('div'); cRow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const cL = document.createElement('div'); cL.style.cssText='font-size:10px;color:#a0a0b0;min-width:60px;'; cL.textContent='Colore';
+      const cI = document.createElement('input'); cI.type='color'; cI.value=el.props?.color||'#60c0f0';
+      cI.style.cssText='width:40px;height:24px;border:none;background:none;cursor:pointer;padding:0;';
+      cI.addEventListener('input',()=>{ el.props.color=cI.value; render(); });
+      cRow.appendChild(cL); cRow.appendChild(cI); wrap.appendChild(cRow);
+      wrap.appendChild(makePropField(el,'fontSize','Font size','px','13',false,()=>render()));
+
+      const hint = document.createElement('div'); hint.style.cssText='font-size:9px;color:var(--muted);margin-top:6px;';
+      hint.textContent='Clicca sul link nel canvas per aprire la pagina.';
+      wrap.appendChild(hint);
+
+      fields.appendChild(wrap);
+      return;
+    }
+
+    if (el.type === 'stats') {
+      const wrap = document.createElement('div'); wrap.style.cssText='padding:14px 16px';
+      addSectionLabel(wrap, 'Statistiche');
+
+      // Titolo
+      const tRow2 = document.createElement('div'); tRow2.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const tL2 = document.createElement('div'); tL2.style.cssText='font-size:10px;color:#a0a0b0;min-width:60px;'; tL2.textContent='Titolo';
+      const tI2 = document.createElement('input'); tI2.type='text'; tI2.value=el.props?.title||''; tI2.placeholder='Titolo esterno';
+      tI2.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+      tI2.addEventListener('change',()=>{el.props.title=tI2.value;render();});
+      tRow2.appendChild(tL2); tRow2.appendChild(tI2); wrap.appendChild(tRow2);
+
+      // Colore
+      const cRow = document.createElement('div'); cRow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const cL = document.createElement('div'); cL.style.cssText='font-size:10px;color:#a0a0b0;min-width:60px;'; cL.textContent='Colore';
+      const cI = document.createElement('input'); cI.type='color'; cI.value=el.props?.color||'#a0e0a0';
+      cI.style.cssText='width:40px;height:24px;border:none;background:none;cursor:pointer;padding:0;';
+      cI.addEventListener('input',()=>{el.props.color=cI.value;render();});
+      cRow.appendChild(cL); cRow.appendChild(cI); wrap.appendChild(cRow);
+
+      // Decimali e font
+      wrap.appendChild(makePropField(el,'decimals','Decimali','','3',false,()=>render()));
+      wrap.appendChild(makePropField(el,'fontSize','Font size','px','11',false,()=>render()));
+
+      addSep(wrap);
+
+      // Colonna (se collegata)
+      const statsRel = relations.find(r=>r.type==='stats_prop'&&(r.aId===el.id||r.bId===el.id));
+      if (statsRel) {
+        const tbl = elements.find(e=>e.id===(statsRel.aId===el.id?statsRel.bId:statsRel.aId));
+        const headers = tbl?.props?.headers || [];
+        addSectionLabel(wrap, 'Colonna dati');
+        const colRow2 = document.createElement('div'); colRow2.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+        const colL2 = document.createElement('div'); colL2.style.cssText='font-size:10px;color:#a0a0b0;min-width:60px;'; colL2.textContent='Colonna';
+        const colSel2 = document.createElement('select'); colSel2.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+        headers.forEach((h,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=h||`Col ${i+1}`; if(i===parseInt(statsRel.props?.colIdx??0)) o.selected=true; colSel2.appendChild(o); });
+        colSel2.addEventListener('change',()=>{ statsRel.props.colIdx=parseInt(colSel2.value); render(); });
+        colRow2.appendChild(colL2); colRow2.appendChild(colSel2); wrap.appendChild(colRow2);
+      }
+
+      addSep(wrap);
+      addSectionLabel(wrap, 'Opzioni');
+
+      // Mediana
+      const medRow = document.createElement('div'); medRow.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:10px;';
+      const medCk = document.createElement('input'); medCk.type='checkbox'; medCk.checked=el.props?.showMedian===true;
+      medCk.style.cssText='accent-color:#a0e0a0;cursor:pointer;width:14px;height:14px;flex-shrink:0;';
+      medCk.addEventListener('change',()=>{el.props.showMedian=medCk.checked;render();});
+      const medL = document.createElement('label'); medL.style.cssText='font-size:11px;color:#c0c0d0;cursor:pointer;display:flex;align-items:center;gap:8px;';
+      medL.textContent='Mostra mediana'; medL.prepend(medCk); medRow.appendChild(medL); wrap.appendChild(medRow);
+
+      // IC 95%
+      const ciRow = document.createElement('div'); ciRow.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:10px;';
+      const ciCk = document.createElement('input'); ciCk.type='checkbox'; ciCk.checked=el.props?.showCI===true;
+      ciCk.style.cssText='accent-color:#a0e0a0;cursor:pointer;width:14px;height:14px;flex-shrink:0;';
+      ciCk.addEventListener('change',()=>{el.props.showCI=ciCk.checked;render();});
+      const ciL = document.createElement('label'); ciL.style.cssText='font-size:11px;color:#c0c0d0;cursor:pointer;display:flex;align-items:center;gap:8px;';
+      ciL.textContent='Intervallo di confidenza 95%'; ciL.prepend(ciCk); ciRow.appendChild(ciL); wrap.appendChild(ciRow);
+
+      if (!statsRel) {
+        const hint = document.createElement('div'); hint.style.cssText='font-size:10px;color:var(--muted);margin-top:8px;padding:6px 8px;background:rgba(160,224,160,0.06);border-radius:4px;';
+        hint.textContent='Collega una tabella (Ctrl+click) per calcolare le statistiche.';
+        wrap.appendChild(hint);
+      }
+
+      fields.appendChild(wrap);
+      return;
+    }
+
+    if (el.type === 'arrow') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'padding:14px 16px';
+      addSectionLabel(wrap, 'Freccia');
+
+      // Colore
+      const cRow = document.createElement('div'); cRow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const cL = document.createElement('div'); cL.style.cssText='font-size:10px;color:#a0a0b0;min-width:60px;'; cL.textContent='Colore';
+      const cI = document.createElement('input'); cI.type='color'; cI.value=el.props?.color||'#f06060';
+      cI.style.cssText='width:40px;height:24px;border:none;background:none;cursor:pointer;padding:0;';
+      cI.addEventListener('input',()=>{el.props.color=cI.value;render();});
+      cRow.appendChild(cL); cRow.appendChild(cI); wrap.appendChild(cRow);
+
+      // Spessore e punta
+      wrap.appendChild(makePropField(el,'strokeWidth','Spessore','px','2',false,()=>render()));
+      wrap.appendChild(makePropField(el,'headSize','Punta','','10',false,()=>render()));
+
+      // Etichetta LaTeX
+      addSep(wrap);
+      addSectionLabel(wrap, 'Etichetta');
+      const lRow = document.createElement('div'); lRow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:6px;';
+      const lL = document.createElement('div'); lL.style.cssText='font-size:10px;color:#a0a0b0;min-width:60px;'; lL.textContent='Testo';
+      const lI = document.createElement('input'); lI.type='text'; lI.value=el.props?.label||''; lI.placeholder='es. $\\vec{F}$';
+      lI.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+      lI.addEventListener('change',()=>{el.props.label=lI.value;render();});
+      lRow.appendChild(lL); lRow.appendChild(lI); wrap.appendChild(lRow);
+
+      // Colore etichetta
+      const lcRow = document.createElement('div'); lcRow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:6px;';
+      const lcL = document.createElement('div'); lcL.style.cssText=lL.style.cssText; lcL.textContent='Colore';
+      const lcI = document.createElement('input'); lcI.type='color'; lcI.value=el.props?.labelColor||el.props?.color||'#f06060';
+      lcI.style.cssText='width:40px;height:24px;border:none;background:none;cursor:pointer;padding:0;';
+      lcI.addEventListener('input',()=>{el.props.labelColor=lcI.value;render();});
+      lcRow.appendChild(lcL); lcRow.appendChild(lcI); wrap.appendChild(lcRow);
+
+      // Dimensione
+      wrap.appendChild(makePropField(el,'labelSize','Dimensione','px','13',false,()=>render()));
+
+      // Bold e Italic
+      const styleRow = document.createElement('div'); styleRow.style.cssText='display:flex;gap:12px;margin-bottom:8px;';
+      const bCk = document.createElement('input'); bCk.type='checkbox'; bCk.checked=el.props?.labelBold||false;
+      bCk.style.cssText='accent-color:#f06060;cursor:pointer;width:14px;height:14px;';
+      bCk.addEventListener('change',()=>{el.props.labelBold=bCk.checked;render();});
+      const bL = document.createElement('label'); bL.style.cssText='font-size:11px;color:#c0c0d0;cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:bold;';
+      bL.textContent='Bold'; bL.prepend(bCk); styleRow.appendChild(bL);
+
+      const iCk = document.createElement('input'); iCk.type='checkbox'; iCk.checked=el.props?.labelItalic||false;
+      iCk.style.cssText='accent-color:#f06060;cursor:pointer;width:14px;height:14px;';
+      iCk.addEventListener('change',()=>{el.props.labelItalic=iCk.checked;render();});
+      const iL = document.createElement('label'); iL.style.cssText='font-size:11px;color:#c0c0d0;cursor:pointer;display:flex;align-items:center;gap:6px;font-style:italic;';
+      iL.textContent='Italic'; iL.prepend(iCk); styleRow.appendChild(iL);
+      wrap.appendChild(styleRow);
+
+      const hint = document.createElement('div'); hint.style.cssText='font-size:9px;color:var(--muted);margin-bottom:8px;';
+      hint.textContent='LaTeX: $\\vec{F}$, $\\alpha$, $\\Delta x$ ecc.'; wrap.appendChild(hint);
+
+      // Info direzione
+      const dxVal = parseFloat(el.props?.dx||0).toFixed(0);
+      const dyVal = parseFloat(el.props?.dy||0).toFixed(0);
+      const len = Math.hypot(el.props?.dx||0, el.props?.dy||0).toFixed(1);
+      const info = document.createElement('div'); info.style.cssText='font-size:10px;color:var(--muted);';
+      info.textContent = `dx=${dxVal}px  dy=${dyVal}px  |v|=${len}px — trascina la punta per ridimensionare`;
+      wrap.appendChild(info);
+
+      fields.appendChild(wrap);
+      return;
+    }
+
+    if (el.type === 'image') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'padding:14px 16px';
+      addSectionLabel(wrap, 'Immagine');
+
+      // Upload
+      const uploadBtn = document.createElement('button');
+      uploadBtn.textContent = el.props?.src ? '↺ Cambia immagine' : '↑ Carica immagine';
+      uploadBtn.style.cssText = `width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.2);
+        border-radius:4px;color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;
+        padding:7px;cursor:pointer;margin-bottom:10px;`;
+      uploadBtn.addEventListener('click', () => {
+        const inp = document.createElement('input');
+        inp.type = 'file'; inp.accept = 'image/*';
+        inp.addEventListener('change', () => {
+          const file = inp.files[0]; if (!file) return;
+          const reader = new FileReader();
+          reader.onload = e => {
+            el.props.src = e.target.result;
+            render(); updatePropsPanel();
+          };
+          reader.readAsDataURL(file);
+        });
+        inp.click();
+      });
+      wrap.appendChild(uploadBtn);
+
+      // Rimuovi immagine
+      if (el.props?.src) {
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = '✕ Rimuovi immagine';
+        removeBtn.style.cssText = `width:100%;background:rgba(204,51,51,0.08);border:1px solid rgba(204,51,51,0.3);
+          border-radius:4px;color:#cc5555;font-family:'IBM Plex Mono',monospace;font-size:11px;
+          padding:5px;cursor:pointer;margin-bottom:10px;`;
+        removeBtn.addEventListener('click', () => { el.props.src = ''; render(); updatePropsPanel(); });
+        wrap.appendChild(removeBtn);
+      }
+
+      addSep(wrap);
+      const tRow = document.createElement('div'); tRow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const tL = document.createElement('div'); tL.style.cssText='font-size:10px;color:#a0a0b0;min-width:60px;'; tL.textContent='Titolo';
+      const tI = document.createElement('input'); tI.type='text'; tI.value=el.props?.title||''; tI.placeholder='Titolo opzionale';
+      tI.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+      tI.addEventListener('change',()=>{el.props.title=tI.value;render();});
+      tRow.appendChild(tL); tRow.appendChild(tI); wrap.appendChild(tRow);
+
+      // Dimensioni
+      wrap.appendChild(makePropField(el,'width','Larghezza','px','200',true,()=>render()));
+      wrap.appendChild(makePropField(el,'height','Altezza','px','150',true,()=>render()));
+
+      // Object fit
+      const fitRow = document.createElement('div'); fitRow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const fitL = document.createElement('div'); fitL.style.cssText=tL.style.cssText; fitL.textContent='Adatta';
+      const fitSel = document.createElement('select');
+      fitSel.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+      [['contain','Contieni'],['cover','Copri'],['fill','Riempi'],['none','Originale']].forEach(([v,l])=>{
+        const o=document.createElement('option'); o.value=v; o.textContent=l;
+        if(v===(el.props?.fit||'contain')) o.selected=true; fitSel.appendChild(o);
+      });
+      fitSel.addEventListener('change',()=>{el.props.fit=fitSel.value;render();});
+      fitRow.appendChild(fitL); fitRow.appendChild(fitSel); wrap.appendChild(fitRow);
+
+      fields.appendChild(wrap);
+      return;
+    }
+
+    if (el.type === 'chart') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'padding:14px 16px';
+      addSectionLabel(wrap, 'Grafico');
+
+      // Titolo
+      const tRow = document.createElement('div'); tRow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const tL = document.createElement('div'); tL.style.cssText='font-size:10px;color:#a0a0b0;min-width:60px;'; tL.textContent='Titolo';
+      const tI = document.createElement('input'); tI.type='text'; tI.value=el.props?.title||''; tI.placeholder='es. Forza vs massa';
+      tI.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+      tI.addEventListener('input',()=>{el.props.title=tI.value;render();});
+      tRow.appendChild(tL); tRow.appendChild(tI); wrap.appendChild(tRow);
+
+      // Colore
+      const cRow = document.createElement('div'); cRow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const cL = document.createElement('div'); cL.style.cssText=tL.style.cssText; cL.textContent='Colore';
+      const cI = document.createElement('input'); cI.type='color'; cI.value=el.props?.color||'#f0c060';
+      cI.style.cssText='width:40px;height:24px;border:none;background:none;cursor:pointer;padding:0;';
+      cI.addEventListener('input',()=>{el.props.color=cI.value;render();});
+      cRow.appendChild(cL); cRow.appendChild(cI); wrap.appendChild(cRow);
+
+      // Tipo grafico
+      const typeRow = document.createElement('div'); typeRow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const typeL = document.createElement('div'); typeL.style.cssText=tL.style.cssText; typeL.textContent='Tipo';
+      const typeSel = document.createElement('select');
+      typeSel.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+      [['line','Linea'],['bar','Barre'],['scatter','Scatter']].forEach(([v,l])=>{
+        const o=document.createElement('option'); o.value=v; o.textContent=l;
+        if(v===el.props?.chartType) o.selected=true; typeSel.appendChild(o);
+      });
+      typeSel.addEventListener('change',()=>{el.props.chartType=typeSel.value;render();});
+      typeRow.appendChild(typeL); typeRow.appendChild(typeSel); wrap.appendChild(typeRow);
+
+      addSep(wrap);
+      // Smooth (solo per line)
+      const smRow = document.createElement('div'); smRow.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:10px;';
+      const smCk = document.createElement('input'); smCk.type='checkbox'; smCk.checked=el.props?.smooth!==false;
+      smCk.style.cssText='accent-color:#f0c060;cursor:pointer;width:14px;height:14px;flex-shrink:0;';
+      smCk.addEventListener('change',()=>{el.props.smooth=smCk.checked;render();});
+      const smL = document.createElement('label'); smL.style.cssText='font-size:11px;color:#c0c0d0;cursor:pointer;';
+      smL.textContent='Linea curva'; smL.style.display='flex'; smL.style.alignItems='center'; smL.style.gap='8px'; smL.prepend(smCk); smRow.appendChild(smL); wrap.appendChild(smRow);
+
+      // Griglia
+      const grRow = document.createElement('div'); grRow.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:10px;';
+      const grCk = document.createElement('input'); grCk.type='checkbox'; grCk.checked=el.props?.showGrid===true;
+      grCk.style.cssText='accent-color:#f0c060;cursor:pointer;width:14px;height:14px;flex-shrink:0;';
+      grCk.addEventListener('change',()=>{el.props.showGrid=grCk.checked;render();});
+      const grL = document.createElement('label'); grL.style.cssText='font-size:11px;color:#c0c0d0;cursor:pointer;';
+      grL.textContent='Griglia verticale'; grL.style.display='flex'; grL.style.alignItems='center'; grL.style.gap='8px'; grL.prepend(grCk); grRow.appendChild(grL); wrap.appendChild(grRow);
+
+      // Regressione lineare
+      const regRow = document.createElement('div'); regRow.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:10px;';
+      const regCk = document.createElement('input'); regCk.type='checkbox'; regCk.checked=el.props?.showRegression===true;
+      regCk.style.cssText='accent-color:#f0c060;cursor:pointer;width:14px;height:14px;flex-shrink:0;';
+      regCk.addEventListener('change',()=>{el.props.showRegression=regCk.checked;render();});
+      const regL = document.createElement('label'); regL.style.cssText='font-size:11px;color:#c0c0d0;cursor:pointer;display:flex;align-items:center;gap:8px;';
+      regL.textContent='Retta di regressione'; regL.prepend(regCk); regRow.appendChild(regL); wrap.appendChild(regRow);
+      wrap.appendChild(makePropField(el,'width','Larghezza','px','280',true,()=>render()));
+      wrap.appendChild(makePropField(el,'height','Altezza','px','200',true,()=>render()));
+
+      // Label assi
+      addSep(wrap);
+      addSectionLabel(wrap, 'Etichette assi');
+      // Label assi — aggiornate solo al blur per non ricostruire il pannello mentre si digita
+      const makeAxisLabelRow = (labelText, propKey, placeholder) => {
+        const row = document.createElement('div'); row.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:6px;';
+        const lbl = document.createElement('div'); lbl.style.cssText=tL.style.cssText; lbl.textContent=labelText;
+        const inp = document.createElement('input'); inp.type='text'; inp.value=el.props?.[propKey]||''; inp.placeholder=placeholder;
+        inp.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+        inp.addEventListener('change',()=>{ el.props[propKey]=inp.value; render(); });
+        row.appendChild(lbl); row.appendChild(inp); return row;
+      };
+      wrap.appendChild(makeAxisLabelRow('Titolo X','xLabel','es. massa (kg)'));
+      wrap.appendChild(makeAxisLabelRow('Titolo Y','yLabel','es. forza (N)'));
+
+      // Info colonne (se collegato)
+      const chartRel = relations.find(r=>r.type==='chart_prop'&&(r.aId===el.id||r.bId===el.id));
+      if (chartRel) {
+        const tbl = elements.find(e=>e.id===(chartRel.aId===el.id?chartRel.bId:chartRel.aId));
+        const headers = tbl?.props?.headers || [];
+        addSep(wrap);
+        // Asse X con errore
+        const xRow2 = document.createElement('div'); xRow2.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:4px;';
+        const xL2 = document.createElement('div'); xL2.style.cssText=tL.style.cssText; xL2.textContent='Asse X';
+        const xSel2 = document.createElement('select'); xSel2.style.cssText=typeSel.style.cssText;
+        headers.forEach((h,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=h||`Col ${i+1}`; if(i===parseInt(chartRel.props?.xCol??0)) o.selected=true; xSel2.appendChild(o); });
+        xSel2.addEventListener('change',()=>{ chartRel.props.xCol=parseInt(xSel2.value); render(); });
+        xRow2.appendChild(xL2); xRow2.appendChild(xSel2); wrap.appendChild(xRow2);
+
+        // Errore X
+        const xErrRow2 = document.createElement('div');
+        xErrRow2.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;padding-left:16px;';
+        const xErrL2 = document.createElement('div'); xErrL2.style.cssText='font-size:10px;color:#a0a0b0;min-width:44px;flex-shrink:0;'; xErrL2.textContent='errore X:';
+        const xErrSel2 = document.createElement('select'); xErrSel2.style.cssText=typeSel.style.cssText;
+        const xNone2 = document.createElement('option'); xNone2.value=-1; xNone2.textContent='— nessuna —'; xErrSel2.appendChild(xNone2);
+        headers.forEach((h,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=h||`Col ${i+1}`; if(i===parseInt(chartRel.props?.xError??-1)) o.selected=true; xErrSel2.appendChild(o); });
+        xErrSel2.addEventListener('change',()=>{ chartRel.props.xError=parseInt(xErrSel2.value); render(); });
+        xErrRow2.appendChild(xErrL2); xErrRow2.appendChild(xErrSel2); wrap.appendChild(xErrRow2);
+
+        // Assi Y multipli con colonna errore opzionale
+        const yLbl2 = document.createElement('div'); yLbl2.style.cssText='font-size:10px;color:#a0a0b0;margin-bottom:6px;'; yLbl2.textContent='Assi Y:';
+        wrap.appendChild(yLbl2);
+        const yErrors = chartRel.props?.yErrors || {};
+        headers.forEach((h,i)=>{
+          if (i === parseInt(chartRel.props?.xCol ?? 0)) return;
+          const yCols = chartRel.props?.yCols || [chartRel.props?.yCol ?? 1];
+
+          const row = document.createElement('div'); row.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:4px;';
+          const ck = document.createElement('input'); ck.type='checkbox'; ck.checked=yCols.includes(i);
+          ck.style.cssText='accent-color:#f0c060;cursor:pointer;width:14px;height:14px;flex-shrink:0;';
+          const lbl3 = document.createElement('label'); lbl3.style.cssText='font-size:11px;color:#e8e8ec;cursor:pointer;font-family:IBM Plex Mono,monospace;display:flex;align-items:center;gap:8px;';
+          lbl3.textContent = h || `Col ${i+1}`; lbl3.prepend(ck); row.appendChild(lbl3); wrap.appendChild(row);
+
+          const errRow = document.createElement('div');
+          errRow.style.cssText = `display:${ck.checked?'flex':'none'};align-items:center;gap:6px;margin-bottom:6px;padding-left:22px;`;
+          const errL = document.createElement('div'); errL.style.cssText='font-size:10px;color:#a0a0b0;min-width:44px;flex-shrink:0;'; errL.textContent='errore:';
+          const errSel = document.createElement('select');
+          errSel.style.cssText='flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;color:#e8e8ec;font-family:IBM Plex Mono,monospace;font-size:10px;padding:2px 4px;';
+          const noneOpt = document.createElement('option'); noneOpt.value=-1; noneOpt.textContent='— nessuna —'; errSel.appendChild(noneOpt);
+          headers.forEach((hh,ii)=>{
+            if (ii===parseInt(chartRel.props?.xCol??0)||ii===i) return;
+            const o=document.createElement('option'); o.value=ii; o.textContent=hh||`Col ${ii+1}`;
+            if (parseInt((chartRel.props?.yErrors||{})[i]??-1)===ii) o.selected=true;
+            errSel.appendChild(o);
+          });
+          errSel.addEventListener('change',()=>{
+            if (!chartRel.props.yErrors) chartRel.props.yErrors={};
+            chartRel.props.yErrors[i]=parseInt(errSel.value); render();
+          });
+          errRow.appendChild(errL); errRow.appendChild(errSel); wrap.appendChild(errRow);
+
+          ck.addEventListener('change',()=>{
+            if (!chartRel.props.yCols) chartRel.props.yCols=Array.isArray(chartRel.props.yCol)?chartRel.props.yCol:[chartRel.props?.yCol??1];
+            if (ck.checked) { if (!chartRel.props.yCols.includes(i)) chartRel.props.yCols.push(i); }
+            else { const idx=chartRel.props.yCols.indexOf(i); if(idx>=0) chartRel.props.yCols.splice(idx,1); }
+            errRow.style.display = ck.checked ? 'flex' : 'none';
+            render();
+          });
+        });
+      } else {
+        const hint = document.createElement('div');
+        hint.style.cssText='font-size:10px;color:var(--muted);margin-top:8px;padding:6px 8px;background:rgba(240,192,96,0.06);border-radius:4px;';
+        hint.textContent='Collega una tabella (Ctrl+click) per visualizzare i dati.';
+        wrap.appendChild(hint);
+      }
+
+      fields.appendChild(wrap);
+      return;
+    }
+
+    if (el.type === 'data_table') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'padding:14px 16px';
+      addSectionLabel(wrap, 'Tabella');
+
+      // Titolo
+      const tRow = document.createElement('div');
+      tRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const tL = document.createElement('div'); tL.style.cssText='font-size:10px;color:#a0a0b0;min-width:60px;'; tL.textContent='Titolo';
+      const tI = document.createElement('input'); tI.type='text'; tI.value=el.props?.title||''; tI.placeholder='es. Dati misure';
+      tI.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+      tI.addEventListener('input',()=>{el.props.title=tI.value;render();});
+      tRow.appendChild(tL); tRow.appendChild(tI); wrap.appendChild(tRow);
+
+      // Colore
+      const cRow = document.createElement('div');
+      cRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:10px;';
+      const cL = document.createElement('div'); cL.style.cssText=tL.style.cssText; cL.textContent='Colore';
+      const cI = document.createElement('input'); cI.type='color'; cI.value=el.props?.color||'#60c0f0';
+      cI.style.cssText='width:40px;height:24px;border:none;background:none;cursor:pointer;padding:0;';
+      cI.addEventListener('input',()=>{el.props.color=cI.value;render();});
+      cRow.appendChild(cL); cRow.appendChild(cI); wrap.appendChild(cRow);
+
+      // Larghezza colonne
+      wrap.appendChild(makePropField(el,'colWidth','Larg. col.','px','es. 90',true,()=>render()));
+      wrap.appendChild(makePropField(el,'pageSize','Righe/pagina','','5',true,()=>{ el.props.currentPage=0; render(); }));
+
+      addSep(wrap);
+      addSectionLabel(wrap, 'Importa dati');
+      const importBtn = document.createElement('button');
+      importBtn.textContent = '↑ Carica CSV o Excel (.xlsx)';
+      importBtn.style.cssText = `width:100%;background:rgba(96,192,240,0.08);
+        border:1px solid rgba(96,192,240,0.3);border-radius:4px;color:#60c0f0;
+        font-family:'IBM Plex Mono',monospace;font-size:11px;padding:8px;
+        cursor:pointer;margin-bottom:6px;`;
+      importBtn.addEventListener('click', () => {
+        importDataToTable(el.id, () => { updatePropsPanel(); });
+      });
+      wrap.appendChild(importBtn);
+      const importHint = document.createElement('div');
+      importHint.style.cssText = 'font-size:9px;color:var(--muted);margin-bottom:10px;line-height:1.5;';
+      importHint.textContent = 'Prima riga = intestazioni colonne. CSV: separatore auto ( ,  ;  tab). XLSX: primo foglio.';
+      wrap.appendChild(importHint);
+
+      addSep(wrap);
+      addSectionLabel(wrap, 'Stile righe');
+
+      // Sfondo righe
+      const rbRow = document.createElement('div'); rbRow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const rbL = document.createElement('div'); rbL.style.cssText='font-size:10px;color:#a0a0b0;min-width:60px;'; rbL.textContent='Sfondo';
+      const rbWrap = document.createElement('div'); rbWrap.style.cssText='display:flex;align-items:center;gap:6px;flex:1;';
+      const rbI = document.createElement('input'); rbI.type='color'; rbI.value=el.props?.rowBg||'#1a1a2e';
+      rbI.style.cssText='width:36px;height:24px;border:none;background:none;cursor:pointer;padding:0;';
+      rbI.addEventListener('input',()=>{el.props.rowBg=rbI.value;render();});
+      const rbClear = document.createElement('button'); rbClear.textContent='↺ Default';
+      rbClear.style.cssText='background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);font-size:10px;padding:2px 6px;cursor:pointer;font-family:IBM Plex Mono,monospace;';
+      rbClear.addEventListener('click',()=>{el.props.rowBg='';render();});
+      rbWrap.appendChild(rbI); rbWrap.appendChild(rbClear);
+      rbRow.appendChild(rbL); rbRow.appendChild(rbWrap); wrap.appendChild(rbRow);
+
+      // Colore griglia
+      const gcRow = document.createElement('div'); gcRow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const gcL = document.createElement('div'); gcL.style.cssText=rbL.style.cssText; gcL.textContent='Griglia';
+      const gcWrap = document.createElement('div'); gcWrap.style.cssText=rbWrap.style.cssText;
+      const gcI = document.createElement('input'); gcI.type='color'; gcI.value=el.props?.gridColor||'#aaaacc';
+      gcI.style.cssText=rbI.style.cssText;
+      gcI.addEventListener('input',()=>{el.props.gridColor=gcI.value;render();});
+      const gcClear = document.createElement('button'); gcClear.textContent='↺ Default';
+      gcClear.style.cssText=rbClear.style.cssText;
+      gcClear.addEventListener('click',()=>{el.props.gridColor='';render();});
+      gcWrap.appendChild(gcI); gcWrap.appendChild(gcClear);
+      gcRow.appendChild(gcL); gcRow.appendChild(gcWrap); wrap.appendChild(gcRow);
+      const dcRow = document.createElement('div'); dcRow.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const dcL = document.createElement('div'); dcL.style.cssText=rbL.style.cssText; dcL.textContent='Testo celle';
+      const dcWrap = document.createElement('div'); dcWrap.style.cssText=rbWrap.style.cssText;
+      const dcI = document.createElement('input'); dcI.type='color'; dcI.value=el.props?.dataColor||'#e8e8ec';
+      dcI.style.cssText=rbI.style.cssText;
+      dcI.addEventListener('input',()=>{el.props.dataColor=dcI.value;render();});
+      const dcClear = document.createElement('button'); dcClear.textContent='↺ Default';
+      dcClear.style.cssText=rbClear.style.cssText;
+      dcClear.addEventListener('click',()=>{el.props.dataColor='';render();});
+      dcWrap.appendChild(dcI); dcWrap.appendChild(dcClear);
+      dcRow.appendChild(dcL); dcRow.appendChild(dcWrap); wrap.appendChild(dcRow);
+
+      addSep(wrap);
+      addSectionLabel(wrap, 'Intestazioni');
+
+      // Headers
+      const headDiv = document.createElement('div');
+      headDiv.style.cssText = 'display:flex;flex-direction:column;gap:4px;margin-bottom:8px;';
+
+      function rebuildHeaders() {
+        headDiv.innerHTML = '';
+        (el.props.headers||[]).forEach((h,i) => {
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex;align-items:center;gap:4px;';
+          const inp = document.createElement('input');
+          inp.type='text'; inp.value=h; inp.placeholder=`Colonna ${i+1}`;
+          inp.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:3px 6px;`;
+          inp.addEventListener('input',()=>{el.props.headers[i]=inp.value;render();});
+          const del = document.createElement('button');
+          del.textContent='✕'; del.style.cssText='background:none;border:none;color:#cc3333;cursor:pointer;font-size:12px;padding:2px 4px;';
+          del.addEventListener('click',()=>{
+            el.props.headers.splice(i,1);
+            el.props.rows.forEach(r=>r.splice(i,1));
+            render(); rebuildHeaders(); rebuildRows();
+          });
+          row.appendChild(inp); row.appendChild(del);
+          headDiv.appendChild(row);
+        });
+      }
+      rebuildHeaders();
+      wrap.appendChild(headDiv);
+
+      const addColBtn = document.createElement('button');
+      addColBtn.textContent = '+ Colonna';
+      addColBtn.style.cssText = `width:100%;background:rgba(96,192,240,0.08);border:1px solid rgba(96,192,240,0.3);border-radius:4px;color:#60c0f0;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px;cursor:pointer;margin-bottom:10px;`;
+      addColBtn.addEventListener('click',()=>{
+        el.props.headers.push(`Col ${el.props.headers.length+1}`);
+        el.props.rows.forEach(r=>r.push(''));
+        render(); rebuildHeaders(); rebuildRows();
+      });
+      wrap.appendChild(addColBtn);
+
+      addSep(wrap);
+      addSectionLabel(wrap, 'Righe');
+
+      // Rows
+      const rowsDiv = document.createElement('div');
+      rowsDiv.style.cssText = 'display:flex;flex-direction:column;gap:6px;margin-bottom:8px;max-height:200px;overflow-y:auto;';
+
+      function rebuildRows() {
+        rowsDiv.innerHTML = '';
+        (el.props.rows||[]).forEach((row,ri) => {
+          const rowWrap = document.createElement('div');
+          rowWrap.style.cssText = 'border:1px solid var(--border);border-radius:4px;padding:4px;';
+          const rowTop = document.createElement('div');
+          rowTop.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;';
+          const rowLbl = document.createElement('span');
+          rowLbl.style.cssText = 'font-size:9px;color:var(--muted);';
+          rowLbl.textContent = `Riga ${ri+1}`;
+          const rowDel = document.createElement('button');
+          rowDel.textContent='✕'; rowDel.style.cssText='background:none;border:none;color:#cc3333;cursor:pointer;font-size:11px;padding:0 2px;';
+          rowDel.addEventListener('click',()=>{el.props.rows.splice(ri,1);render();rebuildRows();});
+          rowTop.appendChild(rowLbl); rowTop.appendChild(rowDel);
+          rowWrap.appendChild(rowTop);
+
+          const cellsDiv = document.createElement('div');
+          cellsDiv.style.cssText = 'display:flex;flex-direction:column;gap:3px;';
+          (el.props.headers||[]).forEach((h,ci) => {
+            const cellRow = document.createElement('div');
+            cellRow.style.cssText = 'display:flex;align-items:center;gap:4px;';
+            const cellL = document.createElement('span');
+            cellL.style.cssText = 'font-size:9px;color:var(--muted);min-width:50px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+            cellL.textContent = h;
+            const cellI = document.createElement('input');
+            cellI.type='text'; cellI.value=row[ci]??'';
+            cellI.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:2px 5px;`;
+            cellI.addEventListener('input',()=>{row[ci]=cellI.value;render();});
+            cellRow.appendChild(cellL); cellRow.appendChild(cellI);
+            cellsDiv.appendChild(cellRow);
+          });
+          rowWrap.appendChild(cellsDiv);
+          rowsDiv.appendChild(rowWrap);
+        });
+      }
+      rebuildRows();
+      wrap.appendChild(rowsDiv);
+
+      const addRowBtn = document.createElement('button');
+      addRowBtn.textContent = '+ Riga';
+      addRowBtn.style.cssText = addColBtn.style.cssText;
+      addRowBtn.addEventListener('click',()=>{
+        el.props.rows.push(new Array(el.props.headers.length).fill(''));
+        render(); rebuildRows();
+      });
+      wrap.appendChild(addRowBtn);
+
+      // Riga attiva
+      addSep(wrap);
+      addSectionLabel(wrap, 'Riga attiva');
+      const rowSelRow = document.createElement('div');
+      rowSelRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:10px;';
+      const rowSel = document.createElement('select');
+      rowSel.style.cssText = `flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+        color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+
+      function rebuildRowSel() {
+        rowSel.innerHTML = '';
+        const noneOpt = document.createElement('option');
+        noneOpt.value = -1; noneOpt.textContent = '— Nessuna —';
+        rowSel.appendChild(noneOpt);
+        (el.props.rows || []).forEach((row, i) => {
+          const opt = document.createElement('option');
+          opt.value = i;
+          // Mostra i valori della riga come label
+          const preview = row.filter(v => v !== '').join(' | ') || `Riga ${i+1}`;
+          opt.textContent = `Riga ${i+1}: ${preview}`;
+          if (i === parseInt(el.props.selectedRow ?? -1)) opt.selected = true;
+          rowSel.appendChild(opt);
+        });
+        if (parseInt(el.props.selectedRow ?? -1) < 0) rowSel.value = -1;
+      }
+      rebuildRowSel();
+
+      rowSel.addEventListener('change', () => {
+        const idx = parseInt(rowSel.value);
+        el.props.selectedRow = idx;
+        // Propaga valori ai target
+        const tRels = relations.filter(r => r.type === 'table_prop' && (r.aId === el.id || r.bId === el.id));
+        for (const rel of tRels) {
+          const tgt = elements.find(e => e.id === (rel.aId === el.id ? rel.bId : rel.aId));
+          if (!tgt || idx < 0) continue;
+          const ci = parseInt(rel.props?.colIdx ?? 0);
+          const pk = rel.props?.propKey;
+          const v = el.props.rows?.[idx]?.[ci];
+          if (pk && v !== undefined) { const n = parseFloat(v); tgt.props[pk] = isNaN(n) ? v : n; }
+        }
+        render();
+      });
+      rowSelRow.appendChild(rowSel);
+      wrap.appendChild(rowSelRow);
+
+      // Info vincoli
+      const tableRels = relations.filter(r=>r.type==='table_prop'&&(r.aId===el.id||r.bId===el.id));
+      if (tableRels.length > 0) {
+        addSep(wrap);
+        addSectionLabel(wrap, 'Vincoli attivi');
+        tableRels.forEach(rel => {
+          const tgt = elements.find(e=>e.id===(rel.aId===el.id?rel.bId:rel.aId));
+          const colName = el.props.headers?.[rel.props?.colIdx] || `Col ${rel.props?.colIdx+1}`;
+          const info = document.createElement('div');
+          info.style.cssText='font-size:10px;color:#60c0f0;padding:4px 8px;background:rgba(96,192,240,0.06);border-radius:4px;margin-bottom:4px;';
+          info.textContent=`"${colName}" → ${DEFS[tgt?.type]?.label||'?'}.${rel.props?.propKey||'?'}`;
+          wrap.appendChild(info);
+        });
+      }
+
+      fields.appendChild(wrap);
+      return;
+    }
+
+    if (el.type === 'option_list') {
+      const wrap2 = document.createElement('div');
+      wrap2.style.cssText = 'padding:14px 16px';
+      addSectionLabel(wrap2, 'Lista opzioni');
+
+      // Titolo
+      const tRow2 = document.createElement('div');
+      tRow2.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const tL2 = document.createElement('div');
+      tL2.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:60px;'; tL2.textContent = 'Titolo';
+      const tI2 = document.createElement('input');
+      tI2.type='text'; tI2.value=el.props?.title||''; tI2.placeholder='es. Pianeta';
+      tI2.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+        color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+      tI2.addEventListener('input',()=>{el.props.title=tI2.value;render();});
+      tRow2.appendChild(tL2); tRow2.appendChild(tI2); wrap2.appendChild(tRow2);
+
+      // Colore
+      const cRow2 = document.createElement('div');
+      cRow2.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:10px;';
+      const cL2 = document.createElement('div');
+      cL2.style.cssText = tL2.style.cssText; cL2.textContent = 'Colore';
+      const cI2 = document.createElement('input');
+      cI2.type='color'; cI2.value=el.props?.color||'#ffffff';
+      cI2.style.cssText='width:40px;height:24px;border:none;background:none;cursor:pointer;padding:0;';
+      cI2.addEventListener('input',()=>{el.props.color=cI2.value;render();});
+      cRow2.appendChild(cL2); cRow2.appendChild(cI2); wrap2.appendChild(cRow2);
+
+      // Mostra valore numerico
+      const svRow = document.createElement('div');
+      svRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:10px;';
+      const svCk = document.createElement('input');
+      svCk.type = 'checkbox'; svCk.checked = el.props?.showValue || false;
+      svCk.style.cssText = 'accent-color:#c060f0;cursor:pointer;';
+      svCk.addEventListener('change', () => { el.props.showValue = svCk.checked; render(); });
+      const svLbl = document.createElement('label');
+      svLbl.style.cssText = 'font-size:10px;color:#a0a0b0;cursor:pointer;';
+      svLbl.textContent = 'Mostra valore numerico';
+      svLbl.prepend(svCk);
+      svRow.appendChild(svLbl);
+      wrap2.appendChild(svRow);
+      const optList2 = document.createElement('div');
+      optList2.style.cssText = 'display:flex;flex-direction:column;gap:4px;margin-bottom:10px;';
+
+      function rebuildOpts() {
+        optList2.innerHTML = '';
+        (el.props.options || []).forEach((opt, i) => {
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex;align-items:center;gap:4px;';
+          const lblI = document.createElement('input');
+          lblI.type='text'; lblI.value=opt.label||''; lblI.placeholder='Label';
+          lblI.style.cssText=`flex:2;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+            color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:3px 6px;`;
+          lblI.addEventListener('input',()=>{opt.label=lblI.value;render();});
+          const valI = document.createElement('input');
+          valI.type='number'; valI.value=opt.value??''; valI.placeholder='Val';
+          valI.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+            color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:3px 6px;`;
+          valI.addEventListener('input',()=>{opt.value=parseFloat(valI.value);render();});
+          const delBtn = document.createElement('button');
+          delBtn.textContent='✕';
+          delBtn.style.cssText=`background:none;border:none;color:#cc3333;cursor:pointer;font-size:12px;padding:2px 4px;`;
+          delBtn.addEventListener('click',()=>{
+            el.props.options.splice(i,1);
+            if (el.props.selected >= el.props.options.length)
+              el.props.selected = Math.max(0, el.props.options.length-1);
+            render(); rebuildOpts();
+          });
+          row.appendChild(lblI); row.appendChild(valI); row.appendChild(delBtn);
+          optList2.appendChild(row);
+        });
+      }
+      rebuildOpts();
+      wrap2.appendChild(optList2);
+
+      const addBtn2 = document.createElement('button');
+      addBtn2.textContent = '+ Aggiungi opzione';
+      addBtn2.style.cssText = `width:100%;background:rgba(192,96,240,0.08);border:1px solid rgba(192,96,240,0.3);
+        border-radius:4px;color:#c060f0;font-family:'IBM Plex Mono',monospace;font-size:11px;
+        padding:5px;cursor:pointer;margin-bottom:10px;`;
+      addBtn2.addEventListener('click',()=>{
+        if (!el.props.options) el.props.options = [];
+        el.props.options.push({label:`Opzione ${el.props.options.length+1}`, value:0});
+        render(); rebuildOpts();
+      });
+      wrap2.appendChild(addBtn2);
+
+      const propRel2 = relations.find(r=>r.type==='option_prop'&&(r.aId===el.id||r.bId===el.id));
+      if (propRel2) {
+        const tgt2 = elements.find(e=>e.id===(propRel2.aId===el.id?propRel2.bId:propRel2.aId));
+        const info2 = document.createElement('div');
+        info2.style.cssText='font-size:10px;color:#c060f0;padding:6px 8px;background:rgba(192,96,240,0.06);border-radius:4px;';
+        info2.textContent=`→ ${DEFS[tgt2?.type]?.label||'?'}.${propRel2.props?.propKey||'?'}`;
+        wrap2.appendChild(info2);
+      }
+      fields.appendChild(wrap2);
+      return;
+    }
+
+    if (el.type === 'display') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'padding:14px 16px';
+      addSectionLabel(wrap, 'Display');
+
+      // Titolo
+      const tRow = document.createElement('div');
+      tRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const tL = document.createElement('div');
+      tL.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:60px;'; tL.textContent = 'Titolo';
+      const tI = document.createElement('input');
+      tI.type='text'; tI.value=el.props?.title||''; tI.placeholder='es. Lunghezza molla';
+      tI.style.cssText=`flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+        color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+      tI.addEventListener('input',()=>{el.props.title=tI.value;render();});
+      tRow.appendChild(tL); tRow.appendChild(tI); wrap.appendChild(tRow);
+
+      // Label
+      const lRow = document.createElement('div');
+      lRow.style.cssText = tRow.style.cssText;
+      const lL = document.createElement('div');
+      lL.style.cssText = tL.style.cssText; lL.textContent = 'Label';
+      const lI = document.createElement('input');
+      lI.type='text'; lI.value=el.props?.label||'';
+      lI.style.cssText=tI.style.cssText;
+      lI.addEventListener('input',()=>{el.props.label=lI.value;render();});
+      lRow.appendChild(lL); lRow.appendChild(lI); wrap.appendChild(lRow);
+
+      // Unità (testo)
+      const uRow = document.createElement('div');
+      uRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const uL = document.createElement('div');
+      uL.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:60px;'; uL.textContent = 'Unità';
+      const uI = document.createElement('input');
+      uI.type='text'; uI.value=el.props?.unit||''; uI.placeholder='es. N/m';
+      uI.style.cssText=tI.style.cssText;
+      uI.addEventListener('input',()=>{el.props.unit=uI.value;render();});
+      uRow.appendChild(uL); uRow.appendChild(uI); wrap.appendChild(uRow);
+      // Decimali
+      wrap.appendChild(makePropField(el,'decimals','Decimali','','es. 3',true,()=>render()));
+
+      // Colore
+      const cRow = document.createElement('div');
+      cRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const cL = document.createElement('div');
+      cL.style.cssText = tL.style.cssText; cL.textContent = 'Colore';
+      const cI = document.createElement('input');
+      cI.type='color'; cI.value=el.props?.color||'#60c0f0';
+      cI.style.cssText='width:40px;height:24px;border:none;background:none;cursor:pointer;padding:0;';
+      cI.addEventListener('input',()=>{el.props.color=cI.value;render();});
+      cRow.appendChild(cL); cRow.appendChild(cI); wrap.appendChild(cRow);
+
+      // Proprietà collegata
+      const propRel = relations.find(r=>r.type==='display_prop'&&(r.aId===el.id||r.bId===el.id));
+      if (propRel) {
+        const tgt = elements.find(e=>e.id===(propRel.aId===el.id?propRel.bId:propRel.aId));
+        const info = document.createElement('div');
+        info.style.cssText='font-size:10px;color:#60c0f0;margin-top:10px;padding:6px 8px;background:rgba(96,192,240,0.06);border-radius:4px;';
+        info.textContent=`→ ${DEFS[tgt?.type]?.label||'?'}.${propRel.props?.propKey||'?'}`;
+        wrap.appendChild(info);
+      }
+      fields.appendChild(wrap);
+      return;
+    }
+
+    if (el.type === 'slider') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'padding:14px 16px';
+      addSectionLabel(wrap, 'Slider');
+
+      // Label — input testo
+      const lblRow = document.createElement('div');
+      lblRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const lblL = document.createElement('div');
+      lblL.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:60px;'; lblL.textContent = 'Label';
+      const lblI = document.createElement('input');
+      lblI.type = 'text'; lblI.value = el.props?.label || '';
+      lblI.style.cssText = `flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+        color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+      lblI.addEventListener('input', () => { el.props.label = lblI.value; render(); });
+      lblRow.appendChild(lblL); lblRow.appendChild(lblI);
+      wrap.appendChild(lblRow);
+
+      // Titolo esterno
+      const titleRow = document.createElement('div');
+      titleRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const titleL = document.createElement('div');
+      titleL.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:60px;'; titleL.textContent = 'Titolo';
+      const titleI = document.createElement('input');
+      titleI.type = 'text'; titleI.value = el.props?.title || '';
+      titleI.placeholder = 'es. Costante elastica';
+      titleI.style.cssText = lblI.style.cssText;
+      titleI.addEventListener('input', () => { el.props.title = titleI.value; render(); });
+      titleRow.appendChild(titleL); titleRow.appendChild(titleI);
+      wrap.appendChild(titleRow);
+
+      // Colore
+      const colRow = document.createElement('div');
+      colRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;';
+      const colL = document.createElement('div');
+      colL.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:60px;'; colL.textContent = 'Colore';
+      const colI = document.createElement('input');
+      colI.type = 'color'; colI.value = el.props?.color || '#f0a060';
+      colI.style.cssText = 'width:40px;height:24px;border:none;background:none;cursor:pointer;padding:0;';
+      colI.addEventListener('input', () => { el.props.color = colI.value; render(); });
+      colRow.appendChild(colL); colRow.appendChild(colI);
+      wrap.appendChild(colRow);
+
+      wrap.appendChild(makePropField(el, 'min',   'Min',   '', 'es. 0',  false, () => render()));
+      wrap.appendChild(makePropField(el, 'max',   'Max',   '', 'es. 10', false, () => render()));
+      wrap.appendChild(makePropField(el, 'step',  'Step',  '', 'es. 0.1',false, () => render()));
+      wrap.appendChild(makePropField(el, 'value', 'Valore','', '',       false, () => {
+        const propRel = relations.find(r => r.type === 'slider_prop' && (r.aId === el.id || r.bId === el.id));
+        if (propRel) {
+          const tgt = elements.find(e => e.id === (propRel.aId === el.id ? propRel.bId : propRel.aId));
+          if (tgt && propRel.props?.propKey) {
+            const pk = propRel.props.propKey;
+            const fm = pk.match(/^forces\[(\d+)\]\.(\w+)$/);
+            if (fm) { if (tgt.props.forces?.[parseInt(fm[1])]) tgt.props.forces[parseInt(fm[1])][fm[2]] = parseFloat(el.props.value); }
+            else tgt.props[pk] = parseFloat(el.props.value);
+          }
+        }
+        render();
+      }));
+      // Mostra proprietà collegata
+      const propRel = relations.find(r => r.type === 'slider_prop' && (r.aId === el.id || r.bId === el.id));
+      if (propRel) {
+        const tgt = elements.find(e => e.id === (propRel.aId === el.id ? propRel.bId : propRel.aId));
+        const info = document.createElement('div');
+        info.style.cssText = 'font-size:10px;color:#c8f060;margin-top:10px;padding:6px 8px;background:rgba(200,240,96,0.06);border-radius:4px;';
+        info.textContent = `→ ${DEFS[tgt?.type]?.label || '?'}.${propRel.props?.propKey || '?'}`;
+        wrap.appendChild(info);
+      }
+      fields.appendChild(wrap);
+      return;
+    }
+
+    if (el.type === 'lever') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'padding:14px 16px';
+      if (typeof buildLeverPanel === 'function') buildLeverPanel(wrap, el);
+      fields.appendChild(wrap);
+      return;
+    }
+
+    if (el.type === 'floor') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'padding:14px 16px';
+
+      // Toggle visibilità
+      const visRow = document.createElement('div');
+      visRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:12px';
+      const visLbl = document.createElement('div');
+      visLbl.className = 'prop-label'; visLbl.style.marginBottom = '0';
+      visLbl.textContent = 'Mostra pavimento';
+      const isVis = el.props.visible !== false;
+      const visBtn = document.createElement('button');
+      visBtn.textContent = isVis ? '● Visibile' : '○ Nascosto';
+      visBtn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;
+        padding:4px 10px;border-radius:4px;cursor:pointer;
+        border:1px solid ${isVis ? 'var(--accent)' : 'var(--border)'};
+        background:${isVis ? 'rgba(200,240,96,0.15)' : 'transparent'};
+        color:${isVis ? 'var(--accent)' : 'var(--muted)'};transition:all 0.12s`;
+      visBtn.addEventListener('click', () => {
+        el.props.visible = !el.props.visible;
+        render(); updatePropsPanel();
+      });
+      visRow.appendChild(visLbl); visRow.appendChild(visBtn);
+      wrap.appendChild(visRow);
+      addSep(wrap);
+
+      const ref = getRefSystem();
+      const hint = document.createElement('div');
+      hint.className = 'prop-hint';
+      hint.style.marginBottom = '12px';
+      hint.textContent = ref
+        ? `Scala attiva: ±${ref.props?.halfX ?? 5} m — la lunghezza si aggiorna automaticamente.`
+        : 'Aggiungi un sistema di riferimento per la scala.';
+      wrap.appendChild(hint);
+
+      const onFloorRangeChange = () => {
+        applyRelationPositions();
+        render();
+        updateFloorRangeWarning();
+      };
+      wrap.appendChild(makePropField(el, 'xMin', 'Da x', 'm', 'es. 0', false, onFloorRangeChange));
+      wrap.appendChild(makePropField(el, 'xMax', 'A x',  'm', 'es. 10', false, onFloorRangeChange));
+
+      const floorWarning = document.createElement('div');
+      floorWarning.className = 'prop-hint';
+      floorWarning.style.color = '#ffb347';
+      wrap.appendChild(floorWarning);
+
+      function updateFloorRangeWarning() {
+        const floorRel = relations.find(r =>
+          r.type === 'body_on_floor' && (r.aId === el.id || r.bId === el.id)
+        );
+        if (!floorRel) { floorWarning.textContent = ''; return; }
+        const h = parseFloat(floorRel.props?.height) || 0;
+        if (h !== 0) { floorWarning.textContent = ''; return; }
+        const xOffset = parseFloat(floorRel.props?.xOffset) || 0;
+        const xMin = parseFloat(el.props?.xMin) ?? 0;
+        const xMax = parseFloat(el.props?.xMax) ?? 10;
+        if (xOffset < xMin || xOffset > xMax) {
+          floorWarning.textContent = `⚠ Corpo fuori range (x=${xOffset.toFixed(2)} m, range ${xMin}÷${xMax} m)`;
+        } else {
+          floorWarning.textContent = '';
+        }
+      }
+      updateFloorRangeWarning();
+      fields.appendChild(wrap);
+    }
+
+    if (el.type === 'inclined_plane') {
+      buildInclinedPlanePanel(el, fields);
+    }
+
+    if (el.type === 'wall') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'padding:14px 16px';
+      // Toggle visibilità
+      const visRow = document.createElement('div');
+      visRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:12px';
+      const visLbl = document.createElement('div');
+      visLbl.className = 'prop-label'; visLbl.style.marginBottom = '0';
+      visLbl.textContent = 'Mostra parete';
+      const isVis = el.props.visible !== false;
+      const visBtn = document.createElement('button');
+      visBtn.textContent = isVis ? '● Visibile' : '○ Nascosto';
+      visBtn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;
+        padding:4px 10px;border-radius:4px;cursor:pointer;
+        border:1px solid ${isVis ? 'var(--accent)' : 'var(--border)'};
+        background:${isVis ? 'rgba(200,240,96,0.15)' : 'transparent'};
+        color:${isVis ? 'var(--accent)' : 'var(--muted)'};transition:all 0.12s`;
+      visBtn.addEventListener('click', () => {
+        el.props.visible = !el.props.visible;
+        render(); updatePropsPanel();
+      });
+      visRow.appendChild(visLbl); visRow.appendChild(visBtn);
+      wrap.appendChild(visRow);
+      addSep(wrap);
+      const ref = getRefSystem();
+      const hint = document.createElement('div');
+      hint.className = 'prop-hint'; hint.style.marginBottom = '12px';
+      hint.textContent = ref
+        ? `Scala attiva: ±${ref.props?.halfY ?? 5} m`
+        : 'Aggiungi un sistema di riferimento per la scala.';
+      wrap.appendChild(hint);
+
+      const onRangeChange = () => {
+        applyRelationPositions();
+        render();
+        // Aggiorna warning fuori range
+        updateWallRangeWarning();
+      };
+      wrap.appendChild(makePropField(el, 'yMin', 'Da y', 'm', 'es. 0', false, onRangeChange));
+      wrap.appendChild(makePropField(el, 'yMax', 'A y',  'm', 'es. 10', false, onRangeChange));
+
+      // Warning se corpo fuori range
+      const warningDiv = document.createElement('div');
+      warningDiv.id = 'wall-range-warning';
+      warningDiv.className = 'prop-hint';
+      warningDiv.style.color = '#ffb347';
+      wrap.appendChild(warningDiv);
+
+      function updateWallRangeWarning() {
+        const wallRel = relations.find(r =>
+          r.type === 'body_on_wall' && (r.aId === el.id || r.bId === el.id)
+        );
+        if (!wallRel) { warningDiv.textContent = ''; return; }
+        const s = parseFloat(wallRel.props?.s) || 0;
+        const yMin = parseFloat(el.props?.yMin) ?? 0;
+        const yMax = parseFloat(el.props?.yMax) ?? 10;
+        if (s < yMin || s > yMax) {
+          warningDiv.textContent = `⚠ Corpo fuori range (s=${s.toFixed(2)} m, range ${yMin}÷${yMax} m)`;
+        } else {
+          warningDiv.textContent = '';
+        }
+      }
+      updateWallRangeWarning();
+
+      addSep(wrap);
+      addSectionLabel(wrap, 'Orientamento');
+      wrap.appendChild(makeFlipToggle(el, 'flipX', 'Lato corpo'));
+      fields.appendChild(wrap);
+    }
+    if (el.type === 'point_mass' || el.type === 'rect_body') {
+      buildPointMassPanel(el, fields);
+    }
+    if (el.type === 'rope') {
+      buildRopePanel(el, fields);
+    }
+    if (el.type === 'spring') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'padding:14px 16px';
+
+      // ── Caso speciale: molla su leva ──────────────────────────────────────
+      const leverRel = relations.find(r =>
+        r.type === 'spring_on_lever' && (r.aId === el.id || r.bId === el.id)
+      );
+      if (leverRel) {
+        const leverEl = elements.find(e => e.id === (leverRel.aId === el.id ? leverRel.bId : leverRel.aId));
+        addSectionLabel(wrap, 'Proprietà molla');
+
+        // Visibilità
+        const visBar = document.createElement('div');
+        visBar.className = 'vis-toggle-bar';
+        visBar.style.marginBottom = '12px';
+        const isVis2 = el.props.visible !== false;
+        const visBtn2 = document.createElement('button');
+        visBtn2.className = 'vis-toggle-btn' + (isVis2 ? '' : ' active-n');
+        visBtn2.innerHTML = `<span class="vis-label">${isVis2 ? 'visibile' : 'nascosta'}</span>`;
+        visBtn2.addEventListener('click', () => {
+          el.props.visible = el.props.visible === false ? true : false;
+          const v2 = el.props.visible !== false;
+          visBtn2.className = 'vis-toggle-btn' + (v2 ? '' : ' active-n');
+          visBtn2.innerHTML = `<span class="vis-label">${v2 ? 'visibile' : 'nascosta'}</span>`;
+          render();
+        });
+        visBar.appendChild(visBtn2);
+        wrap.appendChild(visBar);
+        wrap.appendChild(makePropField(el, 'k',  'Costante elastica k', 'N/m', 'es. 100', false, () => render()));
+        wrap.appendChild(makePropField(el, 'L0', 'Lunghezza a riposo L₀', 'm',   'es. 1',  false, () => render()));
+
+        addSep(wrap);
+        addSectionLabel(wrap, 'Stato sulla leva');
+        const stateDiv = document.createElement('div');
+        wrap.appendChild(stateDiv);
+
+        function updateLeverSpringState() {
+          stateDiv.innerHTML = '';
+          if (!leverEl) return;
+          const k2  = parseFloat(el.props?.k)  || 0;
+          const L0m = parseFloat(el.props?.L0) || 0;
+
+          // Calcola theta di equilibrio
+          const hasK = k2 > 0;
+          const thetaEq2 = hasK && typeof getLeverEquilibriumAngle === 'function'
+            ? getLeverEquilibriumAngle(leverEl) : null;
+          const theta2 = thetaEq2 !== null ? thetaEq2 : 0;
+
+          // Calcola deformazione
+          const fulcrumFrac2 = typeof getLeverFulcrumFrac === 'function' ? getLeverFulcrumFrac(leverEl) : 0.5;
+          const lengthM2 = parseFloat(leverEl.props?.length) || 10;
+          const d1M2 = fulcrumFrac2 * lengthM2;
+          const posM2 = leverRel.props?.pos != null ? parseFloat(leverRel.props.pos) : d1M2;
+          const arm2 = posM2 - d1M2;
+          const side2 = leverRel.props?.side || 'below';
+          const deltaYm = arm2 * Math.sin(theta2);
+          // positivo = allungamento (stessa convenzione di lever.js)
+          const deltaX2 = side2 === 'below' ? -deltaYm : deltaYm;
+          const Fspring2 = k2 * deltaX2;
+          const L2 = L0m > 0 ? L0m + deltaX2 : null;
+
+          if (thetaEq2 !== null) {
+            stateDiv.appendChild(makeReadonlyField('θ equilibrio', (thetaEq2*180/Math.PI).toFixed(3), '°'));
+          }
+          if (L0m > 0) {
+            stateDiv.appendChild(makeReadonlyField('L₀ (riposo)', L0m.toFixed(4), 'm'));
+            const compStr = Math.abs(deltaX2) < 1e-6 ? 'a riposo' : deltaX2 > 0 ? `estesa` : `compressa`;
+            stateDiv.appendChild(makeReadonlyField('Δx ('+compStr+')', deltaX2.toFixed(4), 'm'));
+            const Ldisp = L2 !== null ? L2.toFixed(4) : '—';
+            const Lfield = makeReadonlyField('L attuale', Ldisp, 'm');
+            if (L2 !== null && L2 <= 0) {
+              Lfield.style.color = '#f06060';
+              const warn = document.createElement('div');
+              warn.style.cssText = 'font-size:9px;color:#f06060;margin:-4px 0 4px 8px;';
+              warn.textContent = '⚠ Lunghezza negativa — aumenta k o riduci il braccio';
+              stateDiv.appendChild(Lfield);
+              stateDiv.appendChild(warn);
+            } else {
+              stateDiv.appendChild(Lfield);
+            }
+          }
+          if (k2 > 0) {
+            stateDiv.appendChild(makeReadonlyField('F elastica', Fspring2.toFixed(4), 'N'));
+          }
+
+          const badge = document.createElement('div');
+          badge.style.cssText = `margin-top:6px;padding:5px 8px;border-radius:4px;font-size:10px;
+            font-family:IBM Plex Mono,monospace;text-align:center;`;
+          if (Math.abs(deltaX2) < 1e-6) {
+            badge.style.cssText += 'background:rgba(96,200,240,0.1);color:#60c0f0;';
+            badge.textContent = '⟹ Molla a riposo';
+          } else if (deltaX2 > 0) {
+            badge.style.cssText += 'background:rgba(96,240,160,0.1);color:#60f0a0;';
+            badge.textContent = `⟹ Estesa ${Math.abs(deltaX2).toFixed(3)}m`;
+          } else {
+            badge.style.cssText += 'background:rgba(240,160,96,0.1);color:#f0a060;';
+            badge.textContent = `⟹ Compressa ${Math.abs(deltaX2).toFixed(3)}m`;
+          }
+          stateDiv.appendChild(badge);
+        }
+        updateLeverSpringState();
+        // Aggiorna quando cambia il canvas
+        const obs2 = new MutationObserver(() => {
+          if (document.contains(stateDiv)) updateLeverSpringState();
+          else obs2.disconnect();
+        });
+        if (typeof canvas !== 'undefined') obs2.observe(canvas, { childList: true, subtree: false });
+
+        fields.appendChild(wrap);
+        return;
+      }
+
+      // ── Barra visibilità ──────────────────────────────────────────────────
+      function makeSpringVisBtn(key, icon, label, activeClass) {
+        const btn = document.createElement('button');
+        btn.className = 'vis-toggle-btn' + (el.props[key] ? ` ${activeClass}` : '');
+        btn.innerHTML = `<span class="vis-icon">${icon}</span><span class="vis-label">${label}</span>`;
+        btn.addEventListener('click', () => {
+          el.props[key] = !el.props[key];
+          btn.classList.toggle(activeClass, el.props[key]);
+          render(); updateSpringRiepilogo();
+        });
+        return btn;
+      }
+      const visBar = document.createElement('div');
+      visBar.className = 'vis-toggle-bar';
+      visBar.style.marginBottom = '12px';
+      // Toggle visibilità molla
+      const visBtn = document.createElement('button');
+      const isVis = el.props.visible !== false;
+      visBtn.className = 'vis-toggle-btn' + (isVis ? '' : ' active-n');
+      visBtn.innerHTML = `<span class="vis-label">${isVis ? 'visibile' : 'nascosta'}</span>`;
+      visBtn.addEventListener('click', () => {
+        el.props.visible = el.props.visible === false ? true : false;
+        const v = el.props.visible !== false;
+        visBtn.className = 'vis-toggle-btn' + (v ? '' : ' active-n');
+        visBtn.innerHTML = `<span class="vis-label">${v ? 'visibile' : 'nascosta'}</span>`;
+        render();
+      });
+      visBar.appendChild(visBtn);
+      wrap.appendChild(visBar);
+
+      // ── Vincolo parete ────────────────────────────────────────────────────
+      addSep(wrap);
+
+      // Se in parallelo: pannello gruppo invece del pannello singolo
+      // riepilogoDiv dichiarato con var per evitare temporal dead zone
+      // quando il pannello parallelo fa return prima della dichiarazione normale
+      var riepilogoDiv = document.createElement('div');
+      var updateSpringRiepilogo = function() {};
+
+      // ── Pannello serie ────────────────────────────────────────────────────
+      if (el._seriesRole) {
+        // Trova la catena ordinata
+        const seriesRels = relations.filter(r => r.type === 'spring_spring' && r.props?.layout === 'series');
+        const adj = {};
+        for (const r of seriesRels) {
+          if (!adj[r.aId]) adj[r.aId] = [];
+          if (!adj[r.bId]) adj[r.bId] = [];
+          adj[r.aId].push(r.bId);
+          adj[r.bId].push(r.aId);
+        }
+        const visited = new Set();
+        const queue = [el.id];
+        const chainEls = [];
+        while (queue.length) {
+          const cur = queue.shift();
+          if (visited.has(cur)) continue;
+          visited.add(cur);
+          const sp = elements.find(e => e.id === cur);
+          if (sp) chainEls.push(sp);
+          (adj[cur]||[]).forEach(id => { if (!visited.has(id)) queue.push(id); });
+        }
+        // Ordina per posizione originale
+        const anchor_s = el.props?.anchor || 'left';
+        const getOrig = (sp, axis) => axis === 'x' ? (sp._origSeriesX ?? sp.x) : (sp._origSeriesY ?? sp.y);
+        if (anchor_s === 'left')   chainEls.sort((a,b) => getOrig(a,'x') - getOrig(b,'x'));
+        if (anchor_s === 'right')  chainEls.sort((a,b) => getOrig(b,'x') - getOrig(a,'x'));
+        if (anchor_s === 'top')    chainEls.sort((a,b) => getOrig(a,'y') - getOrig(b,'y'));
+        if (anchor_s === 'bottom') chainEls.sort((a,b) => getOrig(b,'y') - getOrig(a,'y'));
+
+        addSectionLabel(wrap, `Catena serie (${chainEls.length} molle)`);
+        const hintSer = document.createElement('div');
+        hintSer.className = 'prop-hint'; hintSer.style.marginBottom = '8px';
+        hintSer.textContent = 'k e L₀ individuale per ogni molla. Stessa forza F su tutte.';
+        wrap.appendChild(hintSer);
+
+        chainEls.forEach((sp, i) => {
+          addSep(wrap);
+          addSectionLabel(wrap, `Molla ${i+1}${sp.id === el.id ? ' ← selezionata' : ''}`);
+          wrap.appendChild(makePropField(sp, 'k',  `k${i+1}`, 'N/m', 'es. 100', false, () => { render(); updateSpringRiepilogo(); }));
+          wrap.appendChild(makePropField(sp, 'L0', `L₀${i+1}`, 'm', 'es. 0.5', false, () => { render(); updateSpringRiepilogo(); }));
+        });
+
+        wrap.appendChild(makePropField(el, 'visScale', 'Amplif. visiva Δx', 'x', 'es. 5', false, () => {
+          chainEls.forEach(sp => { sp.props.visScale = el.props.visScale; });
+          render();
+        }));
+
+        // Modalità input per la catena serie
+        addSep(wrap);
+        if (!el.props.springMode) el.props.springMode = 'auto';
+        const modeRowS = document.createElement('div');
+        modeRowS.className = 'prop-toggle-row';
+        const btnAutoS = document.createElement('button');
+        btnAutoS.className = 'prop-toggle-btn' + (el.props.springMode === 'auto' ? ' active' : '');
+        btnAutoS.textContent = 'Auto';
+        const btnForcesS = document.createElement('button');
+        btnForcesS.className = 'prop-toggle-btn' + (el.props.springMode === 'forces' ? ' active' : '');
+        btnForcesS.textContent = 'Forze → Δx';
+        modeRowS.appendChild(btnAutoS); modeRowS.appendChild(btnForcesS);
+        wrap.appendChild(modeRowS);
+
+        const modeContS = document.createElement('div');
+        wrap.appendChild(modeContS);
+
+        function buildSeriesModeSection() {
+          modeContS.innerHTML = '';
+          if (el.props.springMode === 'auto') {
+            const h = document.createElement('div'); h.className = 'prop-hint';
+            h.textContent = 'Collega un corpo all\'ultima molla. F calcolata automaticamente.';
+            modeContS.appendChild(h);
+          } else {
+            addSep(modeContS);
+            addSectionLabel(modeContS, 'Forza applicata all\'estremo libero');
+            if (!Array.isArray(el.props.forces)) el.props.forces = [];
+            const forceList = document.createElement('div');
+            function rebuildForceListS() {
+              forceList.innerHTML = '';
+              (el.props.forces || []).forEach((f, i) => {
+                const row = document.createElement('div');
+                row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:6px';
+                const nameInp = document.createElement('input');
+                nameInp.value = f.name || `F${i+1}`;
+                nameInp.style.cssText = `width:36px;font-family:'IBM Plex Mono',monospace;font-size:10px;background:var(--input-bg);border:1px solid var(--border);border-radius:3px;color:var(--text);padding:3px 4px`;
+                nameInp.addEventListener('change', () => { f.name = nameInp.value; render(); });
+                const valInp = document.createElement('input');
+                valInp.type = 'number'; valInp.value = f.val ?? ''; valInp.placeholder = 'es. 10';
+                valInp.style.cssText = `flex:1;font-family:'IBM Plex Mono',monospace;font-size:10px;background:var(--input-bg);border:1px solid var(--border);border-radius:3px;color:var(--text);padding:3px 6px`;
+                valInp.addEventListener('input', () => { f.val = valInp.value; render(); });
+                const unit = document.createElement('span');
+                unit.style.cssText = 'font-size:10px;color:var(--muted);min-width:16px';
+                unit.textContent = 'N';
+                const delBtn = document.createElement('button');
+                delBtn.textContent = '✕';
+                delBtn.style.cssText = `font-size:10px;padding:2px 5px;border-radius:3px;cursor:pointer;background:none;border:1px solid var(--border);color:var(--muted)`;
+                delBtn.addEventListener('click', () => { el.props.forces.splice(i,1); render(); rebuildForceListS(); });
+                row.appendChild(nameInp); row.appendChild(valInp); row.appendChild(unit); row.appendChild(delBtn);
+                forceList.appendChild(row);
+              });
+              const hint = document.createElement('div'); hint.className = 'prop-hint'; hint.style.marginTop='4px';
+              hint.textContent = '+ = allungamento, − = compressione.';
+              forceList.appendChild(hint);
+            }
+            rebuildForceListS();
+            modeContS.appendChild(forceList);
+            const addBtn = document.createElement('button');
+            addBtn.textContent = '+ aggiungi forza';
+            addBtn.style.cssText = `width:100%;margin-top:6px;padding:5px;border-radius:4px;cursor:pointer;background:none;border:1px dashed var(--border);font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted)`;
+            addBtn.addEventListener('click', () => {
+              if (!Array.isArray(el.props.forces)) el.props.forces = [];
+              el.props.forces.push({ name: `F${el.props.forces.length+1}`, val: '' });
+              render(); rebuildForceListS();
+            });
+            modeContS.appendChild(addBtn);
+          }
+        }
+
+        btnAutoS.addEventListener('click', () => {
+          const savedLc = el.props._L_calc;
+          el.props.springMode = 'auto';
+          chainEls.forEach(sp => { sp.props.springMode = 'auto'; sp.props._L_calc = savedLc; });
+          btnAutoS.classList.add('active'); btnForcesS.classList.remove('active');
+          buildSeriesModeSection();
+        });
+        btnForcesS.addEventListener('click', () => {
+          const currentLc = parseFloat(el.props._L_calc);
+          const currentL0 = parseFloat(el.props.L0);
+          const currentK  = parseFloat(el.props.k);
+          const savedLc = el.props._L_calc;
+          if (!isNaN(currentLc) && !isNaN(currentL0) && !isNaN(currentK) && currentK > 0) {
+            const currentF = (currentLc - currentL0) * currentK;
+            el.props.forces = [{ name: 'F', val: String(Math.round(currentF * 1000) / 1000) }];
+          }
+          el.props.springMode = 'forces';
+          chainEls.forEach(sp => { sp.props.springMode = 'forces'; sp.props._L_calc = savedLc; });
+          btnForcesS.classList.add('active'); btnAutoS.classList.remove('active');
+          buildSeriesModeSection();
+        });
+        buildSeriesModeSection();
+
+        // ── Riepilogo serie ───────────────────────────────────────────────────
+        addSep(wrap);
+        addSectionLabel(wrap, 'Riepilogo serie');
+        const riepilogoSerDiv = document.createElement('div');
+        wrap.appendChild(riepilogoSerDiv);
+
+        function updateSeriesRiepilogo() {
+          riepilogoSerDiv.innerHTML = '';
+          const fmt4 = v => (v >= 0 ? '+' : '') + v.toFixed(4);
+          const fmtN = v => (v >= 0 ? '+' : '') + v.toFixed(2);
+
+          // Calcola F dalla modalità attiva
+          let F = 0;
+          let hasF = false;
+          if (el.props.springMode === 'auto') {
+            // Cerca corpo nella catena (spring_body)
+            for (const spC of chainEls) {
+              const springRelC = relations.find(r => r.type === 'spring_body' && (r.aId === spC.id || r.bId === spC.id));
+              const bodyElC = springRelC ? elements.find(e => e.id === (springRelC.aId === spC.id ? springRelC.bId : springRelC.aId)) : null;
+              if (!bodyElC) continue;
+              const ref_s = getRefSystem();
+              const g_s = parseFloat(ref_s?.props?.gravity) || 0;
+              const m_s = parseFloat(bodyElC.props?.mass) || 0;
+              const anc_s = spC.props?.anchor || 'left';
+              const hor_s = anc_s === 'left' || anc_s === 'right';
+              const pesoFy_s = (g_s > 0 && m_s > 0) ? -m_s * g_s : 0;
+              let Fext_s = 0;
+              (bodyElC.props?.forces || []).forEach(f => { Fext_s += parseFloat(hor_s ? f.fx : f.fy) || 0; });
+              if (anc_s === 'top')         F = -(pesoFy_s + Fext_s);
+              else if (anc_s === 'bottom') F = +(pesoFy_s + Fext_s);
+              else if (anc_s === 'left')   F = Fext_s;
+              else                         F = -Fext_s;
+              hasF = true;
+              riepilogoSerDiv.appendChild(makeReadonlyField('Massa corpo', m_s > 0 ? m_s.toFixed(4) : '—', 'kg'));
+              if (!hor_s) riepilogoSerDiv.appendChild(makeReadonlyField('Peso', m_s > 0 ? fmtN(pesoFy_s) : '—', 'N'));
+              break;
+            }
+
+            // Se non trovato spring_body, cerca spring_on_lever
+            if (!hasF) {
+              for (const spC of chainEls) {
+                const leverRelC = relations.find(r =>
+                  r.type === 'spring_on_lever' && (r.aId === spC.id || r.bId === spC.id)
+                );
+                if (!leverRelC) continue;
+                const leverElC = elements.find(e =>
+                  e.id === (leverRelC.aId === spC.id ? leverRelC.bId : leverRelC.aId)
+                );
+                if (!leverElC) continue;
+                // Calcola angolo di equilibrio e forza molla
+                const thetaEqC = typeof getLeverEquilibriumAngle === 'function'
+                  ? getLeverEquilibriumAngle(leverElC) : null;
+                if (thetaEqC === null) continue;
+                const { contributions: contribC } = getLeverMoments(leverElC, thetaEqC);
+                const springContrib = contribC.find(c => c.type === 'spring' && c.springId === spC.id);
+                if (!springContrib) continue;
+                F = springContrib.Fspring * (springContrib.deltaX >= 0 ? 1 : -1);
+                hasF = Math.abs(F) > 1e-9;
+                riepilogoSerDiv.appendChild(makeReadonlyField('θ equilibrio', (thetaEqC*180/Math.PI).toFixed(2), '°'));
+                riepilogoSerDiv.appendChild(makeReadonlyField('Δx molla', springContrib.deltaX?.toFixed(4), 'm'));
+                break;
+              }
+            }
+            if (!hasF) {
+              for (const spC of chainEls) {
+                const ropeSpringRelC = relations.find(r =>
+                  r.type === 'rope_spring' && (r.aId === spC.id || r.bId === spC.id)
+                );
+                if (!ropeSpringRelC) continue;
+                const ropeElC = elements.find(e =>
+                  e.id === (ropeSpringRelC.aId === spC.id ? ropeSpringRelC.bId : ropeSpringRelC.aId)
+                );
+                if (!ropeElC) continue;
+                // Trova il corpo appeso alla fune
+                const hangRelC = relations.find(r =>
+                  r.type === 'rope_body' &&
+                  (r.aId === ropeElC.id || r.bId === ropeElC.id) &&
+                  r.props?.anchor === 'hanging'
+                );
+                if (!hangRelC) continue;
+                const hangBodyC = elements.find(e =>
+                  e.id === (hangRelC.aId === ropeElC.id ? hangRelC.bId : hangRelC.aId)
+                );
+                if (!hangBodyC) continue;
+                const ref_bps = getRefSystem();
+                const g_bps = Math.abs(parseFloat(ref_bps?.props?.gravity) || 9.81);
+                const m_s2 = parseFloat(hangBodyC.props?.mass) || 0;
+                if (m_s2 <= 0) continue;
+                F = m_s2 * g_bps; // T = m·g in equilibrio
+                hasF = true;
+                riepilogoSerDiv.appendChild(makeReadonlyField('Massa corpo appeso', m_s2.toFixed(4), 'kg'));
+                riepilogoSerDiv.appendChild(makeReadonlyField('Tensione T = m·g', fmtN(-m_s2 * g_bps), 'N'));
+                break;
+              }
+            }
+          } else {
+            // Forze dirette
+            let Fdir = 0;
+            (el.props.forces || []).forEach(f => { Fdir += parseFloat(f.val) || 0; });
+            F = Fdir; hasF = Math.abs(Fdir) > 1e-9;
+          }
+
+          if (!hasF && Math.abs(F) < 1e-9) {
+            const h = document.createElement('div'); h.className = 'prop-hint';
+            h.textContent = el.props.springMode === 'auto'
+              ? 'Collega un corpo per il calcolo automatico.'
+              : 'Inserisci una forza per calcolare.';
+            riepilogoSerDiv.appendChild(h); return;
+          }
+
+          riepilogoSerDiv.appendChild(makeReadonlyField('F su ogni molla', fmt4(F), 'N'));
+          addSep(riepilogoSerDiv);
+
+          // Calcola k_eq serie: 1/k_eq = Σ(1/kᵢ)
+          let invKeq = 0;
+          let allValid = true;
+          chainEls.forEach((sp, i) => {
+            const ks = parseFloat(sp.props?.k);
+            const L0s = parseFloat(sp.props?.L0);
+            if (!isNaN(ks) && ks > 0 && !isNaN(L0s) && L0s > 0) {
+              invKeq += 1/ks;
+              const dxs = F / ks;
+              const Ls = L0s + dxs;
+              riepilogoSerDiv.appendChild(makeReadonlyField(`Δx${i+1} = F/k${i+1}`, fmt4(dxs), 'm'));
+              riepilogoSerDiv.appendChild(makeReadonlyField(`L${i+1} = L₀${i+1} + Δx${i+1}`, fmt4(Ls), 'm'));
+            } else { allValid = false; }
+          });
+
+          if (allValid && invKeq > 0) {
+            addSep(riepilogoSerDiv);
+            const keq = 1 / invKeq;
+            const dxTot = F / keq;
+            const L0tot = chainEls.reduce((s, sp) => s + (parseFloat(sp.props?.L0)||0), 0);
+            riepilogoSerDiv.appendChild(makeReadonlyField('k_eq = 1/Σ(1/kᵢ)', fmt4(keq), 'N/m'));
+            riepilogoSerDiv.appendChild(makeReadonlyField('Δx_tot = F/k_eq', fmt4(dxTot), 'm'));
+            riepilogoSerDiv.appendChild(makeReadonlyField('L_tot = ΣLᵢ', fmt4(L0tot + dxTot), 'm'));
+          }
+        }
+
+        updateSpringRiepilogo = updateSeriesRiepilogo;
+        updateSeriesRiepilogo();
+        fields.appendChild(wrap);
+        return;
+      }
+
+      if (el._inParallel) {
+        const group = parallelGroup(el.id);
+        addSectionLabel(wrap, `Gruppo parallelo (${group.length} molle)`);
+
+        // L0 comune (usa quella della molla selezionata, applicata a tutte)
+        const hintPar = document.createElement('div');
+        hintPar.className = 'prop-hint'; hintPar.style.marginBottom = '8px';
+        hintPar.textContent = 'L₀ e amplif. visiva condivise. k individuale per ogni molla.';
+        wrap.appendChild(hintPar);
+
+        wrap.appendChild(makePropField(el, 'L0', 'L₀ comune (riposo)', 'm', 'es. 0.5', false, () => {
+          // Propaga L0 a tutte le molle del gruppo
+          group.forEach(s => { s.props.L0 = el.props.L0; });
+          render(); updateParallelRiepilogo();
+        }));
+        wrap.appendChild(makePropField(el, 'visScale', 'Amplif. visiva Δx', 'x', 'es. 5', false, () => {
+          group.forEach(s => { s.props.visScale = el.props.visScale; });
+          render();
+        }));
+
+        // k individuali — stesso ordine del draw
+        addSep(wrap);
+        addSectionLabel(wrap, 'Costanti elastiche');
+        const anchor_par = el.props?.anchor || 'left';
+        const horiz_par = anchor_par === 'left' || anchor_par === 'right';
+        const groupSorted = [...group].sort((a, b) => horiz_par ? a.y - b.y : a.x - b.x);
+        groupSorted.forEach((s, i) => {
+          wrap.appendChild(makePropField(s, 'k', `k${i+1}`, 'N/m', 'es. 100', false, () => { render(); updateParallelRiepilogo(); }));
+        });
+
+        // Modalità input
+        addSep(wrap);
+        if (!el.props.springMode) el.props.springMode = 'auto';
+        const modeRowP = document.createElement('div');
+        modeRowP.className = 'prop-toggle-row';
+        const btnAutoP = document.createElement('button');
+        btnAutoP.className = 'prop-toggle-btn' + (el.props.springMode === 'auto' ? ' active' : '');
+        btnAutoP.textContent = 'Auto';
+        const btnDxP = document.createElement('button');
+        btnDxP.className = 'prop-toggle-btn' + (el.props.springMode === 'dx' ? ' active' : '');
+        btnDxP.textContent = 'Δx → F';
+        const btnForcesP = document.createElement('button');
+        btnForcesP.className = 'prop-toggle-btn' + (el.props.springMode === 'forces' ? ' active' : '');
+        btnForcesP.textContent = 'Forze → Δx';
+        modeRowP.appendChild(btnAutoP); modeRowP.appendChild(btnDxP); modeRowP.appendChild(btnForcesP);
+        wrap.appendChild(modeRowP);
+
+        const modeContP = document.createElement('div');
+        wrap.appendChild(modeContP);
+
+        function buildParallelModeSection() {
+          modeContP.innerHTML = '';
+          if (el.props.springMode === 'auto') {
+            const h = document.createElement('div'); h.className = 'prop-hint';
+            h.textContent = 'Collega un corpo al gruppo. Δx calcolato automaticamente.';
+            modeContP.appendChild(h);
+          } else if (el.props.springMode === 'dx') {
+            addSep(modeContP);
+            addSectionLabel(modeContP, 'Allungamento comune');
+            modeContP.appendChild(makePropField(el, 'dx', 'Δx', 'm', 'es. +0.1', false, () => {
+              group.forEach(s => { s.props.dx = el.props.dx; });
+              render(); updateParallelRiepilogo();
+            }));
+          } else {
+            addSep(modeContP);
+            addSectionLabel(modeContP, 'Forza totale sul gruppo');
+            modeContP.appendChild(makePropField(el, '_Ftot', 'F totale', 'N', 'es. 100', false, () => { render(); updateParallelRiepilogo(); }));
+            const h = document.createElement('div'); h.className = 'prop-hint';
+            h.textContent = '+ = allungamento, − = compressione.';
+            modeContP.appendChild(h);
+          }
+        }
+
+        btnAutoP.addEventListener('click', () => {
+          // Preserva _L_calc corrente prima di cambiare mode
+          const savedLc = el.props._L_calc;
+          el.props.springMode = 'auto'; group.forEach(s => { s.props.springMode = 'auto'; s.props._L_calc = savedLc; });
+          btnAutoP.classList.add('active'); btnDxP.classList.remove('active'); btnForcesP.classList.remove('active');
+          buildParallelModeSection(); updateParallelRiepilogo();
+        });
+        btnDxP.addEventListener('click', () => {
+          const currentDx = parseFloat(el.props._L_calc) - parseFloat(el.props.L0);
+          const savedLc = el.props._L_calc;
+          el.props.springMode = 'dx'; group.forEach(s => {
+            s.props.springMode = 'dx';
+            s.props._L_calc = savedLc;
+            if (!isNaN(currentDx)) s.props.dx = currentDx;
+          });
+          btnDxP.classList.add('active'); btnAutoP.classList.remove('active'); btnForcesP.classList.remove('active');
+          buildParallelModeSection(); updateParallelRiepilogo();
+        });
+        btnForcesP.addEventListener('click', () => {
+          const keq = group.reduce((s, sp) => s + (parseFloat(sp.props?.k)||0), 0);
+          const currentDx = parseFloat(el.props._L_calc) - parseFloat(el.props.L0);
+          const currentF = !isNaN(currentDx) && keq > 0 ? currentDx * keq : 0;
+          const savedLc = el.props._L_calc;
+          el.props.springMode = 'forces'; group.forEach(s => { s.props.springMode = 'forces'; s.props._L_calc = savedLc; });
+          el.props.forces = [{ name: 'F', val: isNaN(currentF) ? '' : String(Math.round(currentF * 1000) / 1000) }];
+          btnForcesP.classList.add('active'); btnAutoP.classList.remove('active'); btnDxP.classList.remove('active');
+          buildParallelModeSection(); updateParallelRiepilogo();
+        });
+        buildParallelModeSection();
+
+        // Riepilogo parallelo
+        addSep(wrap);
+        addSectionLabel(wrap, 'Riepilogo parallelo');
+        const riepilogoParDiv = document.createElement('div');
+        wrap.appendChild(riepilogoParDiv);
+
+        function updateParallelRiepilogo() {
+          riepilogoParDiv.innerHTML = '';
+          const fmt4 = v => (v >= 0 ? '+' : '') + v.toFixed(4);
+          const L0p = parseFloat(el.props?.L0);
+          if (isNaN(L0p) || L0p <= 0) {
+            const h = document.createElement('div'); h.className = 'prop-hint';
+            h.textContent = 'Inserisci L₀ comune per calcolare.';
+            riepilogoParDiv.appendChild(h); return;
+          }
+
+          // k equivalente
+          const anchor_rp2 = el.props?.anchor || 'left';
+          const horiz_rp2 = anchor_rp2 === 'left' || anchor_rp2 === 'right';
+          const groupSorted2 = [...group].sort((a, b) => horiz_rp2 ? a.y - b.y : a.x - b.x);
+          const ks = groupSorted2.map(s => parseFloat(s.props?.k) || 0);
+          const keq = ks.reduce((a, b) => a + b, 0);
+          riepilogoParDiv.appendChild(makeReadonlyField('k_eq = Σkᵢ', fmt4(keq), 'N/m'));
+          ks.forEach((k, i) => {
+            if (k > 0) riepilogoParDiv.appendChild(makeReadonlyField(`k${i+1}`, fmt4(k), 'N/m'));
+          });
+
+          // Calcola Δx
+          let dx_par = 0;
+          if (el.props.springMode === 'dx') {
+            dx_par = parseFloat(el.props?.dx) || 0;
+          } else if (el.props.springMode === 'forces') {
+            const Ftot = parseFloat(el.props?._Ftot) || 0;
+            dx_par = keq > 0 ? Ftot / keq : 0;
+          } else {
+            // Auto: dal corpo collegato
+            const springRel = relations.find(r => r.type === 'spring_body' && group.some(s => s.id === r.aId || s.id === r.bId));
+            const bodyEl = springRel ? elements.find(e => e.id === (group.some(s=>s.id===springRel.aId) ? springRel.bId : springRel.aId)) : null;
+            if (bodyEl) {
+              const ref_p2 = getRefSystem();
+              const g_p2 = parseFloat(ref_p2?.props?.gravity) || 0;
+              const m_p2 = parseFloat(bodyEl.props?.mass) || 0;
+              const P_p2 = m_p2 * g_p2;
+              const anchor_p2 = el.props?.anchor || 'left';
+              let Fnet_p2 = 0;
+              if (anchor_p2 === 'top') Fnet_p2 = P_p2;
+              else if (anchor_p2 === 'bottom') Fnet_p2 = -P_p2;
+              else {
+                (bodyEl.props?.forces || []).forEach(f => { Fnet_p2 += parseFloat(f.fx) || 0; });
+              }
+              dx_par = keq > 0 ? Fnet_p2 / keq : 0;
+            }
+          }
+
+          const L_par = L0p + dx_par;
+          const Ftot_par = keq * dx_par;
+
+          addSep(riepilogoParDiv);
+          riepilogoParDiv.appendChild(makeReadonlyField('Δx comune', fmt4(dx_par), 'm'));
+          riepilogoParDiv.appendChild(makeReadonlyField('L = L₀ + Δx', fmt4(L_par), 'm'));
+          riepilogoParDiv.appendChild(makeReadonlyField('F totale = k_eq·Δx', fmt4(Ftot_par), 'N'));
+          ks.forEach((k, i) => {
+            if (k > 0) riepilogoParDiv.appendChild(makeReadonlyField(`F su molla ${i+1}`, fmt4(k * dx_par), 'N'));
+          });
+          // Nota: _L_calc è aggiornato da render(), non qui
+        }
+
+        updateParallelRiepilogo();
+        updateSpringRiepilogo = updateParallelRiepilogo;
+        fields.appendChild(wrap);
+        return; // esce dal pannello normale
+      }
+
+      addSectionLabel(wrap, 'Vincolo parete');
+      const anchors = [
+        { value: 'left', label: '← Sinistra' }, { value: 'right', label: '→ Destra' },
+        { value: 'top',  label: '↑ Alto' },      { value: 'bottom', label: '↓ Basso' },
+      ];
+      const grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;margin-bottom:14px';
+      const anchorBtns = [];
+      anchors.forEach(({ value, label }) => {
+        const btn = document.createElement('button');
+        const isActive = (el.props?.anchor || 'left') === value;
+        btn.textContent = label;
+        const setActive = (active) => {
+          btn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;padding:6px 4px;
+            border-radius:4px;cursor:pointer;text-align:center;
+            border:1px solid ${active ? 'var(--accent)' : 'var(--border)'};
+            background:${active ? 'rgba(200,240,96,0.15)' : 'transparent'};
+            color:${active ? 'var(--accent)' : 'var(--muted)'};transition:all 0.12s`;
+        };
+        setActive(isActive);
+        btn.addEventListener('click', () => {
+          el.props.anchor = value;
+          if (!Array.isArray(el.props.forces)) el.props.forces = [];
+          el.props.forces = el.props.forces.map(f => ({ ...f, fx: '', fy: '' }));
+          // Aggiorna visivamente tutti i bottoni subito
+          anchorBtns.forEach(({ b, v }) => setActive.call(b, false), setActive(false));
+          anchorBtns.forEach(({ b, v, s }) => s(v === value));
+          render(); updatePropsPanel();
+        });
+        anchorBtns.push({ b: btn, v: value, s: setActive });
+        grid.appendChild(btn);
+      });
+      wrap.appendChild(grid);
+
+      // ── Parametri fisici ──────────────────────────────────────────────────
+      addSep(wrap);
+      addSectionLabel(wrap, 'Parametri fisici');
+      wrap.appendChild(makePropField(el, 'k',  'Costante k', 'N/m', 'es. 100', false, () => { render(); updateSpringRiepilogo(); }));
+      wrap.appendChild(makePropField(el, 'L0', 'Lunghezza a riposo L₀', 'm', 'es. 0.5', false, () => { render(); updateSpringRiepilogo(); }));
+      wrap.appendChild(makePropField(el, 'visScale', 'Amplif. visiva Δx', 'x', 'es. 5', false, () => { render(); }));
+      const hintVis = document.createElement('div');
+      hintVis.className = 'prop-hint';
+      hintVis.textContent = 'Fattore di amplificazione visiva dell\'allungamento (non cambia la fisica).';
+      wrap.appendChild(hintVis);
+
+      // ── Toggle modalità ──────────────────────────────────────────────────
+      addSep(wrap);
+      if (!el.props.springMode) el.props.springMode = 'auto';
+      const modeRow = document.createElement('div');
+      modeRow.className = 'prop-toggle-row';
+      const btnAuto   = document.createElement('button');
+      btnAuto.className   = 'prop-toggle-btn' + (el.props.springMode === 'auto'   ? ' active' : '');
+      btnAuto.textContent = 'Auto';
+      const btnForces = document.createElement('button');
+      btnForces.className = 'prop-toggle-btn' + (el.props.springMode === 'forces' ? ' active' : '');
+      btnForces.textContent = 'Forze → Δx';
+      const btnDx = document.createElement('button');
+      btnDx.className = 'prop-toggle-btn' + (el.props.springMode === 'dx' ? ' active' : '');
+      btnDx.textContent = 'Δx → F';
+      modeRow.appendChild(btnAuto); modeRow.appendChild(btnForces); modeRow.appendChild(btnDx);
+      wrap.appendChild(modeRow);
+
+      // Contenitore modalità — viene ricostruito al cambio modo
+      const modeContainer = document.createElement('div');
+      wrap.appendChild(modeContainer);
+
+      // ── Riepilogo ─────────────────────────────────────────────────────────
+      addSep(wrap);
+      addSectionLabel(wrap, 'Riepilogo');
+      riepilogoDiv = document.createElement('div');
+      riepilogoDiv.id = `spring-riepilogo-${el.id}`;
+      wrap.appendChild(riepilogoDiv);
+
+      // ── Helper badge stato ────────────────────────────────────────────────
+      function springBadge(dx) {
+        const stato = Math.abs(dx) < 1e-6 ? 'riposo' : dx > 0 ? 'allungata' : 'compressa';
+        const bcol  = stato === 'riposo' ? '#60f060' : stato === 'allungata' ? '#f0c060' : '#60d0f0';
+        const badge = document.createElement('div');
+        badge.style.cssText = `padding:5px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;
+          font-size:9px;font-weight:600;display:inline-block;margin-top:6px;
+          border:1px solid ${bcol};background:${bcol}22;color:${bcol}`;
+        badge.textContent = stato === 'riposo' ? '⟹ Molla a riposo (F = 0)'
+          : stato === 'allungata' ? `⟹ Allungata di ${Math.abs(dx).toFixed(4)} m`
+          : `⟹ Compressa di ${Math.abs(dx).toFixed(4)} m`;
+        return badge;
+      }
+
+      updateSpringRiepilogo = function() {
+        const k  = parseFloat(el.props?.k);
+        const L0 = parseFloat(el.props?.L0);
+        const fmt4 = v => (v >= 0 ? '+' : '') + v.toFixed(4);
+        riepilogoDiv.innerHTML = '';
+
+        const hasK  = !isNaN(k)  && k  > 1e-9;
+        const hasL0 = !isNaN(L0) && L0 > 1e-9;
+        if (!hasK || !hasL0) {
+          const h = document.createElement('div'); h.className = 'prop-hint';
+          h.textContent = 'Inserisci k e L₀ per calcolare.';
+          riepilogoDiv.appendChild(h); return;
+        }
+
+        // ── Caso rope_spring con corpo appeso (anche in modalità dx) ─────────
+        // Cerca sull'altra fune della stessa carrucola se necessario
+        const ropeSpringRelCheck = relations.find(r =>
+          r.type === 'rope_spring' && (r.aId === el.id || r.bId === el.id)
+        );
+        if (ropeSpringRelCheck) {
+          const ropeElCheck = elements.find(e =>
+            e.id === (ropeSpringRelCheck.aId === el.id ? ropeSpringRelCheck.bId : ropeSpringRelCheck.aId)
+          );
+          if (ropeElCheck) {
+            // Cerca corpo hanging sulla stessa fune
+            let hangRelCheck = relations.find(r =>
+              r.type === 'rope_body' && (r.aId === ropeElCheck.id || r.bId === ropeElCheck.id) &&
+              r.props?.anchor === 'hanging'
+            );
+            // Se non trovato, cerca sull'altra fune della stessa carrucola
+            if (!hangRelCheck) {
+              const pulleyRelCheck = relations.find(r =>
+                r.type === 'rope_on_pulley' && (r.aId === ropeElCheck.id || r.bId === ropeElCheck.id)
+              );
+              if (pulleyRelCheck) {
+                const pulleyIdCheck = pulleyRelCheck.aId === ropeElCheck.id ? pulleyRelCheck.bId : pulleyRelCheck.aId;
+                const otherRopeRelsCheck = relations.filter(r =>
+                  r.type === 'rope_on_pulley' && r.id !== pulleyRelCheck.id &&
+                  (r.aId === pulleyIdCheck || r.bId === pulleyIdCheck)
+                );
+                for (const orrCheck of otherRopeRelsCheck) {
+                  const otherRopeIdCheck = orrCheck.aId === pulleyIdCheck ? orrCheck.bId : orrCheck.aId;
+                  hangRelCheck = relations.find(r =>
+                    r.type === 'rope_body' && (r.aId === otherRopeIdCheck || r.bId === otherRopeIdCheck) &&
+                    r.props?.anchor === 'hanging'
+                  );
+                  if (hangRelCheck) break;
+                }
+              }
+            }
+            if (hangRelCheck) {
+              const hangBodyCheck = elements.find(e =>
+                (e.id === hangRelCheck.aId || e.id === hangRelCheck.bId) && e.type !== 'rope'
+              );
+              if (hangBodyCheck) {
+                const ref_rsc = getRefSystem();
+                const g_rsc = Math.abs(parseFloat(ref_rsc?.props?.gravity) || 9.81);
+                const m_rsc = parseFloat(hangBodyCheck.props?.mass) || 0;
+                if (m_rsc > 0) {
+                  const T_rsc = m_rsc * g_rsc;
+                  const dx_rsc = T_rsc / k;
+                  const L_rsc = L0 + dx_rsc;
+                  riepilogoDiv.appendChild(makeReadonlyField('Massa corpo appeso', m_rsc.toFixed(4), 'kg'));
+                  riepilogoDiv.appendChild(makeReadonlyField('T = m·g', '+' + T_rsc.toFixed(4), 'N'));
+                  riepilogoDiv.appendChild(makeReadonlyField('Δx = T/k', '+' + dx_rsc.toFixed(4), 'm'));
+                  riepilogoDiv.appendChild(makeReadonlyField('L = L₀ + Δx', L_rsc.toFixed(4), 'm'));
+                  el.props._L_calc  = L_rsc;
+                  el.props._delta_x = dx_rsc;
+                  el.props._F_el    = k * dx_rsc;
+                  return;
+                }
+              }
+            }
+          }
+        }
+
+        if (el.props.springMode === 'auto') {
+          // Cerca il corpo collegato tramite vincolo spring_body
+          const springRel = relations.find(r => r.type === 'spring_body' && (r.aId === el.id || r.bId === el.id));
+          let bodyEl = springRel ? elements.find(e => e.id === (springRel.aId === el.id ? springRel.bId : springRel.aId)) : null;
+
+          // Se non trovato spring_body, cerca rope_spring → fune → corpo hanging
+          let ropeSpringT = null; // tensione dalla carrucola
+          if (!bodyEl) {
+            const ropeSpringRelA = relations.find(r =>
+              r.type === 'rope_spring' && (r.aId === el.id || r.bId === el.id)
+            );
+            if (ropeSpringRelA) {
+              const ropeElA = elements.find(e =>
+                e.id === (ropeSpringRelA.aId === el.id ? ropeSpringRelA.bId : ropeSpringRelA.aId)
+              );
+              if (ropeElA) {
+                const hangRelA = relations.find(r =>
+                  r.type === 'rope_body' &&
+                  (r.aId === ropeElA.id || r.bId === ropeElA.id) &&
+                  r.props?.anchor === 'hanging'
+                );
+                if (hangRelA) {
+                  bodyEl = elements.find(e =>
+                    e.id === (hangRelA.aId === ropeElA.id ? hangRelA.bId : hangRelA.aId)
+                  );
+                  ropeSpringT = true; // segnala che la forza viene dalla fune
+                }
+              }
+            }
+          }
+
+          if (!bodyEl) {
+            const h = document.createElement('div'); h.className = 'prop-hint';
+            h.textContent = 'Collega un corpo alla molla per calcolo automatico.';
+            riepilogoDiv.appendChild(h);
+            return;
+          }
+
+          const ref_s = getRefSystem();
+          const g_s   = parseFloat(ref_s?.props?.gravity) || 0;
+          const m_s   = parseFloat(bodyEl.props?.mass) || 0;
+          const flipY_s = ref_s?.props?.flipY;
+
+          // Se la forza viene dalla fune (rope_spring): T = m·g, Δx = T/k
+          if (ropeSpringT) {
+            const T = m_s > 0 ? m_s * Math.abs(g_s) : 0;
+            const dx_net = k > 0 ? T / k : 0;
+            const L_net = L0 + dx_net;
+            riepilogoDiv.appendChild(makeReadonlyField('Massa corpo appeso', m_s > 0 ? m_s.toFixed(4) : '—', 'kg'));
+            riepilogoDiv.appendChild(makeReadonlyField('T = m·g', m_s > 0 ? '+' + T.toFixed(4) : '—', 'N'));
+            riepilogoDiv.appendChild(makeReadonlyField('Δx = T/k', '+' + dx_net.toFixed(4), 'm'));
+            riepilogoDiv.appendChild(makeReadonlyField('L = L₀ + Δx', L_net.toFixed(4), 'm'));
+            el.props._L_calc = L_net;
+            return;
+          }
+
+          // Peso del corpo
+          const P = (g_s > 0 && m_s > 0) ? m_s * g_s : 0;
+          // Forze esterne sul corpo lungo l'asse della molla
+          const anchor_a = el.props?.anchor || 'left';
+          const horiz_a  = anchor_a === 'left' || anchor_a === 'right';
+          let Fext_body = 0;
+          (bodyEl.props?.forces || []).forEach(f => {
+            if (horiz_a) Fext_body += parseFloat(f.fx) || 0;
+            else         Fext_body += parseFloat(f.fy) || 0;
+          });
+          // Aggiungi forza fune
+          if (typeof getRopeForceOnBody === 'function') {
+            const ropeF_a = getRopeForceOnBody(bodyEl);
+            if (ropeF_a) {
+              if (horiz_a) Fext_body += ropeF_a.fx;
+              else         Fext_body += ropeF_a.fy;
+            }
+          }
+          // Aggiungi tensioni sistema di funi
+          if (typeof getRopeSystemForceOnBody === 'function') {
+            const sysF_a = getRopeSystemForceOnBody(bodyEl);
+            if (sysF_a) {
+              if (horiz_a) Fext_body += sysF_a.fx;
+            }
+          }
+
+          // Forza totale che tira/spinge la molla:
+          // Per molla verticale (top/bottom): il peso tira verso il basso
+          // anchor=top: corpo sotto, peso tira verso il basso → allungamento positivo
+          // anchor=bottom: corpo sopra, peso spinge verso l'alto → compressione
+          // Calcola F_on_spring = forza che allunga la molla (>0 = allungamento)
+          const pesoFy_a = (g_s > 0 && m_s > 0) ? -m_s * g_s : 0; // negativo = verso il basso
+          let F_on_spring = 0;
+
+          // Per molla sul piano: usa calcSpringFnetOnPlane
+          const planeSpringRelR = relations.find(r =>
+            r.type === 'spring_on_plane' && (r.aId === el.id || r.bId === el.id)
+          );
+          if (planeSpringRelR) {
+            F_on_spring = calcSpringFnetOnPlane(el, bodyEl);
+          } else if (anchor_a === 'top') {
+            const Fnet_down = pesoFy_a + Fext_body;
+            F_on_spring = -Fnet_down;
+          } else if (anchor_a === 'bottom') {
+            const Fnet_down = pesoFy_a + Fext_body;
+            F_on_spring = +Fnet_down;
+          } else if (anchor_a === 'left') {
+            F_on_spring = Fext_body;
+          } else {
+            F_on_spring = -Fext_body;
+          }
+
+          const dx  = F_on_spring / k;
+          const L   = L0 + dx;
+          const Fe  = k * dx;
+
+          // Per molla orizzontale su pavimento: sottrai attrito
+          let F_on_spring_net = F_on_spring;
+          if (horiz_a && !planeSpringRelR) {
+            const floorRelA = relations.find(r =>
+              r.type === 'body_on_floor' && (r.aId === bodyEl.id || r.bId === bodyEl.id)
+            );
+            if (floorRelA) {
+              const muS_a = parseFloat(floorRelA.props?.muS);
+              const muK_a = parseFloat(floorRelA.props?.muK);
+              let Fext_y_a = 0;
+              (bodyEl.props?.forces || []).forEach(f => { Fext_y_a += parseFloat(f.fy) || 0; });
+              if (typeof getRopeForceOnBody === 'function') {
+                const ropeF_ya = getRopeForceOnBody(bodyEl);
+                if (ropeF_ya) Fext_y_a += ropeF_ya.fy;
+              }
+              const Ny_a = Math.abs(pesoFy_a + Fext_y_a);
+              const v0x_a = parseFloat(bodyEl.props?.v0x) || 0;
+              const isMoving_a = Math.abs(v0x_a) > 1e-9;
+              if (!isMoving_a && !isNaN(muS_a) && muS_a > 0) {
+                const fsMax_a = muS_a * Ny_a;
+                if (Math.abs(F_on_spring_net) <= fsMax_a) F_on_spring_net = 0;
+                else {
+                  const fk_a = (!isNaN(muK_a) && muK_a > 0) ? muK_a * Ny_a : fsMax_a;
+                  F_on_spring_net = F_on_spring_net - Math.sign(F_on_spring_net) * fk_a;
+                }
+              } else if (isMoving_a && !isNaN(muK_a) && muK_a > 0) {
+                const fk_a = muK_a * Ny_a;
+                F_on_spring_net = F_on_spring_net - Math.sign(v0x_a) * fk_a;
+              }
+            }
+          }
+          const dx_net  = F_on_spring_net / k;
+          const L_net   = L0 + dx_net;
+          const Fe_net  = k * dx_net;
+
+          // Mostra tutto con segni fisici coerenti
+          riepilogoDiv.appendChild(makeReadonlyField('Massa corpo', m_s > 0 ? m_s.toFixed(4) : '—', 'kg'));
+          if (!horiz_a) {
+            riepilogoDiv.appendChild(makeReadonlyField('Peso (fy fisico)', m_s > 0 ? fmt4(pesoFy_a) : '—', 'N'));
+          }
+          if (Math.abs(Fext_body) > 1e-9)
+            riepilogoDiv.appendChild(makeReadonlyField(horiz_a ? 'F esterne (fx)' : 'F esterne (fy)', fmt4(Fext_body), 'N'));
+          const Fnet_show = horiz_a ? Fext_body : (pesoFy_a + Fext_body);
+          if (!horiz_a || Math.abs(Fext_body) > 1e-9)
+            riepilogoDiv.appendChild(makeReadonlyField('F netta sul corpo', fmt4(Fnet_show), 'N'));
+          riepilogoDiv.appendChild(makeReadonlyField('Δx = F/k', fmt4(dx_net), 'm'));
+          riepilogoDiv.appendChild(makeReadonlyField('L = L₀ + Δx', fmt4(L_net), 'm'));
+          const Fe_label = horiz_a
+            ? (anchor_a === 'left' ? 'F elastica sul corpo (←)' : 'F elastica sul corpo (→)')
+            : (anchor_a === 'top'  ? 'F elastica sul corpo (↑)' : 'F elastica sul corpo (↓)');
+          riepilogoDiv.appendChild(makeReadonlyField(Fe_label, fmt4(Fe_net), 'N'));
+          riepilogoDiv.appendChild(springBadge(dx_net));
+          el.props._delta_x = dx_net;
+          el.props._F_el    = Fe_net;
+          // _L_calc è aggiornato da render(), non qui
+
+        } else if (el.props.springMode === 'dx') {
+          // Modalità Δx → Forza
+          const dxVal = parseFloat(el.props?.dx);
+          if (isNaN(dxVal)) {
+            const h = document.createElement('div'); h.className = 'prop-hint';
+            h.textContent = 'Inserisci Δx per calcolare.';
+            riepilogoDiv.appendChild(h); return;
+          }
+          const Fe = k * dxVal;
+          const L  = L0 + dxVal;
+          riepilogoDiv.appendChild(makeReadonlyField('Δx (input)', fmt4(dxVal), 'm'));
+          riepilogoDiv.appendChild(makeReadonlyField('F = k · Δx', fmt4(Fe), 'N'));
+          riepilogoDiv.appendChild(makeReadonlyField('L = L₀ + Δx', fmt4(L), 'm'));
+          riepilogoDiv.appendChild(springBadge(dxVal));
+          el.props._delta_x = dxVal;
+          el.props._F_el    = k * dxVal;
+          // _L_calc è aggiornato da render(), non qui
+        } else {
+          // Modalità Forze → Δx
+          const forces = el.props?.forces || [];
+          const anchor_f = el.props?.anchor || 'left';
+          const horiz_f  = anchor_f === 'left' || anchor_f === 'right';
+          let Fext = 0;
+          forces.forEach(f => { Fext += parseFloat(f.val) || 0; });
+          const Fe = Fext;
+          const dx = Fe / k;
+          const L  = Math.max(0.001, L0 + dx); // L non può essere negativa
+          const axisLabel = horiz_f ? 'ΣF (lungo x, conv. allungamento)' : 'ΣF (lungo y, conv. allungamento)';
+          riepilogoDiv.appendChild(makeReadonlyField(axisLabel, fmt4(Fext), 'N'));
+          riepilogoDiv.appendChild(makeReadonlyField('F elastica = ΣF', fmt4(Fe), 'N'));
+          riepilogoDiv.appendChild(makeReadonlyField('Δx = F/k', fmt4(dx), 'm'));
+          riepilogoDiv.appendChild(makeReadonlyField('L = L₀ + Δx', fmt4(L), 'm'));
+          riepilogoDiv.appendChild(springBadge(dx));
+          el.props._delta_x = dx;
+          el.props._F_el    = Fe;
+          // _L_calc è aggiornato da render(), non qui
+        }
+        // render() NON viene chiamato qui — solo leggiamo lo stato
+      }
+
+      // ── Costruisce la sezione input della modalità attiva ─────────────────
+      function buildModeSection() {
+        modeContainer.innerHTML = '';
+        const anchor_sp = el.props?.anchor || 'left';
+        const horiz_sp  = anchor_sp === 'left' || anchor_sp === 'right';
+        // Hint: convenzione fisica (y+ = su) + cosa causa allungamento/accorciamento
+        const axisHint = horiz_sp
+          ? (anchor_sp === 'left'
+            ? '+ = verso destra → allungamento. − = verso sinistra → accorciamento.'
+            : '+ = verso sinistra → allungamento. − = verso destra → accorciamento.')
+          : (anchor_sp === 'top'
+            ? '+ = allungamento (es. peso P = −mg in fisico → inserisci +mg qui). − = accorciamento.'
+            : '− = allungamento (es. peso P = −mg in fisico → inserisci −mg qui). + = accorciamento.');
+
+        if (el.props.springMode === 'auto') {
+          // ── Modalità Auto ──
+          addSep(modeContainer);
+          const hintAuto = document.createElement('div');
+          hintAuto.className = 'prop-hint';
+          hintAuto.textContent = 'Collega un corpo alla molla (Ctrl+click). L\'allungamento viene calcolato automaticamente dal peso e dalle forze sul corpo.';
+          modeContainer.appendChild(hintAuto);
+        } else if (el.props.springMode === 'dx') {
+          // ── Modalità Δx → Forza ──
+          addSep(modeContainer);
+          addSectionLabel(modeContainer, 'Allungamento / compressione');
+          modeContainer.appendChild(makePropField(el, 'dx', 'Δx', 'm', 'es. +0.1', false, () => { render(); updateSpringRiepilogo(); }));
+          const hintDx = document.createElement('div');
+          hintDx.className = 'prop-hint'; hintDx.style.marginTop = '4px';
+          hintDx.textContent = '+ = allungamento, − = compressione.';
+          modeContainer.appendChild(hintDx);
+        } else {
+          // ── Modalità Forze → Δx ──
+          addSep(modeContainer);
+          addSectionLabel(modeContainer, horiz_sp ? "Forze lungo x all'estremo libero" : "Forze lungo y all'estremo libero");
+          if (!Array.isArray(el.props.forces)) el.props.forces = [];
+
+          const forceList = document.createElement('div');
+
+          function rebuildForceList() {
+            forceList.innerHTML = '';
+            (el.props.forces || []).forEach((f, i) => {
+              const row = document.createElement('div');
+              row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:6px';
+              const nameInp = document.createElement('input');
+              nameInp.value = f.name || `F${i+1}`;
+              nameInp.style.cssText = `width:36px;font-family:'IBM Plex Mono',monospace;font-size:10px;
+                background:var(--input-bg);border:1px solid var(--border);border-radius:3px;
+                color:var(--text);padding:3px 4px`;
+              nameInp.addEventListener('change', () => { f.name = nameInp.value; render(); updateSpringRiepilogo(); });
+              const valInp = document.createElement('input');
+              valInp.type = 'number'; valInp.value = f.val ?? ''; valInp.placeholder = 'es. 10';
+              valInp.style.cssText = `flex:1;font-family:'IBM Plex Mono',monospace;font-size:10px;
+                background:var(--input-bg);border:1px solid var(--border);border-radius:3px;
+                color:var(--text);padding:3px 6px`;
+              valInp.addEventListener('input', () => { f.val = valInp.value; render(); updateSpringRiepilogo(); });
+              const unit = document.createElement('span');
+              unit.style.cssText = 'font-family:IBM Plex Mono,monospace;font-size:10px;color:var(--muted);min-width:16px';
+              unit.textContent = 'N';
+              const delBtn = document.createElement('button');
+              delBtn.textContent = '✕';
+              delBtn.style.cssText = `font-size:10px;padding:2px 5px;border-radius:3px;cursor:pointer;
+                background:none;border:1px solid var(--border);color:var(--muted)`;
+              delBtn.addEventListener('click', () => {
+                el.props.forces.splice(i, 1);
+                render(); updateSpringRiepilogo(); rebuildForceList();
+              });
+              row.appendChild(nameInp); row.appendChild(valInp);
+              row.appendChild(unit); row.appendChild(delBtn);
+              forceList.appendChild(row);
+            });
+            const hint = document.createElement('div');
+            hint.className = 'prop-hint'; hint.style.marginTop = '4px';
+            hint.textContent = axisHint;
+            forceList.appendChild(hint);
+          }
+          rebuildForceList();
+          modeContainer.appendChild(forceList);
+
+          const addBtn = document.createElement('button');
+          addBtn.textContent = '+ aggiungi forza';
+          addBtn.style.cssText = `width:100%;margin-top:6px;padding:5px;border-radius:4px;cursor:pointer;
+            background:none;border:1px dashed var(--border);font-family:'IBM Plex Mono',monospace;
+            font-size:9px;color:var(--muted);letter-spacing:0.08em;transition:all 0.12s`;
+          addBtn.addEventListener('click', () => {
+            if (!Array.isArray(el.props.forces)) el.props.forces = [];
+            el.props.forces.push({ name: `F${el.props.forces.length+1}`, val: '' });
+            render(); updateSpringRiepilogo(); rebuildForceList();
+          });
+          modeContainer.appendChild(addBtn);
+        }
+      }
+
+      // Helper: pre-popola i campi dalla modalità auto (corpo collegato)
+      function populateFromAuto() {
+        const springRel_p = relations.find(r => r.type === 'spring_body' && (r.aId === el.id || r.bId === el.id));
+        const bodyEl_p = springRel_p ? elements.find(e => e.id === (springRel_p.aId === el.id ? springRel_p.bId : springRel_p.aId)) : null;
+        if (!bodyEl_p) return;
+
+        const ref_p   = getRefSystem();
+        const g_p     = parseFloat(ref_p?.props?.gravity) || 0;
+        const m_p     = parseFloat(bodyEl_p.props?.mass) || 0;
+        const k_p     = parseFloat(el.props?.k);
+        const L0_p    = parseFloat(el.props?.L0);
+        const anchor_p = el.props?.anchor || 'left';
+        const horiz_p  = anchor_p === 'left' || anchor_p === 'right';
+        const flipY_p  = ref_p?.props?.flipY;
+
+        // Calcola Δx dall'equilibrio — include attrito se presente
+        const pesoFy_p = (g_p > 0 && m_p > 0) ? -m_p * g_p : 0;
+        let Fext_p = 0;
+        (bodyEl_p.props?.forces || []).forEach(f => {
+          if (horiz_p) Fext_p += parseFloat(f.fx) || 0;
+          else         Fext_p += parseFloat(f.fy) || 0;
+        });
+        // Aggiungi forza fune
+        if (typeof getRopeForceOnBody === 'function') {
+          const ropeF_p = getRopeForceOnBody(bodyEl_p);
+          if (ropeF_p) {
+            if (horiz_p) Fext_p += ropeF_p.fx;
+            else         Fext_p += ropeF_p.fy;
+          }
+        }
+        // Aggiungi tensioni sistema di funi
+        if (typeof getRopeSystemForceOnBody === 'function') {
+          const sysF_p = getRopeSystemForceOnBody(bodyEl_p);
+          if (sysF_p) {
+            if (horiz_p) Fext_p += sysF_p.fx;
+          }
+        }
+        let F_spring_p = 0;
+        if (anchor_p === 'top')         F_spring_p = -(pesoFy_p + Fext_p);
+        else if (anchor_p === 'bottom') F_spring_p = +(pesoFy_p + Fext_p);
+        else if (anchor_p === 'left')   F_spring_p = Fext_p;
+        else                            F_spring_p = -Fext_p;
+
+        // Per molla sul piano inclinato: usa calcSpringFnetOnPlane
+        const planeSpringRelP = relations.find(r =>
+          r.type === 'spring_on_plane' && (r.aId === el.id || r.bId === el.id)
+        );
+        if (planeSpringRelP) {
+          F_spring_p = calcSpringFnetOnPlane(el, bodyEl_p);
+        }
+
+        // Per molla verticale: sottrai attrito parete se presente
+        if (!horiz_p) {
+          const wallRelP = relations.find(r =>
+            r.type === 'body_on_wall' && (r.aId === bodyEl_p.id || r.bId === bodyEl_p.id)
+          );
+          if (wallRelP) {
+            const muS_p = parseFloat(wallRelP.props?.muS);
+            const muK_p = parseFloat(wallRelP.props?.muK);
+            // N parete = forza orizzontale sul corpo
+            let Fh_p = 0;
+            (bodyEl_p.props?.forces || []).forEach(f => { Fh_p += parseFloat(f.fx) || 0; });
+            const Nw_p = Math.abs(Fh_p);
+            if (Nw_p > 1e-9) {
+              const v0y_p = parseFloat(bodyEl_p.props?.v0y) || 0;
+              const isMoving_p = Math.abs(v0y_p) > 1e-9;
+              if (!isMoving_p && !isNaN(muS_p) && muS_p > 0) {
+                const fsMax_p = muS_p * Nw_p;
+                if (Math.abs(F_spring_p) <= fsMax_p) {
+                  F_spring_p = 0;
+                } else {
+                  const fk_p = (!isNaN(muK_p) && muK_p > 0) ? muK_p * Nw_p : fsMax_p;
+                  F_spring_p = F_spring_p - Math.sign(F_spring_p) * fk_p;
+                }
+              } else if (isMoving_p && !isNaN(muK_p) && muK_p > 0) {
+                F_spring_p = F_spring_p - Math.sign(v0y_p) * muK_p * Nw_p;
+              }
+            }
+          }
+        }
+        // Per molla orizzontale: sottrai attrito pavimento se presente
+        if (horiz_p) {
+          const floorRelP = relations.find(r =>
+            r.type === 'body_on_floor' && (r.aId === bodyEl_p.id || r.bId === bodyEl_p.id)
+          );
+          if (floorRelP) {
+            const muS_p = parseFloat(floorRelP.props?.muS);
+            const muK_p = parseFloat(floorRelP.props?.muK);
+            let Fext_y_p = 0;
+            (bodyEl_p.props?.forces || []).forEach(f => { Fext_y_p += parseFloat(f.fy) || 0; });
+            // Aggiungi componente verticale forza fune
+            if (typeof getRopeForceOnBody === 'function') {
+              const ropeF_yp = getRopeForceOnBody(bodyEl_p);
+              if (ropeF_yp) Fext_y_p += ropeF_yp.fy;
+            }
+            const Ny_p = Math.abs(pesoFy_p + Fext_y_p);
+            const v0x_p = parseFloat(bodyEl_p.props?.v0x) || 0;
+            const isMoving_p = Math.abs(v0x_p) > 1e-9;
+            if (!isMoving_p && !isNaN(muS_p) && muS_p > 0) {
+              const fsMax_p = muS_p * Ny_p;
+              if (Math.abs(F_spring_p) <= fsMax_p) F_spring_p = 0;
+              else {
+                const fk_p = (!isNaN(muK_p) && muK_p > 0) ? muK_p * Ny_p : fsMax_p;
+                F_spring_p = F_spring_p - Math.sign(F_spring_p) * fk_p;
+              }
+            } else if (isMoving_p && !isNaN(muK_p) && muK_p > 0) {
+              F_spring_p = F_spring_p - Math.sign(v0x_p) * muK_p * Ny_p;
+            }
+          }
+        }
+
+        const dx_p = (!isNaN(k_p) && k_p > 0) ? F_spring_p / k_p : 0;
+
+        // Pre-popola dx e forces con la forza netta (già include attrito)
+        el.props.dx = dx_p.toFixed(6);
+
+        // In modalità forces: una sola voce = forza netta sulla molla (include attrito)
+        el.props.forces = [];
+        if (Math.abs(F_spring_p) > 1e-9) {
+          el.props.forces.push({ name: 'F_net', val: String(F_spring_p.toFixed(4)) });
+        }
+      }
+
+      btnAuto.addEventListener('click', () => {
+        const savedLc = el.props._L_calc;
+        el.props.springMode = 'auto';
+        el.props._L_calc = savedLc;
+        btnAuto.classList.add('active'); btnForces.classList.remove('active'); btnDx.classList.remove('active');
+        buildModeSection(); updateSpringRiepilogo();
+      });
+      btnForces.addEventListener('click', () => {
+        const savedLc = el.props._L_calc;
+        populateFromAuto();
+        el.props.springMode = 'forces';
+        el.props._L_calc = savedLc;
+        btnForces.classList.add('active'); btnAuto.classList.remove('active'); btnDx.classList.remove('active');
+        buildModeSection(); updateSpringRiepilogo();
+      });
+      btnDx.addEventListener('click', () => {
+        const savedLc = el.props._L_calc;
+        populateFromAuto();
+        el.props.springMode = 'dx';
+        el.props._L_calc = savedLc;
+        btnDx.classList.add('active'); btnAuto.classList.remove('active'); btnForces.classList.remove('active');
+        buildModeSection(); updateSpringRiepilogo();
+      });
+
+      buildModeSection();
+      updateSpringRiepilogo();
+      fields.appendChild(wrap);
+    }
+    if (el.type === 'axis_xy' || el.type === 'axis_xyz') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'padding: 14px 16px';
+      wrap.appendChild(makePropField(el, 'gravity', 'Gravità g', 'm/s²', 'es. 9.81'));
+      addSep(wrap);
+      addSectionLabel(wrap, 'Range assi (± m)');
+      wrap.appendChild(makePropField(el, 'halfX', 'Asse x  ±', 'm', '5', false, () => render()));
+      wrap.appendChild(makePropField(el, 'halfY', 'Asse y  ±', 'm', '5', false, () => render()));
+      if (el.type === 'axis_xyz') {
+        wrap.appendChild(makePropField(el, 'halfZ', 'Asse z  ±', 'm', '5'));
+      }
+      fields.appendChild(wrap);
+    }
+
+    if (el.type === 'text_label') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'padding: 14px 16px';
+      addSectionLabel(wrap, 'Testo');
+
+      // Pulsante modifica diretta
+      const editBtn = document.createElement('button');
+      editBtn.textContent = '✎ Modifica testo (doppio click sul canvas)';
+      editBtn.style.cssText = `width:100%;padding:7px;margin-bottom:10px;border-radius:4px;cursor:pointer;
+        background:rgba(200,240,96,0.08);border:1px solid #c8f060;
+        font-family:'IBM Plex Mono',monospace;font-size:10px;color:#c8f060`;
+      editBtn.addEventListener('click', () => {
+        if (typeof startTextEdit === 'function') startTextEdit(el);
+      });
+      wrap.appendChild(editBtn);
+
+      addSep(wrap);
+      addSectionLabel(wrap, 'Stile');
+      wrap.appendChild(makePropField(el, 'fontSize', 'Dimensione', 'px', '18', false, () => render()));
+
+      // Hint LaTeX
+      const latexHint = document.createElement('div');
+      latexHint.style.cssText = `font-size:9px;color:var(--muted);margin-bottom:8px;padding:6px 8px;
+        background:rgba(200,240,96,0.04);border-radius:4px;line-height:1.5;`;
+      latexHint.innerHTML = `<b style="color:var(--accent)">LaTeX:</b> usa <code>$formula$</code> inline o <code>$$formula$$</code> display.<br>
+        Es: <code>$F = -k \\cdot \\Delta x$</code>`;
+      wrap.appendChild(latexHint);
+
+      // Colore
+      const colorRow = document.createElement('div');
+      colorRow.className = 'prop-row';
+      const colorLbl = document.createElement('span');
+      colorLbl.className = 'prop-label';
+      colorLbl.textContent = 'Colore';
+      const colorInput = document.createElement('input');
+      colorInput.type = 'color';
+      colorInput.value = el.props?.color || '#e8e8ec';
+      colorInput.style.cssText = 'width:40px;height:24px;border:none;background:none;cursor:pointer;padding:0';
+      colorInput.addEventListener('input', () => { el.props.color = colorInput.value; render(); });
+      colorRow.appendChild(colorLbl);
+      colorRow.appendChild(colorInput);
+      wrap.appendChild(colorRow);
+
+      // Bold / Italic toggle
+      const styleRow = document.createElement('div');
+      styleRow.className = 'prop-toggle-row';
+      const btnBold = document.createElement('button');
+      btnBold.className = 'prop-toggle-btn' + (el.props?.bold ? ' active' : '');
+      btnBold.textContent = 'B'; btnBold.style.fontWeight = 'bold';
+      btnBold.addEventListener('click', () => {
+        el.props.bold = !el.props.bold;
+        btnBold.classList.toggle('active', el.props.bold);
+        render();
+      });
+      const btnItalic = document.createElement('button');
+      btnItalic.className = 'prop-toggle-btn' + (el.props?.italic ? ' active' : '');
+      btnItalic.textContent = 'I'; btnItalic.style.fontStyle = 'italic';
+      btnItalic.addEventListener('click', () => {
+        el.props.italic = !el.props.italic;
+        btnItalic.classList.toggle('active', el.props.italic);
+        render();
+      });
+      styleRow.appendChild(btnBold);
+      styleRow.appendChild(btnItalic);
+      wrap.appendChild(styleRow);
+
+      fields.appendChild(wrap);
+    }
+
+    if (el.type === 'pulley_simple') {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'padding:14px 16px';
+      addSectionLabel(wrap, 'Carrucola semplice');
+
+      const hint = document.createElement('div');
+      hint.className = 'prop-hint';
+      hint.textContent = 'La carrucola semplice trasmette la tensione costante lungo la fune.';
+      hint.style.marginBottom = '12px';
+      wrap.appendChild(hint);
+
+      addSectionLabel(wrap, 'Ancoraggio');
+      const anchors = [
+        { value: 'top',    label: '↑ Soffitto' },
+        { value: 'bottom', label: '↓ Pavimento' },
+        { value: 'left',   label: '← Sinistra' },
+        { value: 'right',  label: '→ Destra' },
+      ];
+      const grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px';
+      const anchorBtns = [];
+      anchors.forEach(({ value, label }) => {
+        const btn = document.createElement('button');
+        const isActive = (el.props?.anchor || 'top') === value;
+        btn.textContent = label;
+        const setActive = (active) => {
+          btn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;padding:6px 4px;
+            border-radius:4px;cursor:pointer;text-align:center;
+            border:1px solid ${active ? 'var(--accent)' : 'var(--border)'};
+            background:${active ? 'rgba(200,240,96,0.15)' : 'transparent'};
+            color:${active ? 'var(--accent)' : 'var(--muted)'};transition:all 0.12s`;
+        };
+        setActive(isActive);
+        btn.addEventListener('click', () => {
+          el.props.anchor = value;
+          anchorBtns.forEach(({ v, s }) => s(v === value));
+          render();
+        });
+        anchorBtns.push({ b: btn, v: value, s: setActive });
+        grid.appendChild(btn);
+      });
+      wrap.appendChild(grid);
+      fields.appendChild(wrap);
+    }
+
+  // Aggiorna sempre i totali (anche senza rebuild)
+  refreshTotals(el);
+}
+}
+
+
+
+function makePropField(el, key, label, unit, placeholder, isInt = false, onChange = null) {
+  const row = document.createElement('div');
+  row.className = 'prop-row';
+
+  const lbl = document.createElement('div');
+  lbl.className = 'prop-label';
+  lbl.textContent = label;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'prop-input-wrap';
+
+  const input = document.createElement('input');
+  input.className = 'prop-input';
+  input.type = 'text';
+  input.inputMode = 'decimal';
+  input.placeholder = placeholder || '';
+  // Mostra il valore attuale formattato
+  const cur = el.props[key];
+  input.value = (cur !== '' && cur !== undefined && cur !== null) ? String(cur) : '';
+
+  input.addEventListener('input', () => {
+    const raw = input.value.trim();
+    if (raw === '' || raw === '-' || raw === '.' || raw === '-.') {
+      el.props[key] = '';
+      refreshTotals(el);
+      return;
+    }
+    const num = isInt ? parseInt(raw) : parseFloat(raw);
+    if (!isNaN(num)) {
+      el.props[key] = num;
+      refreshTotals(el);
+      render();
+      if (onChange) onChange();
+    }
+  });
+  input.addEventListener('blur', () => {
+    const raw = input.value.trim();
+    const num = isInt ? parseInt(raw) : parseFloat(raw);
+    if (raw === '' || isNaN(num)) {
+      el.props[key] = '';
+      input.value = '';
+    } else {
+      el.props[key] = num;
+      input.value = String(num);
+    }
+    render();
+    refreshTotals(el);
+    if (onChange) onChange();
+  });
+
+  const unitEl = document.createElement('span');
+  unitEl.className = 'prop-unit';
+  unitEl.textContent = unit;
+
+  wrap.appendChild(input);
+  wrap.appendChild(unitEl);
+  row.appendChild(lbl);
+  row.appendChild(wrap);
+  row._input = input;
+  return row;
+}
+
+// ═══ MODULE: lever.js ═══
+// ─── Leva con fulcro ──────────────────────────────────────────────────────────
+
+function getLeverFulcrumFrac(el) {
+  const lengthM = Math.max(0.5, parseFloat(el.props?.length) || 10);
+  const d1 = Math.max(0.1, Math.min(lengthM - 0.1, parseFloat(el.props?.d1) || lengthM / 2));
+  return d1 / lengthM;
+}
+
+function updateLeverGeometry(el) {
+  const ref = getRefSystem();
+  const ML = 50, W = 340, MR = 24, MB = 50, H = 300, MT = 24;
+  const axisW = W - ML - MR, axisH = H - MB - MT;
+  const halfX = Math.max(0.1, parseFloat(ref?.props?.halfX) || 5);
+  const halfY = Math.max(0.1, parseFloat(ref?.props?.halfY) || 5);
+  const scaleX = ref ? axisW / (2 * halfX) : 18;
+  const scaleY = ref ? axisH / (2 * halfY) : 18;
+  const scaleIso = Math.min(scaleX, scaleY);
+  const lengthM = Math.max(0.5, parseFloat(el.props?.length) || 10);
+  const lengthPx = lengthM * scaleIso;
+  el._lengthPx = lengthPx;
+  el._thicknessPx = 6;
+  el._fulcrumH = 20;
+  el._scaleIso = scaleIso;
+  el._wPx = lengthPx;
+  el._hPx = 6 + 20 + 10;
+  DEFS.lever.w = el._wPx;
+  DEFS.lever.h = el._hPx;
+}
+
+function getLeverMoments(el, thetaRad) {
+  const ref = getRefSystem();
+  const g = Math.abs(parseFloat(ref?.props?.gravity) || 9.81);
+  const fulcrumFrac = getLeverFulcrumFrac(el);
+  const lengthM = Math.max(0.5, parseFloat(el.props?.length) || 10);
+  const d1M = fulcrumFrac * lengthM;
+  const theta = thetaRad || 0;
+  let totalMoment = 0;
+  const contributions = [];
+
+  // Corpi collegati
+  const bodyRels = relations.filter(r =>
+    r.type === 'body_on_lever' && (r.aId === el.id || r.bId === el.id)
+  );
+  for (const rel of bodyRels) {
+    const bodyEl = elements.find(e => e.id === (rel.aId === el.id ? rel.bId : rel.aId));
+    if (!bodyEl) continue;
+    const m = parseFloat(bodyEl.props?.mass) || 0;
+    if (m <= 0) continue;
+    const posM = Math.max(0, Math.min(lengthM, rel.props?.pos != null ? parseFloat(rel.props.pos) : d1M));
+    const arm = posM - d1M;
+    const P = m * g;
+    const M = -P * arm * Math.cos(theta);
+    totalMoment += M;
+    contributions.push({ type: 'body', bodyId: bodyEl.id, arm, F: P, M, posM, label: `Peso m=${m.toFixed(2)}kg` });
+  }
+
+  // Forze esterne
+  const forces = el.props?.forces || [];
+  for (const f of forces) {
+    const F = parseFloat(f.F) || 0;
+    if (Math.abs(F) < 1e-9) continue;
+    const posM = Math.max(0, Math.min(lengthM, parseFloat(f.pos) || 0));
+    const angle = parseFloat(f.angle) || 90;
+    const arm = posM - d1M;
+    const angleRad = angle * Math.PI / 180;
+    const Fperp = F * Math.sin(angleRad - theta);
+    const M = Fperp * arm;
+    totalMoment += M;
+    contributions.push({ type: 'force', arm, F, angle, M, posM, label: `F=${F.toFixed(1)}N ∠${angle}°` });
+  }
+
+  // Molle collegate
+  const springRels = relations.filter(r =>
+    r.type === 'spring_on_lever' && (r.aId === el.id || r.bId === el.id)
+  );
+  for (const rel of springRels) {
+    const springEl = elements.find(e => e.id === (rel.aId === el.id ? rel.bId : rel.aId));
+    if (!springEl) continue;
+    const k = parseFloat(springEl.props?.k) || 0;
+    if (k <= 0) continue;
+    const posM = Math.max(0, Math.min(lengthM, rel.props?.pos != null ? parseFloat(rel.props.pos) : d1M));
+    const arm = posM - d1M;
+    const side = rel.props?.side || 'below';
+    // Spostamento verticale del punto di attacco quando leva ruota di theta
+    const deltaY = arm * Math.sin(theta);
+    // Allungamento molla: convenzione positivo = allungamento
+    // Se sotto: il punto scende (deltaY>0 per arm>0,theta>0) → molla si comprime → deltaX<0
+    // Se sopra: il punto scende → molla si allunga → deltaX>0
+    const deltaX = side === 'below' ? -deltaY : deltaY;
+    const Fspring = k * deltaX; // positivo = allungamento → forza di richiamo
+    // Forza verticale sulla leva (verso l'alto positivo):
+    // molla sotto allungata (deltaX>0): tira il punto di attacco verso il basso → Fvert<0
+    // molla sotto compressa (deltaX<0): spinge il punto di attacco verso l'alto → Fvert>0
+    const Fvert = side === 'below' ? -Fspring : Fspring;
+    const M = Fvert * arm * Math.cos(theta);
+    totalMoment += M;
+    contributions.push({ type: 'spring', springId: springEl.id, arm, k, deltaX, Fspring: Math.abs(Fspring), M, posM, label: `Molla k=${k}N/m` });
+  }
+
+  return { totalMoment, contributions, g, d1M, d2M: lengthM - d1M, lengthM };
+}
+
+// Calcola l'angolo di equilibrio con le molle (iterativo)
+function getLeverEquilibriumAngle(el) {
+  const springRels = relations.filter(r =>
+    r.type === 'spring_on_lever' && (r.aId === el.id || r.bId === el.id)
+  );
+  if (springRels.length === 0) return null;
+
+  let theta = 0;
+  for (let i = 0; i < 100; i++) {
+    const { totalMoment } = getLeverMoments(el, theta);
+    const { totalMoment: M2 } = getLeverMoments(el, theta + 0.001);
+    const dM = (M2 - totalMoment) / 0.001;
+    if (Math.abs(dM) < 1e-10) break;
+    const dTheta = -totalMoment / dM;
+    theta += Math.max(-0.05, Math.min(0.05, dTheta));
+    theta = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, theta));
+    if (Math.abs(dTheta) < 1e-7) break;
+  }
+  return theta;
+}
+
+function buildLeverPanel(wrap, el) {
+  const fmt = v => (v >= 0 ? '+' : '') + parseFloat(v).toFixed(3);
+  if (!el.props.forces) el.props.forces = [];
+  const lengthM = Math.max(0.5, parseFloat(el.props?.length) || 10);
+  const d1cur = Math.max(0.1, Math.min(lengthM - 0.1, parseFloat(el.props?.d1) || lengthM / 2));
+
+  function rebuild() { wrap.innerHTML = ''; buildLeverPanel(wrap, el); }
+
+  // ── Geometria ──
+  addSectionLabel(wrap, 'Geometria');
+  wrap.appendChild(makePropField(el, 'length', 'Lunghezza totale L', 'm', 'es. 10', false, () => {
+    const L = parseFloat(el.props.length) || 10;
+    if (parseFloat(el.props.d1) >= L) el.props.d1 = (L / 2).toFixed(2);
+    updateLeverGeometry(el); render(); rebuild();
+  }));
+
+  // ── Fulcro ──
+  addSectionLabel(wrap, 'Posizione fulcro');
+  const d1Row = document.createElement('div');
+  d1Row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:6px;';
+  const d1Lbl = document.createElement('div');
+  d1Lbl.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:80px;';
+  d1Lbl.textContent = 'd₁ (sinistra)';
+  const d1Input = document.createElement('input');
+  d1Input.type = 'number'; d1Input.step = '0.1';
+  d1Input.min = '0.1'; d1Input.max = (lengthM - 0.1).toFixed(1);
+  d1Input.value = d1cur.toFixed(2);
+  d1Input.style.cssText = `flex:1;background:#13131a;border:1px solid #3a3a44;border-radius:4px;
+    color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+  const d1Unit = document.createElement('span');
+  d1Unit.style.cssText = 'font-size:10px;color:#606070;'; d1Unit.textContent = 'm';
+  d1Input.addEventListener('change', () => {
+    const v = Math.max(0.1, Math.min(lengthM - 0.1, parseFloat(d1Input.value) || d1cur));
+    el.props.d1 = v.toFixed(2);
+    d2Display.textContent = (lengthM - v).toFixed(2);
+    render(); rebuild();
+  });
+  d1Row.appendChild(d1Lbl); d1Row.appendChild(d1Input); d1Row.appendChild(d1Unit);
+  wrap.appendChild(d1Row);
+
+  const d2Row = document.createElement('div');
+  d2Row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:12px;';
+  const d2Lbl = document.createElement('div');
+  d2Lbl.style.cssText = 'font-size:10px;color:#a0a0b0;min-width:80px;';
+  d2Lbl.textContent = 'd₂ (destra)';
+  const d2Display = document.createElement('div');
+  d2Display.style.cssText = `flex:1;background:#0d0d14;border:1px solid #2a2a34;border-radius:4px;
+    color:#606070;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;`;
+  d2Display.textContent = (lengthM - d1cur).toFixed(2);
+  const d2Unit = document.createElement('span');
+  d2Unit.style.cssText = 'font-size:10px;color:#606070;'; d2Unit.textContent = 'm';
+  d2Row.appendChild(d2Lbl); d2Row.appendChild(d2Display); d2Row.appendChild(d2Unit);
+  wrap.appendChild(d2Row);
+
+  // ── Forze esterne ──
+  addSep(wrap);
+  addSectionLabel(wrap, 'Forze esterne');
+
+  const forceList = document.createElement('div');
+  wrap.appendChild(forceList);
+
+  function rebuildForceList() {
+    forceList.innerHTML = '';
+    (el.props.forces || []).forEach((f, i) => {
+      const card = document.createElement('div');
+      card.style.cssText = `background:#13131a;border:1px solid #2a2a34;border-radius:6px;
+        padding:8px;margin-bottom:6px;box-sizing:border-box;width:100%;`;
+
+      // Header con rimuovi
+      const hdr = document.createElement('div');
+      hdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;';
+      const title = document.createElement('span');
+      title.style.cssText = 'font-size:10px;color:#f0a060;font-family:IBM Plex Mono,monospace;';
+      title.textContent = `F${i+1}`;
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = '✕';
+      removeBtn.style.cssText = `background:none;border:none;color:#606070;cursor:pointer;
+        font-size:11px;padding:0 2px;`;
+      removeBtn.onclick = () => {
+        el.props.forces.splice(i, 1);
+        render(); rebuildForceList();
+      };
+      hdr.appendChild(title); hdr.appendChild(removeBtn);
+      card.appendChild(hdr);
+
+      // Campi: pos, F, angle
+      const fields = [
+        { key: 'pos',   label: 'Posizione', unit: 'm',  placeholder: 'es. 2', min: 0, max: lengthM },
+        { key: 'F',     label: 'Intensità', unit: 'N',  placeholder: 'es. 10' },
+        { key: 'angle', label: 'Angolo',    unit: '°',  placeholder: 'es. 90' },
+      ];
+      fields.forEach(fd => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:4px;margin-bottom:4px;width:100%;box-sizing:border-box;';
+        const lbl = document.createElement('div');
+        lbl.style.cssText = 'font-size:10px;color:#a0a0b0;width:60px;flex-shrink:0;';
+        lbl.textContent = fd.label;
+        const inp = document.createElement('input');
+        inp.type = 'number'; inp.step = '0.1';
+        if (fd.min !== undefined) inp.min = fd.min;
+        if (fd.max !== undefined) inp.max = fd.max;
+        inp.value = f[fd.key] ?? '';
+        inp.placeholder = fd.placeholder;
+        inp.style.cssText = `flex:1;min-width:0;background:#0d0d14;border:1px solid #3a3a44;border-radius:4px;
+          color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:3px 6px;box-sizing:border-box;`;
+        inp.addEventListener('change', () => {
+          f[fd.key] = parseFloat(inp.value);
+          render(); rebuildForceList();
+        });
+        const unit = document.createElement('span');
+        unit.style.cssText = 'font-size:10px;color:#606070;width:14px;flex-shrink:0;text-align:right;';
+        unit.textContent = fd.unit;
+        row.appendChild(lbl); row.appendChild(inp); row.appendChild(unit);
+        card.appendChild(row);
+      });
+
+      // Hint angolo
+      const hint = document.createElement('div');
+      hint.style.cssText = 'font-size:9px;color:#505060;margin-top:2px;';
+      hint.textContent = '0°=destra  90°=su  -90°=giù  180°=sinistra';
+      card.appendChild(hint);
+
+      forceList.appendChild(card);
+    });
+
+    // Bottone aggiungi
+    const addBtn = document.createElement('button');
+    addBtn.textContent = '+ aggiungi forza';
+    addBtn.style.cssText = `width:100%;margin-top:4px;padding:5px;border-radius:4px;cursor:pointer;
+      background:none;border:1px dashed #3a3a44;font-family:'IBM Plex Mono',monospace;
+      font-size:9px;color:#a0a0b0;`;
+    addBtn.onclick = () => {
+      if (!el.props.forces) el.props.forces = [];
+      el.props.forces.push({ pos: d1cur, F: 10, angle: 90 });
+      render(); rebuildForceList();
+    };
+    forceList.appendChild(addBtn);
+  }
+  rebuildForceList();
+
+  // ── Riepilogo momenti ──
+  addSep(wrap);
+  addSectionLabel(wrap, 'Momenti rispetto al fulcro');
+  const rDiv = document.createElement('div');
+  wrap.appendChild(rDiv);
+
+  function updateRiepilogo() {
+    rDiv.innerHTML = '';
+    const fmt2 = v => (v >= 0 ? '+' : '') + parseFloat(v).toFixed(3);
+
+    const hasSpringNow = relations.some(r => {
+      if (r.type !== 'spring_on_lever') return false;
+      if (r.aId !== el.id && r.bId !== el.id) return false;
+      const sEl = elements.find(e => e.id === (r.aId === el.id ? r.bId : r.aId));
+      return sEl && parseFloat(sEl.props?.k) > 0;
+    });
+    const thetaEqNow = hasSpringNow ? getLeverEquilibriumAngle(el) : null;
+    const thetaNow = thetaEqNow !== null ? thetaEqNow : 0;
+    const { totalMoment, contributions } = getLeverMoments(el, thetaNow);
+
+    if (contributions.length === 0) {
+      const h = document.createElement('div'); h.className = 'prop-hint';
+      h.textContent = 'Collega corpi, molle o aggiungi forze per calcolare i momenti.';
+      rDiv.appendChild(h); return;
+    }
+
+    contributions.forEach(c => {
+      const side = c.arm > 0.01 ? `d=${c.arm.toFixed(2)}m →` : c.arm < -0.01 ? `d=${Math.abs(c.arm).toFixed(2)}m ←` : 'sul fulcro';
+      if (c.type === 'spring') {
+        const springEl2 = elements.find(e => e.id === c.springId);
+        const L0val = parseFloat(springEl2?.props?.L0) || null;
+        const compStr = Math.abs(c.deltaX) < 1e-6
+          ? 'a riposo'
+          : c.deltaX > 0 ? `compressa ${c.deltaX.toFixed(3)}m`
+          : `estesa ${Math.abs(c.deltaX).toFixed(3)}m`;
+        const L0str = L0val ? `L₀=${L0val.toFixed(2)}m → L=${(L0val - c.deltaX).toFixed(3)}m  ` : '';
+        rDiv.appendChild(makeReadonlyField(`${c.label} ${side}`, fmt2(c.M), 'N·m'));
+        const hint = document.createElement('div');
+        hint.style.cssText = 'font-size:9px;color:#60c0f0;margin:-4px 0 6px 8px;';
+        hint.textContent = `${L0str}${compStr}  F=${c.Fspring?.toFixed(2)}N`;
+        rDiv.appendChild(hint);
+      } else {
+        rDiv.appendChild(makeReadonlyField(`${c.label} ${side}`, fmt2(c.M), 'N·m'));
+      }
+    });
+    addSep(rDiv);
+    rDiv.appendChild(makeReadonlyField('ΣM (fulcro)', fmt2(totalMoment), 'N·m'));
+
+    if (thetaEqNow !== null) {
+      rDiv.appendChild(makeReadonlyField('θ equilibrio', (thetaEqNow * 180 / Math.PI).toFixed(2), '°'));
+    }
+
+    const badge = document.createElement('div');
+    badge.style.cssText = `margin-top:6px;padding:5px 8px;border-radius:4px;font-size:10px;
+      font-family:IBM Plex Mono,monospace;text-align:center;`;
+    if (thetaEqNow !== null) {
+      badge.style.cssText += 'background:rgba(96,240,96,0.1);color:#60f060;';
+      badge.textContent = `⟹ Equilibrio a θ=${(thetaEqNow*180/Math.PI).toFixed(1)}°`;
+    } else if (Math.abs(totalMoment) < 1e-6) {
+      badge.style.cssText += 'background:rgba(96,240,96,0.1);color:#60f060;';
+      badge.textContent = '⟹ Leva in equilibrio';
+    } else if (totalMoment > 0) {
+      badge.style.cssText += 'background:rgba(240,160,96,0.1);color:#f0a060;';
+      badge.textContent = '⟹ Rotazione antioraria ↺';
+    } else {
+      badge.style.cssText += 'background:rgba(240,160,96,0.1);color:#f0a060;';
+      badge.textContent = '⟹ Rotazione oraria ↻';
+    }
+    rDiv.appendChild(badge);
+  }
+
+  updateRiepilogo();
+
+  // Aggiorna riepilogo ad ogni render (tramite MutationObserver sul pannello)
+  const obs = new MutationObserver(() => {
+    if (document.contains(rDiv)) updateRiepilogo();
+    else obs.disconnect();
+  });
+  // Osserva cambiamenti nel canvas per rilevare nuovi render
+  if (typeof canvas !== 'undefined') {
+    obs.observe(canvas, { childList: true, subtree: false });
+  }
+}
+
+// ═══ MODULE: inclined.js ═══
+// ─── Geometria piano inclinato ────────────────────────────────────────────────
+// getInclinedPlaneDims è definita in inclined-geometry.js
+
+function fmtAngle(el) {
+  const ref = getRefSystem();
+  const ML=50,W=340,MR=24,MB=50,H=300,MT=24;
+  const axisW=W-ML-MR, axisH=H-MB-MT;
+  const halfX=Math.max(0.1,parseFloat(ref?.props?.halfX)||5);
+  const halfY=Math.max(0.1,parseFloat(ref?.props?.halfY)||5);
+  const scaleX=ref?axisW/(2*halfX):18;
+  const scaleY=ref?axisH/(2*halfY):18;
+  const d = getInclinedPlaneDims(el, scaleX, scaleY);
+  return d.angle.toFixed(1);
+}
+
+// Aggiorna le props derivate del piano inclinato dopo un cambio
+function syncInclinedPlane(el) {
+  const ref = getRefSystem();
+  const ML=50,W=340,MR=24,MB=50,H=300,MT=24;
+  const axisW=W-ML-MR, axisH=H-MB-MT;
+  const halfX=Math.max(0.1,parseFloat(ref?.props?.halfX)||5);
+  const halfY=Math.max(0.1,parseFloat(ref?.props?.halfY)||5);
+  const scaleX=ref?axisW/(2*halfX):18;
+  const scaleY=ref?axisH/(2*halfY):18;
+  const d = getInclinedPlaneDims(el, scaleX, scaleY);
+  // Aggiorna tutti i valori derivati
+  el.props._derivedBase   = d.base.toFixed(4);
+  el.props._derivedHeight = d.height.toFixed(4);
+  el.props._derivedLength = d.length.toFixed(4);
+  el.props._derivedAngle  = d.angle.toFixed(2);
+}
+// ─── Pannello piano inclinato ─────────────────────────────────────────────────
+function buildInclinedPlanePanel(el, container) {
+  const p = el.props;
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'padding:14px 16px';
+
+  // Visibilità
+  const visRow = document.createElement('div');
+  visRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:12px';
+  const visLbl = document.createElement('div');
+  visLbl.className = 'prop-label';
+  visLbl.style.marginBottom = '0';
+  visLbl.textContent = 'Mostra piano';
+  const visBtn = document.createElement('button');
+  const isVisible = p.visible !== false;
+  visBtn.textContent = isVisible ? '● Visibile' : '○ Nascosto';
+  visBtn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;
+    padding:4px 10px;border-radius:4px;cursor:pointer;
+    border:1px solid ${isVisible ? 'var(--accent)' : 'var(--border)'};
+    background:${isVisible ? 'rgba(200,240,96,0.15)' : 'transparent'};
+    color:${isVisible ? 'var(--accent)' : 'var(--muted)'};transition:all 0.12s`;
+  visBtn.addEventListener('click', () => {
+    p.visible = !p.visible;
+    render();
+    container.innerHTML = '';
+    buildInclinedPlanePanel(el, container);
+  });
+  visRow.appendChild(visLbl); visRow.appendChild(visBtn);
+  wrap.appendChild(visRow);
+  addSep(wrap);
+  wrap.appendChild(makeFlipToggle(el, 'flipX', 'Orientamento'));
+  addSep(wrap);
+
+  // Modalità input
+  addSectionLabel(wrap, 'Definisci tramite');
+  const modes = [
+    { key: 'angle+base',   label: 'θ + Base' },
+    { key: 'angle+height', label: 'θ + Altezza' },
+    { key: 'angle+length', label: 'θ + Lunghezza' },
+    { key: 'base+height',  label: 'Base + Altezza' },
+  ];
+  const modeRow = document.createElement('div');
+  modeRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:12px';
+  modes.forEach(m => {
+    const btn = document.createElement('button');
+    btn.textContent = m.label;
+    const active = (p.inputMode || 'angle+base') === m.key;
+    btn.style.cssText = `padding:5px 4px;border-radius:4px;cursor:pointer;
+      font-family:'IBM Plex Mono',monospace;font-size:9px;text-align:center;
+      border:1px solid ${active ? 'var(--accent)' : 'var(--border)'};
+      background:${active ? 'rgba(200,240,96,0.15)' : 'transparent'};
+      color:${active ? 'var(--accent)' : 'var(--muted)'};transition:all 0.1s`;
+    btn.addEventListener('click', () => {
+      p.inputMode = m.key;
+      syncInclinedPlane(el);
+      container.innerHTML = '';
+      buildInclinedPlanePanel(el, container);
+      render();
+    });
+    modeRow.appendChild(btn);
+  });
+  wrap.appendChild(modeRow);
+
+  // Campi in base alla modalità
+  const mode = p.inputMode || 'angle+base';
+  const onChange = () => { syncInclinedPlane(el); render(); };
+
+  if (mode.includes('angle')) {
+    wrap.appendChild(makePropField(el, 'angle', 'θ (angolo)', '°', 'es. 30', false, onChange));
+  }
+  if (mode === 'angle+base' || mode === 'base+height') {
+    wrap.appendChild(makePropField(el, 'base', 'Base', 'm', 'es. 5', false, onChange));
+  }
+  if (mode === 'angle+height' || mode === 'base+height') {
+    wrap.appendChild(makePropField(el, 'height', 'Altezza', 'm', 'es. 3', false, onChange));
+  }
+  if (mode === 'angle+length') {
+    wrap.appendChild(makePropField(el, 'length', 'Lunghezza', 'm', 'es. 6', false, onChange));
+  }
+
+  // Valori derivati readonly
+  addSep(wrap);
+  addSectionLabel(wrap, 'Valori calcolati');
+  syncInclinedPlane(el);
+  if (mode === 'base+height') {
+    wrap.appendChild(makeReadonlyField('θ',         parseFloat(p._derivedAngle  ||0).toFixed(1), '°'));
+  }
+  if (mode !== 'angle+base' && mode !== 'base+height') {
+    wrap.appendChild(makeReadonlyField('Base',      parseFloat(p._derivedBase   ||0).toFixed(3), 'm'));
+  }
+  if (mode !== 'angle+height' && mode !== 'base+height') {
+    wrap.appendChild(makeReadonlyField('Altezza',   parseFloat(p._derivedHeight ||0).toFixed(3), 'm'));
+  }
+  if (mode !== 'angle+length') {
+    wrap.appendChild(makeReadonlyField('Lunghezza', parseFloat(p._derivedLength ||0).toFixed(3), 'm'));
+  }
+
+  container.appendChild(wrap);
+}
+
+function makeSection(container, title, openByDefault, buildFn) {
+  const section = document.createElement('div');
+  section.className = 'prop-section';
+
+  const header = document.createElement('div');
+  header.className = 'prop-section-header' + (openByDefault ? ' open' : '');
+  header.innerHTML = `<span>${title}</span><span class="prop-section-chevron">▶</span>`;
+
+  const body = document.createElement('div');
+  body.className = 'prop-section-body' + (openByDefault ? ' open' : '');
+  buildFn(body);
+
+  header.addEventListener('click', () => {
+    const isOpen = body.classList.contains('open');
+    if (!isOpen) {
+      container.querySelectorAll('.prop-section-body.open').forEach(b => {
+        b.classList.remove('open');
+        b.previousElementSibling?.classList.remove('open');
+      });
+    }
+    body.classList.toggle('open', !isOpen);
+    header.classList.toggle('open', !isOpen);
+  });
+
+  section.appendChild(header);
+  section.appendChild(body);
+  container.appendChild(section);
+}
+
+// ═══ MODULE: body-panel.js ═══
+// ─── Pannello corpo puntiforme ────────────────────────────────────────────────
+function buildPointMassPanel(el, container) {
+  const p = el.props;
+
+  // ── TOGGLE VISIBILITÀ CORPO ────────────────────────────────────────────────
+  const visRow = document.createElement('div');
+  visRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 16px 8px;border-bottom:1px solid var(--border)';
+  const visLbl = document.createElement('div');
+  visLbl.className = 'prop-label';
+  visLbl.style.marginBottom = '0';
+  visLbl.textContent = 'Mostra corpo';
+  const isVis = p.visible !== false;
+  const visBtn = document.createElement('button');
+  visBtn.textContent = isVis ? '● Visibile' : '○ Nascosto';
+  visBtn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;
+    padding:4px 10px;border-radius:4px;cursor:pointer;
+    border:1px solid ${isVis ? 'var(--accent)' : 'var(--border)'};
+    background:${isVis ? 'rgba(200,240,96,0.15)' : 'transparent'};
+    color:${isVis ? 'var(--accent)' : 'var(--muted)'};transition:all 0.12s`;
+  visBtn.addEventListener('click', () => {
+    p.visible = !p.visible;
+    render();
+    // Ricostruisce il pannello per aggiornare il bottone
+    container.innerHTML = '';
+    buildPointMassPanel(el, container);
+  });
+  visRow.appendChild(visLbl); visRow.appendChild(visBtn);
+  container.appendChild(visRow);
+
+  // ── BARRA VISIBILITÀ VETTORI ───────────────────────────────────────────────
+  const visBar = document.createElement('div');
+  visBar.className = 'vis-toggle-bar';
+
+  function makeVisBtn(key, icon, label, activeClass) {
+    const btn = document.createElement('button');
+    btn.className = 'vis-toggle-btn' + (p[key] ? ` ${activeClass}` : '');
+    btn.innerHTML = `<span class="vis-icon">${icon}</span><span class="vis-label">${label}</span>`;
+    btn.title = `Mostra/nascondi ${label}`;
+    btn.addEventListener('click', () => {
+      p[key] = !p[key];
+      btn.classList.toggle(activeClass, p[key]);
+      render();
+    });
+    return btn;
+  }
+
+  visBar.appendChild(makeVisBtn('showV0', '→', 'vel. iniz.', 'active-v0'));
+  visBar.appendChild(makeVisBtn('showF',  '↓', 'forze est.', 'active-f'));
+  visBar.appendChild(makeVisBtn('showR',  '⇀', 'risultante','active-r'));
+  visBar.appendChild(makeVisBtn('showA',  '⇒', 'accel.',    'active-a'));
+  container.appendChild(visBar);
+
+  // Seconda riga — forze vincolari (pavimento o piano inclinato)
+  const constraint  = getBodyConstraint(el);
+  const planeConstr = getPlaneConstraint(el);
+  const anyConstraint = constraint || planeConstr || getWallConstraint(el);
+
+  if (anyConstraint) {
+    const visBar2 = document.createElement('div');
+    visBar2.className = 'vis-toggle-bar';
+    visBar2.style.paddingTop = '6px';
+    visBar2.appendChild(makeVisBtn('showN', '⊥', 'vin. N', 'active-n'));
+
+    // Etichetta attrito dipende dal regime e dal tipo di vincolo
+    const activeC = constraint || planeConstr || getWallConstraint(el);
+    const muS = parseFloat(activeC.props?.muS);
+    const muK = parseFloat(activeC.props?.muK);
+    const hasFriction = (!isNaN(muS) && muS > 0) || (!isNaN(muK) && muK > 0);
+    const v0val = parseFloat(planeConstr ? (p.v0s || 0) : getWallConstraint(el) ? (p.v0y || 0) : (p.v0x || 0)) || 0;
+    const isMoving = Math.abs(v0val) > 1e-9;
+
+    if (hasFriction) {
+      if (isMoving && !isNaN(muK) && muK > 0) {
+        visBar2.appendChild(makeVisBtn('showFriction', '↔', 'att. din.', 'active-fr'));
+      } else {
+        visBar2.appendChild(makeVisBtn('showFriction', '↔', 'att. stat.', 'active-fr'));
+      }
+    } else {
+      visBar2.appendChild(makeVisBtn('showFriction', '↔', 'attrito', 'active-fr'));
+    }
+
+    container.appendChild(visBar2);
+  }
+
+  // ── MASSA ──────────────────────────────────────────────────────────────────
+  makeSection(container, 'Massa', false, body => {
+    body.appendChild(makePropField(el, 'mass', 'm', 'kg', 'es. 1.5', false, () => {
+      // Aggiorna peso nella sezione forze solo se è aperta
+      const forcesBody = document.getElementById('pm-forces-body');
+      if (forcesBody) { forcesBody.innerHTML = ''; buildForcesSection(forcesBody, el); }
+    }));
+  });
+
+  // ── VELOCITÀ INIZIALE ──────────────────────────────────────────────────────
+  makeSection(container, 'Velocità iniziale', false, body => {
+    const isPolar    = p.v0Mode === 'polar';
+    const floorC     = getBodyConstraint(el);
+    const planeC     = getPlaneConstraint(el);
+    const wallC_v    = getWallConstraint(el);
+
+    // ── CASO: vincolo parete verticale ────────────────────────────────────
+    if (wallC_v) {
+      const wallEl_v = elements.find(e => e.id === (wallC_v.aId === el.id ? wallC_v.bId : wallC_v.aId));
+      const flipXW_v = wallEl_v?.props?.flipX;
+      // Controlla se c'è N valida (forza orizzontale che spinge sulla parete)
+      let Fx_v = 0;
+      (p.forces||[]).forEach(f => { Fx_v += parseFloat(f.fx)||0; });
+      const pushes_v = flipXW_v ? (Fx_v > 0) : (Fx_v < 0);
+      const hasN_v = Math.abs(Fx_v) > 1e-9 && pushes_v;
+
+      if (hasN_v) {
+        // Con N valida: v₀y libero, v₀x = 0 oppure nel verso che si allontana (stacca)
+        // flipX=false (parete sx): v₀x ≥ 0 (0 = scorre, >0 = si stacca)
+        // flipX=true  (parete dx): v₀x ≤ 0 (0 = scorre, <0 = si stacca)
+
+        // Toggle comp / polare
+        const toggleRow_w = document.createElement('div');
+        toggleRow_w.className = 'prop-toggle-row';
+        const btnC_w = document.createElement('button');
+        btnC_w.className = 'prop-toggle-btn' + (!isPolar ? ' active' : '');
+        btnC_w.textContent = 'v₀x, v₀y';
+        const btnP_w = document.createElement('button');
+        btnP_w.className = 'prop-toggle-btn' + (isPolar ? ' active' : '');
+        btnP_w.textContent = '|v₀|, θ';
+        toggleRow_w.appendChild(btnC_w); toggleRow_w.appendChild(btnP_w);
+        body.appendChild(toggleRow_w);
+
+        // ── Componenti ──
+        const compDiv_w = document.createElement('div');
+        compDiv_w.style.display = isPolar ? 'none' : 'block';
+
+        const rowVx_w = makePropField(el, 'v0x', 'v₀x', 'm/s', flipXW_v ? 'es. -1 o 0' : 'es. 0 o 1', false, () => {
+          // Clamp: non può entrare nella parete
+          const vx = parseFloat(p.v0x) || 0;
+          if (!flipXW_v && vx < 0) { p.v0x = 0; if (rowVx_w._input) rowVx_w._input.value = '0'; }
+          if ( flipXW_v && vx > 0) { p.v0x = 0; if (rowVx_w._input) rowVx_w._input.value = '0'; }
+          syncV0(el, 'comp'); render();
+        });
+        const rowVy_w = makePropField(el, 'v0y', 'v₀y', 'm/s', 'es. 2', false, () => {
+          syncV0(el, 'comp'); render();
+        });
+        compDiv_w.appendChild(rowVx_w);
+        compDiv_w.appendChild(rowVy_w);
+        const hintComp_w = document.createElement('div');
+        hintComp_w.className = 'prop-hint'; hintComp_w.style.marginTop = '4px';
+        hintComp_w.textContent = flipXW_v
+          ? 'v₀x ≤ 0 (0=scorre, <0=si stacca). v₀y libero.'
+          : 'v₀x ≥ 0 (0=scorre, >0=si stacca). v₀y libero.';
+        compDiv_w.appendChild(hintComp_w);
+        body.appendChild(compDiv_w);
+
+        // ── Polare ──
+        const polarDiv_w = document.createElement('div');
+        polarDiv_w.style.display = isPolar ? 'block' : 'none';
+        const rowMod_w = makePropField(el, 'v0Mod', '|v₀|', 'm/s', 'es. 2', false, () => {
+          syncV0(el, 'polar');
+          // Clamp v₀x
+          const vx2 = parseFloat(p.v0x) || 0;
+          if (!flipXW_v && vx2 < 0) { p.v0Angle = 90; syncV0(el, 'polar'); }
+          if ( flipXW_v && vx2 > 0) { p.v0Angle = 90; syncV0(el, 'polar'); }
+          if (rowVx_w._input) rowVx_w._input.value = p.v0x ?? '';
+          if (rowVy_w._input) rowVy_w._input.value = p.v0y ?? '';
+          render();
+        });
+        const rowAng_w = makePropField(el, 'v0Angle', 'θ', '°',
+          flipXW_v ? 'θ ∈ [90°,270°]' : 'θ ∈ [-90°,90°]', false, () => {
+          let ang = parseFloat(p.v0Angle) || 0;
+          if (!flipXW_v) ang = Math.max(-90, Math.min(90, ang));
+          else { if (ang > -90 && ang < 90) ang = 90; }
+          p.v0Angle = ang;
+          if (rowAng_w._input) rowAng_w._input.value = String(ang);
+          syncV0(el, 'polar');
+          if (rowVx_w._input) rowVx_w._input.value = p.v0x ?? '';
+          if (rowVy_w._input) rowVy_w._input.value = p.v0y ?? '';
+          render();
+        });
+        const hintAng_w = document.createElement('div');
+        hintAng_w.className = 'prop-hint'; hintAng_w.style.marginTop = '4px';
+        hintAng_w.textContent = flipXW_v
+          ? 'θ ∈ [90°,270°]. θ=90° o 270° = scorre, altro = si stacca.'
+          : 'θ ∈ [-90°,90°]. θ=90° o -90° = scorre, θ=0° = si stacca.';
+        polarDiv_w.appendChild(rowMod_w);
+        polarDiv_w.appendChild(rowAng_w);
+        polarDiv_w.appendChild(hintAng_w);
+        body.appendChild(polarDiv_w);
+
+        btnC_w.addEventListener('click', () => {
+          p.v0Mode = 'comp';
+          btnC_w.classList.add('active'); btnP_w.classList.remove('active');
+          compDiv_w.style.display = 'block'; polarDiv_w.style.display = 'none';
+        });
+        btnP_w.addEventListener('click', () => {
+          p.v0Mode = 'polar';
+          btnP_w.classList.add('active'); btnC_w.classList.remove('active');
+          polarDiv_w.style.display = 'block'; compDiv_w.style.display = 'none';
+        });
+
+      } else {
+        // Nessuna N: corpo sulla parete ma si stacca
+        // flipX=false (parete sx): v₀x >= 0  →  θ ∈ [-90°, 90°]
+        // flipX=true  (parete dx): v₀x <= 0  →  θ ∈ [90°, 270°] ovvero |θ| >= 90°
+        const hintFree = document.createElement('div');
+        hintFree.className = 'prop-hint'; hintFree.style.marginBottom = '8px';
+        hintFree.textContent = flipXW_v
+          ? 'Parete a destra: v₀x ≤ 0 (θ ∈ [90°,270°]).'
+          : 'Parete a sinistra: v₀x ≥ 0 (θ ∈ [-90°,90°]).';
+        body.appendChild(hintFree);
+
+        // Toggle comp / polare
+        const toggleFree = document.createElement('div');
+        toggleFree.className = 'prop-toggle-row';
+        const btnCF = document.createElement('button');
+        btnCF.className = 'prop-toggle-btn' + (!isPolar ? ' active' : '');
+        btnCF.textContent = 'v₀x, v₀y';
+        const btnPF = document.createElement('button');
+        btnPF.className = 'prop-toggle-btn' + (isPolar ? ' active' : '');
+        btnPF.textContent = '|v₀|, θ';
+        toggleFree.appendChild(btnCF); toggleFree.appendChild(btnPF);
+        body.appendChild(toggleFree);
+
+        // ── Componenti ──
+        const compFree = document.createElement('div');
+        compFree.style.display = isPolar ? 'none' : 'block';
+
+        const rowVx = makePropField(el, 'v0x', 'v₀x', 'm/s', flipXW_v ? 'es. -1' : 'es. 1', false, () => {
+          const vx = parseFloat(p.v0x) || 0;
+          if (!flipXW_v && vx < 0) { p.v0x = 0; if (rowVx._input) rowVx._input.value = '0'; }
+          if ( flipXW_v && vx > 0) { p.v0x = 0; if (rowVx._input) rowVx._input.value = '0'; }
+          syncV0(el, 'comp'); render();
+        });
+        const rowVy = makePropField(el, 'v0y', 'v₀y', 'm/s', 'es. 0', false, () => {
+          syncV0(el, 'comp'); render();
+        });
+        compFree.appendChild(rowVx); compFree.appendChild(rowVy);
+        body.appendChild(compFree);
+
+        // ── Polare ──
+        const polarFree = document.createElement('div');
+        polarFree.style.display = isPolar ? 'block' : 'none';
+
+        const rowMF = makePropField(el, 'v0Mod', '|v₀|', 'm/s', 'es. 3', false, () => {
+          syncV0(el, 'polar');
+          // Clamp angolo se necessario
+          const ang = parseFloat(p.v0Angle) || 0;
+          if (!flipXW_v && (ang > 90 || ang < -90)) {
+            p.v0Angle = ang > 0 ? 90 : -90;
+          }
+          if (flipXW_v && ang > -90 && ang < 90) {
+            p.v0Angle = 90;
+          }
+          syncV0(el, 'polar');
+          if (rowVx._input) rowVx._input.value = p.v0x ?? '';
+          if (rowVy._input) rowVy._input.value = p.v0y ?? '';
+          render();
+        });
+        const angHint = flipXW_v ? 'θ ∈ [90°,270°]' : 'θ ∈ [-90°,90°]';
+        const rowAF = makePropField(el, 'v0Angle', 'θ', '°', angHint, false, () => {
+          // Clamp angolo
+          let ang = parseFloat(p.v0Angle) || 0;
+          if (!flipXW_v) ang = Math.max(-90, Math.min(90, ang));
+          else { if (ang > -90 && ang < 90) ang = 90; }
+          p.v0Angle = ang;
+          if (rowAF._input) rowAF._input.value = String(ang);
+          syncV0(el, 'polar');
+          if (rowVx._input) rowVx._input.value = p.v0x ?? '';
+          if (rowVy._input) rowVy._input.value = p.v0y ?? '';
+          render();
+        });
+        polarFree.appendChild(rowMF); polarFree.appendChild(rowAF);
+        body.appendChild(polarFree);
+
+        btnCF.addEventListener('click', () => {
+          p.v0Mode = 'comp';
+          btnCF.classList.add('active'); btnPF.classList.remove('active');
+          compFree.style.display = 'block'; polarFree.style.display = 'none';
+        });
+        btnPF.addEventListener('click', () => {
+          p.v0Mode = 'polar';
+          btnPF.classList.add('active'); btnCF.classList.remove('active');
+          polarFree.style.display = 'block'; compFree.style.display = 'none';
+        });
+      }
+      return;
+    }
+
+    // ── CASO: vincolo piano inclinato ──────────────────────────────────────
+    if (planeC) {
+      const plane = elements.find(e => e.id === (planeC.aId === el.id ? planeC.bId : planeC.aId));
+      const geo   = plane ? getPlaneGeometry(plane) : null;
+
+      // Calcola N dalle sole forze (peso + esterne)
+      let planeNValid = false;
+      if (geo) {
+        const ref2    = getRefSystem();
+        const g2      = parseFloat(ref2?.props?.gravity) || 0;
+        const m2      = parseFloat(p.mass) || 0;
+        const flipY2  = ref2?.props?.flipY;
+        const pesoFy2 = (g2 > 0 && m2 > 0) ? (flipY2 ? +m2*g2 : -m2*g2) : 0;
+        const Pperp   = pesoFy2 * geo.ny_fis;
+        let Fext_perp = 0;
+        (p.forces||[]).forEach(f => {
+          Fext_perp += (parseFloat(f.fx)||0)*geo.nx_fis + (parseFloat(f.fy)||0)*geo.ny_fis;
+        });
+        planeNValid = (Pperp + Fext_perp) < -1e-9;
+      }
+
+      if (planeNValid && geo) {
+        // ── N valida: toggle "Sul piano" / "Si stacca" ─────────────────────
+        // "Sul piano": v₀s lungo ipotenusa, v_perp = 0 → N valida
+        // "Si stacca": v₀x, v₀y liberi con v_perp ≥ 0 → N = 0
+        const modeStacca = p.v0Mode === 'stacca';
+
+        const modeRow = document.createElement('div');
+        modeRow.className = 'prop-toggle-row';
+        const btnSulPiano = document.createElement('button');
+        btnSulPiano.className = 'prop-toggle-btn' + (!modeStacca ? ' active' : '');
+        btnSulPiano.textContent = 'Sul piano';
+        const btnStacca = document.createElement('button');
+        btnStacca.className = 'prop-toggle-btn' + (modeStacca ? ' active' : '');
+        btnStacca.textContent = 'Si stacca';
+        modeRow.appendChild(btnSulPiano); modeRow.appendChild(btnStacca);
+        body.appendChild(modeRow);
+
+        // ── Sul piano ───────────────────────────────────────────────────────
+        const sulPianoDiv = document.createElement('div');
+        sulPianoDiv.style.display = modeStacca ? 'none' : 'block';
+        sulPianoDiv.appendChild(makePropField(el, 'v0s', 'v₀ (lungo piano)', 'm/s', 'es. 2', false, () => {
+          p.v0x = '0'; p.v0y = '0'; render();
+        }));
+        const hintSP = document.createElement('div');
+        hintSP.className = 'prop-hint'; hintSP.style.marginTop = '4px';
+        hintSP.textContent = '+ = su per il piano, − = giù. N valida.';
+        sulPianoDiv.appendChild(hintSP);
+        body.appendChild(sulPianoDiv);
+
+        // ── Si stacca: v₀x, v₀y con v_perp ≥ 0 ────────────────────────────
+        const staccaDiv = document.createElement('div');
+        staccaDiv.style.display = modeStacca ? 'block' : 'none';
+
+        const staccaToggle = document.createElement('div');
+        staccaToggle.className = 'prop-toggle-row'; staccaToggle.style.marginTop = '6px';
+        const btnC_p = document.createElement('button');
+        btnC_p.className = 'prop-toggle-btn' + (!isPolar ? ' active' : '');
+        btnC_p.textContent = 'v₀x, v₀y';
+        const btnP_p = document.createElement('button');
+        btnP_p.className = 'prop-toggle-btn' + (isPolar ? ' active' : '');
+        btnP_p.textContent = '|v₀|, θ';
+        staccaToggle.appendChild(btnC_p); staccaToggle.appendChild(btnP_p);
+        staccaDiv.appendChild(staccaToggle);
+
+        // Clamp: v_perp = v0x*nx_fis + v0y*ny_fis ≥ 0
+        function clampVperp() {
+          const vx = parseFloat(p.v0x)||0, vy = parseFloat(p.v0y)||0;
+          if (vx*geo.nx_fis + vy*geo.ny_fis < -1e-6) {
+            // Proietta sul piano: azzera la componente perpendicolare
+            const vpar = vx*geo.dx_fis + vy*geo.dy_fis;
+            p.v0x = (vpar * geo.dx_fis).toFixed(4);
+            p.v0y = (vpar * geo.dy_fis).toFixed(4);
+          }
+        }
+
+        const compDiv = document.createElement('div');
+        compDiv.style.display = isPolar ? 'none' : 'block';
+        const rowV0x = makePropField(el, 'v0x', 'v₀x', 'm/s', 'es. 1', false, () => {
+          clampVperp();
+          if (rowV0x._input) rowV0x._input.value = p.v0x ?? '';
+          if (rowV0y._input) rowV0y._input.value = p.v0y ?? '';
+          syncV0(el, 'comp'); render();
+        });
+        const rowV0y = makePropField(el, 'v0y', 'v₀y', 'm/s', 'es. 1', false, () => {
+          clampVperp();
+          if (rowV0x._input) rowV0x._input.value = p.v0x ?? '';
+          if (rowV0y._input) rowV0y._input.value = p.v0y ?? '';
+          syncV0(el, 'comp'); render();
+        });
+        compDiv.appendChild(rowV0x); compDiv.appendChild(rowV0y);
+        const hintComp = document.createElement('div');
+        hintComp.className = 'prop-hint'; hintComp.style.marginTop = '4px';
+        hintComp.textContent = 'v⊥ ≥ 0 (non entra nel piano). N = 0.';
+        compDiv.appendChild(hintComp);
+        staccaDiv.appendChild(compDiv);
+
+        const polarDiv = document.createElement('div');
+        polarDiv.style.display = isPolar ? 'block' : 'none';
+        const rowMod = makePropField(el, 'v0Mod', '|v₀|', 'm/s', 'es. 3', false, () => {
+          syncV0(el, 'polar'); clampVperp(); syncV0(el, 'comp');
+          if (rowMod._input) rowMod._input.value = p.v0Mod ?? '';
+          render();
+        });
+        const rowAng = makePropField(el, 'v0Angle', 'θ', '°', 'es. 45', false, () => {
+          syncV0(el, 'polar'); clampVperp(); syncV0(el, 'comp');
+          if (rowAng._input) rowAng._input.value = p.v0Angle ?? '';
+          render();
+        });
+        // Hint angoli limite
+        const angPiano = Math.atan2(geo.dy_fis, geo.dx_fis) * 180/Math.PI;
+        const angNorm  = Math.atan2(geo.ny_fis, geo.nx_fis) * 180/Math.PI;
+        const hintPol = document.createElement('div');
+        hintPol.className = 'prop-hint'; hintPol.style.marginTop = '4px';
+        hintPol.textContent = `v⊥ ≥ 0. Piano: θ≈${angPiano.toFixed(0)}°, Normale: θ≈${angNorm.toFixed(0)}°.`;
+        polarDiv.appendChild(rowMod); polarDiv.appendChild(rowAng); polarDiv.appendChild(hintPol);
+        staccaDiv.appendChild(polarDiv);
+
+        btnC_p.addEventListener('click', () => {
+          p.v0Mode = 'stacca';
+          btnC_p.classList.add('active'); btnP_p.classList.remove('active');
+          compDiv.style.display = 'block'; polarDiv.style.display = 'none';
+        });
+        btnP_p.addEventListener('click', () => {
+          p.v0Mode = 'stacca';
+          btnP_p.classList.add('active'); btnC_p.classList.remove('active');
+          polarDiv.style.display = 'block'; compDiv.style.display = 'none';
+        });
+        body.appendChild(staccaDiv);
+
+        btnSulPiano.addEventListener('click', () => {
+          p.v0Mode = 'comp'; p.v0x = '0'; p.v0y = '0';
+          btnSulPiano.classList.add('active'); btnStacca.classList.remove('active');
+          sulPianoDiv.style.display = 'block'; staccaDiv.style.display = 'none';
+          render();
+        });
+        btnStacca.addEventListener('click', () => {
+          p.v0Mode = 'stacca'; p.v0s = '0';
+          btnStacca.classList.add('active'); btnSulPiano.classList.remove('active');
+          staccaDiv.style.display = 'block'; sulPianoDiv.style.display = 'none';
+        });
+
+      } else {
+        // ── N non valida: v₀ completamente libero ──────────────────────────
+        const hintFree = document.createElement('div');
+        hintFree.className = 'prop-hint'; hintFree.style.marginBottom = '8px';
+        hintFree.textContent = 'N = 0: corpo non vincolato, v₀ libero.';
+        body.appendChild(hintFree);
+
+        const toggle = document.createElement('div');
+        toggle.className = 'prop-toggle-row';
+        const btnComp  = document.createElement('button');
+        btnComp.className  = 'prop-toggle-btn' + (!isPolar ? ' active' : '');
+        btnComp.textContent = 'v₀x, v₀y';
+        const btnPolar = document.createElement('button');
+        btnPolar.className = 'prop-toggle-btn' + (isPolar ? ' active' : '');
+        btnPolar.textContent = '|v₀|, θ';
+        toggle.appendChild(btnComp); toggle.appendChild(btnPolar);
+        body.appendChild(toggle);
+
+        const compDiv = document.createElement('div');
+        compDiv.style.display = isPolar ? 'none' : 'block';
+        compDiv.appendChild(makePropField(el, 'v0x', 'v₀x', 'm/s', 'es. 0'));
+        compDiv.appendChild(makePropField(el, 'v0y', 'v₀y', 'm/s', 'es. 0'));
+        body.appendChild(compDiv);
+
+        const polarDiv = document.createElement('div');
+        polarDiv.style.display = isPolar ? 'block' : 'none';
+        polarDiv.appendChild(makePropField(el, 'v0Mod',   '|v₀|', 'm/s', 'es. 3', false, () => syncV0(el, 'polar')));
+        polarDiv.appendChild(makePropField(el, 'v0Angle', 'θ',    '°',   'es. 30', false, () => syncV0(el, 'polar')));
+        body.appendChild(polarDiv);
+
+        btnComp.addEventListener('click', () => {
+          p.v0Mode = 'comp';
+          btnComp.classList.add('active'); btnPolar.classList.remove('active');
+          compDiv.style.display = 'block'; polarDiv.style.display = 'none';
+        });
+        btnPolar.addEventListener('click', () => {
+          p.v0Mode = 'polar';
+          btnPolar.classList.add('active'); btnComp.classList.remove('active');
+          polarDiv.style.display = 'block'; compDiv.style.display = 'none';
+        });
+      }
+      return;
+    }
+
+    // ── CASO: vincolo pavimento con N valida ────────────────────────────────
+    let nValid = false;
+    if (floorC) {
+      const ref2   = getRefSystem();
+      const g2     = parseFloat(ref2?.props?.gravity) || 0;
+      const flipY2 = ref2?.props?.flipY;
+      const m2     = parseFloat(p.mass) || 0;
+      const pesoFy2 = (g2 > 0 && m2 > 0) ? (flipY2 ? +m2*g2 : -m2*g2) : 0;
+      let Fy_app = pesoFy2;
+      (p.forces||[]).forEach(f => { Fy_app += parseFloat(f.fy)||0; });
+      const Ny = -Fy_app;
+      const v0y_vel = parseFloat(p.v0y) || 0;
+      const detaching_vel = flipY2 ? (v0y_vel < 0) : (v0y_vel > 0);
+      nValid = !detaching_vel && (flipY2 ? (Ny < 0) : (Ny > 0));
+    }
+    const onFloor = !!floorC && nValid;
+
+    if (onFloor) {
+      // Corpo appoggiato: v₀x libero, v₀y ≥ 0
+      // v₀y = 0 → scorre sul pavimento con N
+      // v₀y > 0 → si stacca (N = 0 da quell'istante)
+      // v₀y < 0 → impossibile (entrerebbe nel pavimento)
+      if ((parseFloat(p.v0y)||0) < 0) { p.v0y = 0; }
+
+      // Toggle comp / polare
+      const toggleF = document.createElement('div');
+      toggleF.className = 'prop-toggle-row';
+      const btnCFloor = document.createElement('button');
+      btnCFloor.className = 'prop-toggle-btn' + (!isPolar ? ' active' : '');
+      btnCFloor.textContent = 'v₀x, v₀y';
+      const btnPFloor = document.createElement('button');
+      btnPFloor.className = 'prop-toggle-btn' + (isPolar ? ' active' : '');
+      btnPFloor.textContent = '|v₀|, θ';
+      toggleF.appendChild(btnCFloor); toggleF.appendChild(btnPFloor);
+      body.appendChild(toggleF);
+
+      // ── Componenti ──
+      const compFloor = document.createElement('div');
+      compFloor.style.display = isPolar ? 'none' : 'block';
+      const rowVx0 = makePropField(el, 'v0x', 'v₀x', 'm/s', 'es. 2', false, () => {
+        syncV0(el, 'comp');
+        render();
+      });
+      const rowVy0 = makePropField(el, 'v0y', 'v₀y', 'm/s', 'es. 0', false, () => {
+        // Clamp v₀y ≥ 0
+        if ((parseFloat(p.v0y)||0) < 0) { p.v0y = 0; if (rowVy0._input) rowVy0._input.value = '0'; }
+        syncV0(el, 'comp');
+        render();
+      });
+      compFloor.appendChild(rowVx0);
+      compFloor.appendChild(rowVy0);
+      // Nota dinamica
+      const hintFcomp = document.createElement('div');
+      hintFcomp.className = 'prop-hint'; hintFcomp.style.marginTop = '4px';
+      hintFcomp.textContent = 'v₀y ≥ 0. Se v₀y = 0 → scorre sul piano (N attiva). Se v₀y > 0 → si stacca (N = 0).';
+      compFloor.appendChild(hintFcomp);
+      body.appendChild(compFloor);
+
+      // ── Polare ──
+      const polarFloor = document.createElement('div');
+      polarFloor.style.display = isPolar ? 'block' : 'none';
+      const rowModF = makePropField(el, 'v0Mod', '|v₀|', 'm/s', 'es. 2', false, () => {
+        syncV0(el, 'polar');
+        // Clamp v₀y ≥ 0: θ ∈ [0°, 180°]
+        if ((parseFloat(p.v0y)||0) < 0) {
+          const ang = parseFloat(p.v0Angle)||0;
+          p.v0Angle = ang < 0 ? 0 : 180;
+          syncV0(el, 'polar');
+        }
+        if (rowVx0._input) rowVx0._input.value = p.v0x ?? '';
+        if (rowVy0._input) rowVy0._input.value = p.v0y ?? '';
+        if (rowAngF._input) rowAngF._input.value = p.v0Angle ?? '';
+        render();
+      });
+      const rowAngF = makePropField(el, 'v0Angle', 'θ', '°', '0°÷180°', false, () => {
+        // Clamp θ ∈ [0°, 180°] — v₀y ≥ 0
+        let ang = parseFloat(p.v0Angle) || 0;
+        ang = Math.max(0, Math.min(180, ang));
+        p.v0Angle = ang;
+        if (rowAngF._input) rowAngF._input.value = String(ang);
+        syncV0(el, 'polar');
+        if (rowVx0._input) rowVx0._input.value = p.v0x ?? '';
+        if (rowVy0._input) rowVy0._input.value = p.v0y ?? '';
+        render();
+      });
+      const hintAngF = document.createElement('div');
+      hintAngF.className = 'prop-hint'; hintAngF.style.marginTop = '4px';
+      hintAngF.textContent = 'θ ∈ [0°, 180°] (v₀y ≥ 0). θ=0°→destra, θ=180°→sinistra, θ=90°→si stacca.';
+      polarFloor.appendChild(rowModF);
+      polarFloor.appendChild(rowAngF);
+      polarFloor.appendChild(hintAngF);
+      body.appendChild(polarFloor);
+
+      btnCFloor.addEventListener('click', () => {
+        p.v0Mode = 'comp';
+        btnCFloor.classList.add('active'); btnPFloor.classList.remove('active');
+        compFloor.style.display = 'block'; polarFloor.style.display = 'none';
+      });
+      btnPFloor.addEventListener('click', () => {
+        p.v0Mode = 'polar';
+        btnPFloor.classList.add('active'); btnCFloor.classList.remove('active');
+        polarFloor.style.display = 'block'; compFloor.style.display = 'none';
+      });
+
+    } else {
+      // corpo libero (nessun vincolo) o con vincolo ma N≤0 (si stacca)
+      // Se ha vincolo h=0 ma si stacca → v₀y ≥ 0 e θ ∈ [0°, 180°]
+      const hasFloorConstraint = !!constraint; // vincolo geometrico c'è, ma N≤0
+      const clampPositive = hasFloorConstraint; // v₀y e θ non possono essere negativi
+
+      const toggle = document.createElement('div');
+      toggle.className = 'prop-toggle-row';
+      const btnComp  = document.createElement('button');
+      btnComp.className  = 'prop-toggle-btn' + (!isPolar ? ' active' : '');
+      btnComp.textContent = 'v₀x, v₀y';
+      const btnPolar = document.createElement('button');
+      btnPolar.className = 'prop-toggle-btn' + (isPolar ? ' active' : '');
+      btnPolar.textContent = '|v₀|, θ';
+      toggle.appendChild(btnComp); toggle.appendChild(btnPolar);
+      body.appendChild(toggle);
+
+      const compDiv = document.createElement('div');
+      compDiv.style.display = isPolar ? 'none' : 'block';
+      const rowV0x = makePropField(el, 'v0x', 'v₀x', 'm/s', 'es. 2', false, () => {
+        syncV0(el, 'comp');
+        if (rowV0Mod?._input) rowV0Mod._input.value = p.v0Mod   ?? '';
+        if (rowV0Ang?._input) rowV0Ang._input.value = p.v0Angle ?? '';
+      });
+      const rowV0y = makePropField(el, 'v0y', 'v₀y', 'm/s', 'es. 0', false, () => {
+        if (clampPositive && (parseFloat(p.v0y)||0) < 0) {
+          p.v0y = 0;
+          if (rowV0y._input) rowV0y._input.value = '0';
+        }
+        syncV0(el, 'comp');
+        if (rowV0Mod?._input) rowV0Mod._input.value = p.v0Mod   ?? '';
+        if (rowV0Ang?._input) rowV0Ang._input.value = p.v0Angle ?? '';
+      });
+      compDiv.appendChild(rowV0x);
+      compDiv.appendChild(rowV0y);
+      if (clampPositive) {
+        const h = document.createElement('div');
+        h.className = 'prop-hint'; h.style.marginTop = '4px';
+        h.textContent = '↑ Sul pavimento: v₀y ≥ 0.';
+        compDiv.appendChild(h);
+      }
+      body.appendChild(compDiv);
+
+      const polarDiv = document.createElement('div');
+      polarDiv.style.display = isPolar ? 'block' : 'none';
+      const rowV0Mod = makePropField(el, 'v0Mod', '|v₀|', 'm/s', 'es. 3', false, () => {
+        syncV0(el, 'polar');
+        if (rowV0x?._input) rowV0x._input.value = p.v0x ?? '';
+        if (rowV0y?._input) rowV0y._input.value = p.v0y ?? '';
+      });
+      const rowV0Ang = makePropField(el, 'v0Angle', 'θ', '°',
+        clampPositive ? 'es. 45 (0°–180°)' : 'es. 30', false, () => {
+        if (clampPositive) {
+          // Clamp θ a [0°, 180°]
+          const ang = parseFloat(p.v0Angle) || 0;
+          if (ang < 0 || ang > 180) {
+            p.v0Angle = Math.max(0, Math.min(180, ang));
+            if (rowV0Ang._input) rowV0Ang._input.value = String(p.v0Angle);
+          }
+        }
+        syncV0(el, 'polar');
+        if (rowV0x?._input) rowV0x._input.value = p.v0x ?? '';
+        if (rowV0y?._input) rowV0y._input.value = p.v0y ?? '';
+      });
+      if (clampPositive) {
+        const h = document.createElement('div');
+        h.className = 'prop-hint'; h.style.marginTop = '4px';
+        h.textContent = '↑ Sul pavimento: θ ∈ [0°, 180°].';
+        polarDiv.appendChild(h);
+      }
+      polarDiv.appendChild(rowV0Mod);
+      polarDiv.appendChild(rowV0Ang);
+      body.appendChild(polarDiv);
+
+      btnComp.addEventListener('click', () => {
+        p.v0Mode = 'comp';
+        btnComp.classList.add('active'); btnPolar.classList.remove('active');
+        compDiv.style.display = 'block'; polarDiv.style.display = 'none';
+      });
+      btnPolar.addEventListener('click', () => {
+        p.v0Mode = 'polar';
+        btnPolar.classList.add('active'); btnComp.classList.remove('active');
+        polarDiv.style.display = 'block'; compDiv.style.display = 'none';
+      });
+    }
+  });
+
+  // ── FORZE ─────────────────────────────────────────────────────────────────
+  makeSection(container, 'Forze', false, body => {
+    body.id = 'pm-forces-body';
+    buildForcesSection(body, el);
+  });
+
+  // ── RIEPILOGO ──────────────────────────────────────────────────────────────
+  makeSection(container, '∑ Riepilogo', false, body => {
+    body.id = 'pm-riepilogo-body';
+    buildRiepilogo(body, el);
+  });
+}
+
+
+// ─── Pannello proprietà fune ───────────────────────────────────────────────────
+function buildRopePanel(el, container) {
+  const freeEnd = typeof getRopeFreeEnd === 'function' ? getRopeFreeEnd(el) : null;
+  const hasBody = relations.some(r => r.type === 'rope_body' && (r.aId === el.id || r.bId === el.id));
+
+  if (!hasBody) {
+    makeSection(container, '⌀ Fune', true, body => {
+      const h = document.createElement('div');
+      h.className = 'prop-hint';
+      h.textContent = 'Collega un corpo alla fune per le opzioni fisiche.';
+      body.appendChild(h);
+    });
+    return;
+  }
+
+  makeSection(container, '⌀ Fune', true, body => {
+    // Toggle visibilità fune
+    const visRow = document.createElement('div');
+    visRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:12px';
+    const visLbl = document.createElement('div');
+    visLbl.className = 'prop-label'; visLbl.style.marginBottom = '0';
+    visLbl.textContent = 'Mostra fune';
+    const isVis = el.props.visible !== false;
+    const visBtn = document.createElement('button');
+    visBtn.textContent = isVis ? '● Visibile' : '○ Nascosta';
+    visBtn.style.cssText = `font-family:'IBM Plex Mono',monospace;font-size:10px;
+      padding:4px 10px;border-radius:4px;cursor:pointer;
+      border:1px solid ${isVis ? 'var(--accent)' : 'var(--border)'};
+      background:${isVis ? 'rgba(200,240,96,0.15)' : 'transparent'};
+      color:${isVis ? 'var(--accent)' : 'var(--muted)'};transition:all 0.12s`;
+    visBtn.addEventListener('click', () => {
+      el.props.visible = !el.props.visible;
+      render(); updatePropsPanel(true);
+    });
+    visRow.appendChild(visLbl); visRow.appendChild(visBtn);
+    body.appendChild(visRow);
+    addSep(body);
+
+    if (freeEnd) {
+      // Estremo libero → forza applicabile
+      addSectionLabel(body, 'Forza sull\'estremo libero');
+
+      const hintDir = document.createElement('div');
+      hintDir.className = 'prop-hint';
+      hintDir.style.marginBottom = '8px';
+      hintDir.textContent = `Estremo libero: ${freeEnd === 'left' ? 'sinistra ←' : 'destra →'}. La fune ruota nella direzione della forza.`;
+      body.appendChild(hintDir);
+
+      body.appendChild(makePropField(el, 'forceF', 'F', 'N', 'es. 10', false, () => { render(); }));
+      body.appendChild(makePropField(el, 'forceAngle', 'Angolo θ', '°', 'es. 0 (→), 90 (↑)', false, () => { render(); }));
+
+      const rDiv = document.createElement('div');
+      rDiv.style.marginTop = '10px';
+      body.appendChild(rDiv);
+
+      function updateRopeRiepilogo() {
+        rDiv.innerHTML = '';
+        const F   = parseFloat(el.props?.forceF) || 0;
+        const ang = parseFloat(el.props?.forceAngle) || 0;
+        if (Math.abs(F) < 1e-9) return;
+        const angRad = ang * Math.PI / 180;
+        const fx = F * Math.cos(angRad);
+        const fy = F * Math.sin(angRad);
+        const fmt = v => (v >= 0 ? '+' : '') + v.toFixed(3);
+        addSep(rDiv);
+        addSectionLabel(rDiv, 'Tensione trasmessa al corpo');
+        const fmtF = document.createElement('div');
+        fmtF.className = 'prop-hint';
+        fmtF.textContent = `T = ${F.toFixed(3)} N | Fx = ${fmt(fx)} N | Fy = ${fmt(fy)} N`;
+        rDiv.appendChild(fmtF);
+      }
+      updateRopeRiepilogo();
+      el._updateRopeRiepilogo = updateRopeRiepilogo;
+
+    } else {
+      const h = document.createElement('div');
+      h.className = 'prop-hint';
+      h.textContent = 'Fune con entrambi gli estremi collegati. La tensione è calcolata automaticamente dall\'equilibrio.';
+      body.appendChild(h);
+    }
+  });
+}
+
+// ═══ MODULE: forces-ui.js ═══
+// ─── Sezione forze ────────────────────────────────────────────────────────────
+function buildForcesSection(container, el) {
+  const p = el.props;
+  const ref = getRefSystem();
+  const g = parseFloat(ref?.props?.gravity) || 0;
+  const flipY = ref?.props?.flipY;
+  const m = parseFloat(p.mass) || 0;
+
+  // Peso automatico (readonly)
+  if (g > 0 && m > 0) {
+    const pesoFy = flipY ? +m*g : -m*g;
+    body_addLabel(container, 'Peso (automatico)');
+    container.appendChild(makeReadonlyField('Fx', '0', 'N'));
+    container.appendChild(makeReadonlyField('Fy', pesoFy.toFixed(3), 'N'));
+    addSep(container);
+  } else {
+    const hint = document.createElement('div');
+    hint.className = 'prop-hint';
+    hint.style.marginBottom = '8px';
+    hint.textContent = 'Imposta m e g per aggiungere il peso automaticamente.';
+    container.appendChild(hint);
+  }
+
+  // Forze aggiuntive
+  if (!Array.isArray(p.forces)) p.forces = [];
+  body_addLabel(container, 'Forze aggiuntive');
+
+  const list = document.createElement('div');
+  list.id = 'forces-list';
+  p.forces.forEach((f, i) => list.appendChild(makeForceRow(el, i, container)));
+  container.appendChild(list);
+
+  const addBtn = document.createElement('button');
+  addBtn.style.cssText = `width:100%;margin-top:6px;padding:5px;border-radius:4px;cursor:pointer;
+    background:none;border:1px dashed var(--border);font-family:'IBM Plex Mono',monospace;
+    font-size:9px;color:var(--muted);letter-spacing:0.08em;transition:all 0.12s`;
+  addBtn.textContent = '+ aggiungi forza';
+  addBtn.addEventListener('mouseenter', () => { addBtn.style.borderColor='var(--accent)'; addBtn.style.color='var(--accent)'; });
+  addBtn.addEventListener('mouseleave', () => { addBtn.style.borderColor='var(--border)'; addBtn.style.color='var(--muted)'; });
+  addBtn.addEventListener('click', () => {
+    p.forces.push({ name: `F${p.forces.length+1}`, mode: 'comp', fx: '', fy: '' });
+    container.innerHTML = '';
+    buildForcesSection(container, el);
+    refreshTotals(el);
+  });
+  container.appendChild(addBtn);
+}
+
+function body_addLabel(container, txt) {
+  const lbl = document.createElement('div');
+  lbl.className = 'prop-label';
+  lbl.style.marginBottom = '4px';
+  lbl.textContent = txt;
+  container.appendChild(lbl);
+}
+
+function makeForceRow(el, idx, container) {
+  const p = el.props;
+  const f = p.forces[idx];
+
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:7px 8px;margin-bottom:6px';
+
+  // Header nome + elimina
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:6px';
+  const nameIn = document.createElement('input');
+  nameIn.value = f.name || `F${idx+1}`;
+  nameIn.style.cssText = `background:none;border:none;outline:none;color:var(--accent2);
+    font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;width:60px`;
+  nameIn.addEventListener('input', () => { f.name = nameIn.value; });
+  const del = document.createElement('span');
+  del.textContent = '✕';
+  del.style.cssText = 'cursor:pointer;color:var(--muted);font-size:10px';
+  del.addEventListener('click', () => {
+    p.forces.splice(idx, 1);
+    container.innerHTML = '';
+    buildForcesSection(container, el);
+    refreshTotals(el);
+  });
+  hdr.appendChild(nameIn); hdr.appendChild(del);
+  wrap.appendChild(hdr);
+
+  // Toggle comp/polar
+  const toggle = document.createElement('div');
+  toggle.className = 'prop-toggle-row';
+  toggle.style.marginBottom = '6px';
+  const btnC = document.createElement('button');
+  btnC.className = 'prop-toggle-btn' + (f.mode !== 'polar' ? ' active' : '');
+  btnC.textContent = 'Fx, Fy';
+  const btnP = document.createElement('button');
+  btnP.className = 'prop-toggle-btn' + (f.mode === 'polar' ? ' active' : '');
+  btnP.textContent = '|F|, θ';
+  toggle.appendChild(btnC); toggle.appendChild(btnP);
+  wrap.appendChild(toggle);
+
+  const compDiv = document.createElement('div');
+  compDiv.style.display = f.mode === 'polar' ? 'none' : 'block';
+  const rowFx = makeInlineInput('Fx', f, 'fx', 'N', el, () => { syncForce(f,'comp'); updatePolarInputs(); });
+  const rowFy = makeInlineInput('Fy', f, 'fy', 'N', el, () => { syncForce(f,'comp'); updatePolarInputs(); });
+  compDiv.appendChild(rowFx); compDiv.appendChild(rowFy);
+  wrap.appendChild(compDiv);
+
+  const polarDiv = document.createElement('div');
+  polarDiv.style.display = f.mode === 'polar' ? 'block' : 'none';
+  const rowMod   = makeInlineInput('|F|', f, 'fMod',   'N', el, () => { syncForce(f,'polar'); updateCompInputs(); });
+  const rowAngle = makeInlineInput('θ',   f, 'fAngle', '°', el, () => { syncForce(f,'polar'); updateCompInputs(); });
+  polarDiv.appendChild(rowMod); polarDiv.appendChild(rowAngle);
+  wrap.appendChild(polarDiv);
+
+  function updatePolarInputs() {
+    if (rowMod._input)   rowMod._input.value   = f.fMod   ?? '';
+    if (rowAngle._input) rowAngle._input.value  = f.fAngle ?? '';
+  }
+  function updateCompInputs() {
+    if (rowFx._input) rowFx._input.value = f.fx ?? '';
+    if (rowFy._input) rowFy._input.value = f.fy ?? '';
+  }
+
+  btnC.addEventListener('click', () => {
+    f.mode = 'comp'; syncForce(f, 'polar');
+    btnC.classList.add('active'); btnP.classList.remove('active');
+    compDiv.style.display = 'block'; polarDiv.style.display = 'none';
+  });
+  btnP.addEventListener('click', () => {
+    f.mode = 'polar'; syncForce(f, 'comp');
+    btnP.classList.add('active'); btnC.classList.remove('active');
+    polarDiv.style.display = 'block'; compDiv.style.display = 'none';
+  });
+
+  return wrap;
+}
+
+function makeInlineInput(label, obj, key, unit, el, onChange) {
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;align-items:center;gap:5px;margin-bottom:4px';
+  const lbl = document.createElement('span');
+  lbl.style.cssText = "font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);width:24px;flex-shrink:0";
+  lbl.textContent = label;
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.inputMode = 'decimal';
+  const cur = obj[key];
+  input.value = (cur !== '' && cur !== undefined && cur !== null) ? String(cur) : '';
+  input.placeholder = '0';
+  input.style.cssText = `flex:1;background:var(--bg);border:1px solid var(--border);border-radius:3px;
+    padding:3px 5px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:11px;outline:none`;
+  let _renderPending = false;
+  input.addEventListener('input', () => {
+    const raw = input.value.trim();
+    if (raw === '' || raw === '-' || raw === '.' || raw === '-.') {
+      obj[key] = '';
+    } else {
+      const num = parseFloat(raw);
+      if (!isNaN(num)) {
+        obj[key] = num;
+        if (!_renderPending) {
+          _renderPending = true;
+          requestAnimationFrame(() => { _renderPending = false; render(); });
+        }
+      }
+    }
+    refreshTotals(el);
+  });
+  input.addEventListener('blur', () => {
+    input.style.borderColor = 'var(--border)';
+    const num = parseFloat(input.value.trim());
+    obj[key] = isNaN(num) ? '' : num;
+    if (!isNaN(num)) input.value = String(num);
+    render();
+    if (onChange) onChange();
+    refreshTotals(el);
+  });
+  const u = document.createElement('span');
+  u.style.cssText = "font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);width:18px";
+  u.textContent = unit;
+  row.appendChild(lbl); row.appendChild(input); row.appendChild(u);
+  row._input = input;
+  return row;
+}
+
+function syncForce(f, from) {
+  if (from === 'comp') {
+    const fx = parseFloat(f.fx)||0, fy = parseFloat(f.fy)||0;
+    f.fMod   = Math.hypot(fx,fy).toFixed(4);
+    f.fAngle = (Math.atan2(fy,fx)*180/Math.PI).toFixed(2);
+  } else {
+    const mod = parseFloat(f.fMod)||0;
+    const ang = (parseFloat(f.fAngle)||0)*Math.PI/180;
+    f.fx = (mod*Math.cos(ang)).toFixed(4);
+    f.fy = (mod*Math.sin(ang)).toFixed(4);
+  }
+}
+
+function syncV0(el, from) {
+  const p = el.props;
+  if (from === 'comp') {
+    const vx = parseFloat(p.v0x)||0, vy = parseFloat(p.v0y)||0;
+    p.v0Mod   = Math.hypot(vx,vy).toFixed(4);
+    p.v0Angle = (Math.atan2(vy,vx)*180/Math.PI).toFixed(2);
+  } else {
+    const mod = parseFloat(p.v0Mod)||0;
+    const ang = (parseFloat(p.v0Angle)||0)*Math.PI/180;
+    p.v0x = (mod*Math.cos(ang)).toFixed(4);
+    p.v0y = (mod*Math.sin(ang)).toFixed(4);
+  }
+  refreshTotals(el);
+}
+
+// ═══ MODULE: ui-refresh.js ═══
+// ─── Aggiornamento riepilogo in tempo reale ───────────────────────────────────
+function refreshTotals(el) {
+  if (!el || el.type !== 'point_mass') return;
+  // Aggiorna SOLO il riepilogo — non toccare mai buildForcesSection durante la digitazione
+  const body = document.getElementById('pm-riepilogo-body');
+  if (body) buildRiepilogo(body, el);
+}
+
+function computePeso(el) {
+  const ref = getRefSystem();
+  const g = parseFloat(ref?.props?.gravity);
+  const m = parseFloat(el.props?.mass);
+  if (!isNaN(g) && !isNaN(m) && g > 0 && m > 0) {
+    return ((ref.props?.flipY ? +1 : -1) * m * g).toFixed(3);
+  }
+  return '—';
+}
+
+// ═══ MODULE: parent-child.js ═══
+// ─── Composizione: relazioni parent→child ────────────────────────────────────
+
+const BODIES   = ['point_mass', 'block', 'sphere', 'rect_body'];
+const SURFACES = ['inclined_plane', 'floor', 'wall', 'circular_path', 'parabola'];
+const VECTORS  = ['velocity', 'force_arrow'];
+// I vettori si agganciano ai corpi, i corpi alle superfici
+
+// Proietta il punto (px, py) sul segmento (ax,ay)→(bx,by), ritorna punto proiettato
+function projectOnSegment(px, py, ax, ay, bx, by) {
+  const dx = bx - ax, dy = by - ay;
+  const len2 = dx*dx + dy*dy;
+  if (len2 === 0) return { x: ax, y: ay };
+  let t = ((px - ax)*dx + (py - ay)*dy) / len2;
+  t = Math.max(0, Math.min(1, t));
+  return { x: ax + t*dx, y: ay + t*dy };
+}
+
+// Proietta il punto (px,py) sul cerchio centrato in (cx,cy) con raggio r
+function projectOnCircle(px, py, cx, cy, r) {
+  const dx = px - cx, dy = py - cy;
+  const dist = Math.hypot(dx, dy) || 1;
+  return { x: cx + (dx/dist)*r, y: cy + (dy/dist)*r };
+}
+
+// Proietta sul punto più vicino della parabola (campionamento)
+function projectOnParabola(px, py, surfX, surfY) {
+  // La parabola è: M 5 90 Q 90 5 175 90 in coordinate locali
+  let best = null, bestDist = Infinity;
+  for (let t = 0; t <= 1; t += 0.01) {
+    const qx = (1-t)*(1-t)*5 + 2*(1-t)*t*90 + t*t*175;
+    const qy = (1-t)*(1-t)*90 + 2*(1-t)*t*5  + t*t*90;
+    const wx = surfX + qx, wy = surfY + qy;
+    const d = Math.hypot(px - wx, py - wy);
+    if (d < bestDist) { bestDist = d; best = { x: wx, y: wy }; }
+  }
+  return best;
+}
+
+// Calcola il punto di ancoraggio del child (centro bounding box) proiettato sulla superficie
+function getSnapPoint(child, parent) {
+  const cd = DEFS[child.type];
+  // centro del corpo
+  const cx = child.x + cd.w / 2;
+  const cy = child.y + cd.h / 2;
+
+  switch (parent.type) {
+    case 'inclined_plane': {
+      // diagonale: da (px+10, py+110) a (px+170, py+30) in coordinate canvas
+      const ax = parent.x + 10,  ay = parent.y + 110;
+      const bx = parent.x + 170, by = parent.y + 30;
+      return projectOnSegment(cx, cy, ax, ay, bx, by);
+    }
+    case 'floor': {
+      // linea orizzontale a y = parent.y + 10
+      const ax = parent.x,       ay = parent.y + 10;
+      const bx = parent.x + 220, by = parent.y + 10;
+      return projectOnSegment(cx, cy, ax, ay, bx, by);
+    }
+    case 'wall': {
+      // linea verticale a x = parent.x + 20
+      const ax = parent.x + 20, ay = parent.y;
+      const bx = parent.x + 20, by = parent.y + 200;
+      return projectOnSegment(cx, cy, ax, ay, bx, by);
+    }
+    case 'circular_path': {
+      const pcx = parent.x + 60, pcy = parent.y + 60, r = 50;
+      return projectOnCircle(cx, cy, pcx, pcy, r);
+    }
+    case 'parabola': {
+      return projectOnParabola(cx, cy, parent.x, parent.y);
+    }
+    default:
+      return { x: cx, y: cy };
+  }
+}
+
+function getOverlappingParent(child) {
+  const cd = DEFS[child.type];
+  const cx = child.x + cd.w / 2;
+  const cy = child.y + cd.h / 2;
+
+  // Vettori si agganciano ai corpi
+  if (VECTORS.includes(child.type)) {
+    for (const other of elements) {
+      if (other.id === child.id) continue;
+      if (!BODIES.includes(other.type)) continue;
+      const od = DEFS[other.type];
+      const pad = 30;
+      if (cx >= other.x - pad && cx <= other.x + od.w + pad &&
+          cy >= other.y - pad && cy <= other.y + od.h + pad) {
+        return other;
+      }
+    }
+    return null;
+  }
+
+  // Corpi si agganciano alle superfici
+  if (!BODIES.includes(child.type)) return null;
+  for (const other of elements) {
+    if (other.id === child.id) continue;
+    if (other.parentId === child.id) continue;
+    if (!SURFACES.includes(other.type)) continue;
+    const od = DEFS[other.type];
+    const pad = 30;
+    if (cx >= other.x - pad && cx <= other.x + od.w + pad &&
+        cy >= other.y - pad && cy <= other.y + od.h + pad) {
+      return other;
+    }
+  }
+  return null;
+}
+
+function bindElement(childId, parentId) {
+  const child  = elements.find(e => e.id === childId);
+  const parent = elements.find(e => e.id === parentId);
+  if (!child || !parent) return;
+
+  const cd = DEFS[child.type];
+  const pd = DEFS[parent.type];
+
+  if (VECTORS.includes(child.type)) {
+    // Il vettore si posiziona centrato sopra il corpo
+    child.x = parent.x + pd.w / 2 - cd.w / 2;
+    child.y = parent.y - cd.h - 10;
+  } else {
+    // Proiezione sulla superficie
+    const snap = getSnapPoint(child, parent);
+    child.x = snap.x - cd.w / 2;
+    child.y = snap.y - cd.h / 2;
+  }
+
+  child.parentId = parentId;
+  child.offsetX  = child.x - parent.x;
+  child.offsetY  = child.y - parent.y;
+
+  render();
+  showToast(`🔗 Agganciato a "${DEFS[parent.type].label}"`);
+}
+
+function unbindElement(childId) {
+  const child = elements.find(e => e.id === childId);
+  if (!child || !child.parentId) return;
+  const parentLabel = DEFS[elements.find(e => e.id === child.parentId)?.type]?.label || '';
+  delete child.parentId;
+  delete child.offsetX;
+  delete child.offsetY;
+  render();
+  showToast(`🔓 Sganciato da "${parentLabel}"`);
+}
+
+// Quando muoviamo un parent, trasciniamo con lui tutti i figli
+function moveWithChildren(parentId, dx, dy) {
+  for (const el of elements) {
+    if (el.parentId === parentId) {
+      el.x += dx;
+      el.y += dy;
+      el.offsetX = el.x - elements.find(e => e.id === parentId).x;
+      el.offsetY = el.y - elements.find(e => e.id === parentId).y;
+      // ricorsivo: se questo elemento ha figli
+      moveWithChildren(el.id, dx, dy);
+    }
+  }
+}
+
+// ═══ MODULE: workspace.js ═══
+// ─── Salvataggio e caricamento workspace ──────────────────────────────────────
+
+const WORKSPACE_VERSION = 1;
+
+function saveWorkspace() {
+  // Salva la slide corrente prima di serializzare
+  if (typeof saveCurrentSlide === 'function') saveCurrentSlide();
+
+  const data = {
+    version: WORKSPACE_VERSION,
+    savedAt: new Date().toISOString(),
+    elements: elements.map(el => {
+      const clean = {};
+      for (const [k, v] of Object.entries(el)) {
+        if (!k.startsWith('_')) clean[k] = v;
+      }
+      return clean;
+    }),
+    relations: relations.map(r => ({ ...r })),
+    idCounter,
+    viewSettings: {
+      vectorScale:    window._vectorScale    || 140,
+      vectorStroke:   window._vectorStroke   || 1.5,
+      vectorHead:     window._vectorHead     || 9,
+      vectorFontSize: window._vectorFontSize || 13,
+    },
+    // Salva slides se in modalità presentazione
+    slides: (typeof _slidesMode !== 'undefined' && _slidesMode && typeof _slides !== 'undefined' && _slides.length > 1)
+      ? _slides.map(s => ({
+          id: s.id,
+          title: s.title,
+          elements: (s.elements || []).map(el => {
+            const clean = {};
+            for (const [k, v] of Object.entries(el)) {
+              if (!k.startsWith('_')) clean[k] = v;
+            }
+            return clean;
+          }),
+          relations: (s.relations || []).map(r => ({ ...r })),
+          idCounter: s.idCounter,
+        }))
+      : null,
+    currentSlide: (typeof _currentSlide !== 'undefined') ? _currentSlide : 0,
+  };
+
+  const json = JSON.stringify(data, null, 2);
+  showWorkspaceSaveModal(json);
+}
+
+function showWorkspaceSaveModal(json) {
+  // Rimuovi modal precedente
+  const existing = document.getElementById('workspace-modal');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'workspace-modal';
+  overlay.style.cssText = `
+    position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;
+    display:flex;align-items:center;justify-content:center;
+  `;
+
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    background:#1a1a22;border:1px solid #3a3a44;border-radius:8px;
+    padding:20px;width:520px;max-width:90vw;max-height:80vh;
+    display:flex;flex-direction:column;gap:12px;
+    font-family:'IBM Plex Mono',monospace;
+  `;
+
+  const title = document.createElement('div');
+  title.style.cssText = 'color:#c8f060;font-size:13px;font-weight:600';
+  title.textContent = '💾 Salva workspace';
+
+  const hint = document.createElement('div');
+  hint.style.cssText = 'color:#a0a0b0;font-size:11px;line-height:1.5';
+  hint.textContent = 'Copia il JSON qui sotto e salvalo in un file .json sul tuo computer.';
+
+  const ta = document.createElement('textarea');
+  ta.value = json;
+  ta.readOnly = true;
+  ta.style.cssText = `
+    width:100%;height:280px;resize:none;
+    background:#111118;border:1px solid #3a3a44;border-radius:4px;
+    color:#c8f060;font-family:'IBM Plex Mono',monospace;font-size:10px;
+    padding:10px;box-sizing:border-box;outline:none;
+  `;
+
+  const btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:8px;justify-content:flex-end';
+
+  const btnCopy = document.createElement('button');
+  btnCopy.textContent = '📋 Copia negli appunti';
+  btnCopy.style.cssText = `
+    padding:8px 16px;border-radius:5px;cursor:pointer;
+    background:rgba(200,240,96,0.12);border:1px solid #c8f060;
+    color:#c8f060;font-family:'IBM Plex Mono',monospace;font-size:11px;
+  `;
+  btnCopy.addEventListener('click', () => {
+    ta.select();
+    navigator.clipboard?.writeText(json).then(() => {
+      btnCopy.textContent = '✓ Copiato!';
+      setTimeout(() => { btnCopy.textContent = '📋 Copia negli appunti'; }, 2000);
+    }).catch(() => {
+      document.execCommand('copy');
+      btnCopy.textContent = '✓ Copiato!';
+      setTimeout(() => { btnCopy.textContent = '📋 Copia negli appunti'; }, 2000);
+    });
+  });
+
+  const btnClose = document.createElement('button');
+  btnClose.textContent = 'Chiudi';
+  btnClose.style.cssText = `
+    padding:8px 16px;border-radius:5px;cursor:pointer;
+    background:none;border:1px solid #3a3a44;
+    color:#a0a0b0;font-family:'IBM Plex Mono',monospace;font-size:11px;
+  `;
+  btnClose.addEventListener('click', () => overlay.remove());
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+
+  btnRow.appendChild(btnCopy);
+  btnRow.appendChild(btnClose);
+  modal.appendChild(title);
+  modal.appendChild(hint);
+  modal.appendChild(ta);
+  modal.appendChild(btnRow);
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  // Seleziona tutto automaticamente
+  setTimeout(() => ta.select(), 50);
+}
+
+function loadWorkspace() {
+  // Rimuovi modal precedente
+  const existing = document.getElementById('workspace-modal');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'workspace-modal';
+  overlay.style.cssText = `
+    position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;
+    display:flex;align-items:center;justify-content:center;
+  `;
+
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    background:#1a1a22;border:1px solid #3a3a44;border-radius:8px;
+    padding:20px;width:520px;max-width:90vw;max-height:80vh;
+    display:flex;flex-direction:column;gap:12px;
+    font-family:'IBM Plex Mono',monospace;
+  `;
+
+  const title = document.createElement('div');
+  title.style.cssText = 'color:#c8f060;font-size:13px;font-weight:600';
+  title.textContent = '📂 Carica workspace';
+
+  const hint = document.createElement('div');
+  hint.style.cssText = 'color:#a0a0b0;font-size:11px;line-height:1.5';
+  hint.textContent = 'Incolla il JSON di un workspace salvato in precedenza.';
+
+  const ta = document.createElement('textarea');
+  ta.placeholder = 'Incolla qui il JSON del workspace...';
+  ta.style.cssText = `
+    width:100%;height:280px;resize:none;
+    background:#111118;border:1px solid #3a3a44;border-radius:4px;
+    color:#e8e8ec;font-family:'IBM Plex Mono',monospace;font-size:10px;
+    padding:10px;box-sizing:border-box;outline:none;
+  `;
+
+  const btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:8px;justify-content:flex-end';
+
+  const btnLoad = document.createElement('button');
+  btnLoad.textContent = '▶ Carica';
+  btnLoad.style.cssText = `
+    padding:8px 16px;border-radius:5px;cursor:pointer;
+    background:rgba(200,240,96,0.12);border:1px solid #c8f060;
+    color:#c8f060;font-family:'IBM Plex Mono',monospace;font-size:11px;
+  `;
+  btnLoad.addEventListener('click', () => {
+    let data;
+    try {
+      data = JSON.parse(ta.value.trim());
+    } catch (err) {
+      ta.style.borderColor = '#f06060';
+      setTimeout(() => { ta.style.borderColor = '#3a3a44'; }, 1500);
+      showToast('JSON non valido — errore di sintassi');
+      return;
+    }
+    try {
+      applyWorkspace(data);
+      overlay.remove();
+    } catch (err) {
+      console.error('applyWorkspace error:', err);
+      showToast('Errore nel caricamento: ' + err.message);
+    }
+  });
+
+  const btnClose = document.createElement('button');
+  btnClose.textContent = 'Annulla';
+  btnClose.style.cssText = `
+    padding:8px 16px;border-radius:5px;cursor:pointer;
+    background:none;border:1px solid #3a3a44;
+    color:#a0a0b0;font-family:'IBM Plex Mono',monospace;font-size:11px;
+  `;
+  btnClose.addEventListener('click', () => overlay.remove());
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+
+  btnRow.appendChild(btnLoad);
+  btnRow.appendChild(btnClose);
+  modal.appendChild(title);
+  modal.appendChild(hint);
+  modal.appendChild(ta);
+  modal.appendChild(btnRow);
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  setTimeout(() => ta.focus(), 50);
+}
+
+function applyWorkspace(data) {
+  if (!data.elements || !data.relations) {
+    showToast('Errore: formato non riconosciuto');
+    return;
+  }
+
+  elements.length = 0;
+  relations.length = 0;
+  selectedId = null;
+
+  if (typeof data.idCounter === 'number') {
+    idCounter = data.idCounter;
+  } else {
+    const allIds = [
+      ...data.elements.map(e => e.id),
+      ...data.relations.map(r => r.id),
+    ].filter(Number.isFinite);
+    idCounter = allIds.length > 0 ? Math.max(...allIds) : 0;
+  }
+
+  for (const el of data.elements) {
+    if (el && el.type && el.id != null) {
+      el.id = parseInt(el.id);
+      elements.push(el);
+    }
+  }
+  for (const r of data.relations) {
+    if (r && r.aId != null && r.bId != null) {
+      r.id = parseInt(r.id);
+      r.aId = parseInt(r.aId);
+      r.bId = parseInt(r.bId);
+      relations.push(r);
+    }
+  }
+
+  // Rimuovi relazioni orfane
+  const _loadedIds = new Set(elements.map(e => e.id));
+  relations = relations.filter(r => _loadedIds.has(r.aId) && _loadedIds.has(r.bId));
+
+  // Reset tutte le cache di posizione
+  elements.forEach(el => { delete el._xRestPx; });
+  Object.keys(window).filter(k =>
+    k.startsWith('_restDist_') || k.startsWith('_xOffARest_') || k.startsWith('_xBRest_')
+  ).forEach(k => delete window[k]);
+
+  // Ripristina impostazioni vista
+  if (data.viewSettings) {
+    const vs = data.viewSettings;
+    if (vs.vectorScale)    { window._vectorScale    = vs.vectorScale;    const el=document.getElementById('vector-scale');    if(el){el.value=vs.vectorScale;    document.getElementById('vector-scale-val').textContent=vs.vectorScale;} }
+    if (vs.vectorStroke)   { window._vectorStroke   = vs.vectorStroke;   const el=document.getElementById('vector-stroke');   if(el){el.value=vs.vectorStroke;   document.getElementById('vector-stroke-val').textContent=vs.vectorStroke;} }
+    if (vs.vectorHead)     { window._vectorHead     = vs.vectorHead;     const el=document.getElementById('vector-head');     if(el){el.value=vs.vectorHead;     document.getElementById('vector-head-val').textContent=vs.vectorHead;} }
+    if (vs.vectorFontSize) { window._vectorFontSize = vs.vectorFontSize; const el=document.getElementById('vector-fontsize'); if(el){el.value=vs.vectorFontSize; document.getElementById('vector-fontsize-val').textContent=vs.vectorFontSize;} }
+  }
+
+  // applyRelationPositions posiziona tutti i corpi dalle loro formule stabili
+  // È il momento giusto per salvare xBRest prima che render() lo modifichi
+  applyRelationPositions();
+
+  // Ripristina slides se presenti nel workspace
+  if (data.slides && Array.isArray(data.slides) && data.slides.length > 0 && typeof _slides !== 'undefined') {
+    if (typeof _slidesMode !== 'undefined' && _slidesMode && typeof exitSlidesMode === 'function') exitSlidesMode();
+    _slides.length = 0;
+    for (const s of data.slides) {
+      _slides.push({
+        id: s.id || Date.now(),
+        title: s.title || 'Slide',
+        elements: (s.elements || []).map(el => { el.id = parseInt(el.id); return el; }),
+        relations: (s.relations || []).map(r => { r.id = parseInt(r.id); r.aId = parseInt(r.aId); r.bId = parseInt(r.bId); return r; }),
+        idCounter: s.idCounter || 0,
+      });
+    }
+    const targetSlide = Math.min(data.currentSlide || 0, _slides.length - 1);
+    _currentSlide = targetSlide;
+    if (typeof _loadSlideData === 'function') _loadSlideData(_slides[targetSlide]);
+    _slidesMode = true;
+    const slidesBar = document.getElementById('slides-bar');
+    if (slidesBar) slidesBar.style.display = 'flex';
+    if (typeof slidesUpdateBar === 'function') slidesUpdateBar();
+    if (typeof updateRefSystemBtn === 'function') updateRefSystemBtn();
+  }
+
+  render();
+  updatePropsPanel();
+  closePropsPanel();
+  showToast('Workspace caricato ✓');
+}
+
+// (slides handling integrated in applyWorkspace above)
+
+// ═══ MODULE: canvas-pan.js ═══
+// ─── Canvas Pan & Center ──────────────────────────────────────────────────────
+
+let _panX = 0;
+let _panY = 0;
+let _isPanning = false;
+let _panStartX = 0;
+let _panStartY = 0;
+let _panOrigX = 0;
+let _panOrigY = 0;
+let _panModeEnabled = false;
+
+function getCanvasPan() {
+  return { x: _panX, y: _panY };
+}
+
+function setCanvasPan(x, y) {
+  _panX = x;
+  _panY = y;
+  _applyPanTransform();
+}
+
+function _applyPanTransform() {
+  const canvas = document.getElementById('canvas');
+  if (!canvas) return;
+  const wrap = canvas.parentElement;
+  if (wrap) {
+    wrap.style.backgroundPosition = `${_panX - 1}px ${_panY - 1}px`;
+  }
+  if (typeof elements !== 'undefined' && elements.length > 0) {
+    _applyPanToElements();
+  }
+}
+
+function _applyPanToElements() {
+  const canvas = document.getElementById('canvas');
+  if (!canvas) return;
+  for (const g of canvas.querySelectorAll('g[data-id]')) {
+    const id = parseInt(g.getAttribute('data-id'));
+    const el = elements.find(e => e.id === id);
+    if (!el) continue;
+    const bx = el.x + _panX;
+    const by = el.y + _panY;
+    const transform = el._rotation
+      ? `translate(${bx}, ${by}) rotate(${el._rotation.angle}, ${el._rotation.cx}, ${el._rotation.cy})`
+      : `translate(${bx}, ${by})`;
+    g.setAttribute('transform', transform);
+  }
+  // Aggiorna decorazioni parallelo
+  for (const g of canvas.querySelectorAll('g[data-deco]')) {
+    g.setAttribute('transform', `translate(${_panX}, ${_panY})`);
+  }
+}
+
+// ─── Centra ───────────────────────────────────────────────────────────────────
+function centerElements() {
+  const canvas = document.getElementById('canvas');
+  if (!canvas) return;
+
+  if (!elements || !elements.length) {
+    _animatePan(0, 0);
+    return;
+  }
+
+  const rect = canvas.getBoundingClientRect();
+  const W = rect.width;
+  const H = rect.height;
+
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const el of elements) {
+    const w = el._wPx || 60;
+    const h = el._hPx || 40;
+    minX = Math.min(minX, el.x);
+    minY = Math.min(minY, el.y);
+    maxX = Math.max(maxX, el.x + w);
+    maxY = Math.max(maxY, el.y + h);
+  }
+
+  if (!isFinite(minX)) { _animatePan(0, 0); return; }
+
+  const cx = (minX + maxX) / 2;
+  const cy = (minY + maxY) / 2;
+  const targetX = W / 2 - cx;
+  const targetY = H / 2 - cy;
+
+  _animatePan(targetX, targetY);
+}
+
+function _animatePan(targetX, targetY) {
+  const startX = _panX;
+  const startY = _panY;
+  const duration = 280;
+  const start = performance.now();
+
+  function step(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    _panX = startX + (targetX - startX) * ease;
+    _panY = startY + (targetY - startY) * ease;
+    _applyPanTransform();
+    if (typeof updateChartOverlays === 'function') updateChartOverlays();
+    if (t < 1) requestAnimationFrame(step);
+    else {
+      _panX = targetX;
+      _panY = targetY;
+      _applyPanTransform();
+      if (typeof updateChartOverlays === 'function') updateChartOverlays();
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+// ─── Toggle Pan Mode ──────────────────────────────────────────────────────────
+const _iconPanUnlocked = `<svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:middle;margin-right:4px"><path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2z" fill="currentColor"/><path d="M3 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H3zm4 2.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" fill="currentColor"/></svg>Pan`;
+const _iconPanLocked  = `<svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:middle;margin-right:4px"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" fill="currentColor"/></svg>Pan`;
+
+function togglePanMode() {
+  _panModeEnabled = !_panModeEnabled;
+  const btn = document.getElementById('btn-pan-toggle');
+  const canvas = document.getElementById('canvas');
+  if (_panModeEnabled) {
+    btn?.classList.add('active');
+    if (btn) btn.innerHTML = _iconPanLocked;
+    canvas.style.cursor = 'grab';
+  } else {
+    btn?.classList.remove('active');
+    if (btn) btn.innerHTML = _iconPanUnlocked;
+    canvas.style.cursor = '';
+    _isPanning = false;
+  }
+}
+
+// ─── Inizializzazione pan ─────────────────────────────────────────────────────
+function initCanvasPan() {
+  const canvas = document.getElementById('canvas');
+  const btnCenter = document.getElementById('btn-center');
+
+  if (btnCenter) btnCenter.addEventListener('click', centerElements);
+
+
+  let spaceDown = false;
+
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space' && !e.target.matches('input,textarea,select')) {
+      e.preventDefault();
+      spaceDown = true;
+      canvas.style.cursor = 'grab';
+    }
+  });
+
+  document.addEventListener('keyup', e => {
+    if (e.code === 'Space') {
+      spaceDown = false;
+      if (!_isPanning) canvas.style.cursor = _panModeEnabled ? 'grab' : '';
+    }
+  });
+
+  // Pan con spazio+drag o click centrale — sempre attivi
+  canvas.addEventListener('mousedown', e => {
+    const isMiddleClick = e.button === 1;
+    const isSpaceDrag = spaceDown && e.button === 0;
+    if (isMiddleClick || isSpaceDrag) {
+      e.preventDefault();
+      e.stopPropagation();
+      _startPan(e.clientX, e.clientY);
+      canvas.style.cursor = 'grabbing';
+    }
+  });
+
+  // Pan con drag sinistro — solo se pan mode attivo
+  canvas.addEventListener('mousedown', e => {
+    if (e.button !== 0 || spaceDown) return;
+    if (!_panModeEnabled) return;
+    e.preventDefault();
+    e.stopPropagation();
+    _startPan(e.clientX, e.clientY);
+    canvas.style.cursor = 'grabbing';
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!_isPanning) return;
+    const dx = e.clientX - _panStartX;
+    const dy = e.clientY - _panStartY;
+    _panX = _panOrigX + dx;
+    _panY = _panOrigY + dy;
+    _applyPanTransform();
+    if (typeof updateChartOverlays === 'function') updateChartOverlays();
+  });
+
+  document.addEventListener('mouseup', e => {
+    if (_isPanning) {
+      _isPanning = false;
+      canvas.style.cursor = spaceDown ? 'grab' : (_panModeEnabled ? 'grab' : '');
+    }
+  });
+}
+
+function _startPan(clientX, clientY) {
+  _isPanning = true;
+  _panStartX = clientX;
+  _panStartY = clientY;
+  _panOrigX = _panX;
+  _panOrigY = _panY;
+}
+
+// ═══ MODULE: events.js ═══
+// ─── Toast notification ───────────────────────────────────────────────────────
+function showToast(msg) {
+  let toast = document.getElementById('toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast';
+    toast.style.cssText = `
+      position:fixed; bottom:48px; left:50%; transform:translateX(-50%);
+      background:#1e1e24; border:1px solid #3a3a44;
+      color:#e8e8ec; font-family:'IBM Plex Mono',monospace; font-size:11px;
+      padding:7px 16px; border-radius:6px; pointer-events:none;
+      opacity:0; transition:opacity 0.2s; z-index:100; white-space:nowrap;
+    `;
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2200);
+}
+
+// ─── Copy / Paste ─────────────────────────────────────────────────────────────
+let _clipboard = null; // { elements: [...], relations: [...] }
+
+function copyCluster(startId) {
+  // BFS: trova tutti gli elementi connessi tramite relazioni
+  const visited = new Set([startId]);
+  const queue = [startId];
+  while (queue.length) {
+    const cur = queue.shift();
+    for (const r of relations) {
+      if (r.aId === cur && !visited.has(r.bId)) { visited.add(r.bId); queue.push(r.bId); }
+      if (r.bId === cur && !visited.has(r.aId)) { visited.add(r.aId); queue.push(r.aId); }
+    }
+  }
+  // Escludi axis_xy — ce n'è uno solo
+  const copyIds = [...visited].filter(id => {
+    const el = elements.find(e => e.id === id);
+    return el && el.type !== 'axis_xy';
+  });
+  if (copyIds.length === 0) return;
+
+  // Serializza elementi (solo props pubbliche, come saveWorkspace)
+  const copiedEls = copyIds.map(id => {
+    const el = elements.find(e => e.id === id);
+    const clean = {};
+    for (const [k, v] of Object.entries(el)) {
+      if (!k.startsWith('_')) clean[k] = v;
+    }
+    return JSON.parse(JSON.stringify(clean));
+  });
+
+  // Serializza relazioni interne al cluster
+  const copyIdSet = new Set(copyIds);
+  const copiedRels = relations
+    .filter(r => copyIdSet.has(r.aId) && copyIdSet.has(r.bId))
+    .map(r => JSON.parse(JSON.stringify(r)));
+
+  _clipboard = { elements: copiedEls, relations: copiedRels };
+  showToast(`📋 Copiati ${copiedEls.length} elementi, ${copiedRels.length} vincoli`);
+}
+
+function pasteCluster() {
+  if (!_clipboard) { showToast('Nessun elemento copiato'); return; }
+
+  const OFFSET = 40; // offset pixel per non sovrapporre
+  // Mappa vecchi ID → nuovi ID
+  const idMap = {};
+  for (const el of _clipboard.elements) {
+    idCounter++;
+    idMap[el.id] = idCounter;
+  }
+
+  // Incolla elementi con nuovi ID e offset
+  for (const el of _clipboard.elements) {
+    const newEl = JSON.parse(JSON.stringify(el));
+    newEl.id = idMap[el.id];
+    newEl.x = (newEl.x || 0) + OFFSET;
+    newEl.y = (newEl.y || 0) + OFFSET;
+    elements.push(newEl);
+  }
+
+  // Incolla relazioni con ID aggiornati
+  for (const r of _clipboard.relations) {
+    const newAId = idMap[r.aId];
+    const newBId = idMap[r.bId];
+    if (newAId == null || newBId == null) continue; // salta relazioni con ID non mappati
+    idCounter++;
+    relations.push({
+      ...JSON.parse(JSON.stringify(r)),
+      id: idCounter,
+      aId: newAId,
+      bId: newBId,
+    });
+  }
+
+  // Seleziona il primo elemento incollato
+  const firstNewId = idMap[_clipboard.elements[0]?.id];
+  if (firstNewId) { selectedId = firstNewId; }
+
+  render();
+  updatePropsPanel();
+  showToast(`✅ Incollati ${_clipboard.elements.length} elementi`);
+}
+
+
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement?.tagName;
+  const inInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
+    || !!document.activeElement?.closest('#props-panel');
+
+  // Ctrl+C — copia cluster selezionato
+  if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !inInput) {
+    if (selectedId) { e.preventDefault(); copyCluster(selectedId); }
+    return;
+  }
+  // Ctrl+V — incolla cluster
+  if ((e.ctrlKey || e.metaKey) && e.key === 'v' && !inInput) {
+    e.preventDefault(); pasteCluster(); return;
+  }
+
+  // Ctrl+Delete — cancella cluster connesso
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'Delete' || e.key === 'Backspace') && selectedId && !inInput) {
+    e.preventDefault();
+    // BFS per trovare tutti gli elementi connessi
+    const visited = new Set([selectedId]);
+    const queue = [selectedId];
+    while (queue.length) {
+      const cur = queue.shift();
+      for (const r of relations) {
+        if (r.aId === cur && !visited.has(r.bId)) { visited.add(r.bId); queue.push(r.bId); }
+        if (r.bId === cur && !visited.has(r.aId)) { visited.add(r.aId); queue.push(r.aId); }
+      }
+    }
+    // Escludi axis_xy
+    const toDelete = [...visited].filter(id => {
+      const el = elements.find(e => e.id === id);
+      return el && el.type !== 'axis_xy';
+    });
+    // Rimuovi prima le relazioni, poi gli elementi
+    const delSet = new Set(toDelete);
+    for (let i = relations.length - 1; i >= 0; i--) {
+      if (delSet.has(relations[i].aId) || delSet.has(relations[i].bId)) relations.splice(i, 1);
+    }
+    toDelete.forEach(id => {
+      const idx = elements.findIndex(e => e.id === id);
+      if (idx >= 0) elements.splice(idx, 1);
+    });
+    selectedId = null;
+    render(); updatePropsPanel();
+    showToast(`🗑 Eliminati ${toDelete.length} elementi`);
+    return;
+  }
+
+  if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
+    const tag = document.activeElement?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if (document.activeElement?.closest('#props-panel')) return;
+    e.preventDefault();
+    deleteElement(selectedId);
+  }
+  if (e.key === 'Escape') { selectedId = null; render(); updatePropsPanel(); closePropsPanel(); }
+
+  // Frecce ← → per slider selezionato (step preciso)
+  if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && selectedId) {
+    const tag = document.activeElement?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    const slEl = elements.find(el => el.id === selectedId && el.type === 'slider');
+    if (!slEl) return;
+    e.preventDefault();
+    const step = parseFloat(slEl.props.step ?? 1);
+    const min  = parseFloat(slEl.props.min ?? 0);
+    const max  = parseFloat(slEl.props.max ?? 10);
+    const dir  = e.key === 'ArrowRight' ? 1 : -1;
+    let val = parseFloat(slEl.props.value ?? min) + dir * step;
+    val = Math.max(min, Math.min(max, parseFloat(val.toFixed(6))));
+    slEl.props.value = val;
+    // Applica la stessa logica del drag
+    const propRel = relations.find(r =>
+      r.type === 'slider_prop' && (r.aId === selectedId || r.bId === selectedId)
+    );
+    if (propRel) {
+      const targetEl = elements.find(e2 =>
+        e2.id === (propRel.aId === selectedId ? propRel.bId : propRel.aId)
+      );
+      const propKey = propRel.props?.propKey;
+      const subKey  = propRel.props?.subKey;
+      const activeKey = subKey || propKey;
+      if (targetEl && activeKey) {
+        const virtualMatch = activeKey.match(/^forces\[(\d+)\]\.__(\w+)$/);
+        if (virtualMatch) {
+          const idx = parseInt(virtualMatch[1]);
+          const vtype = virtualMatch[2];
+          const f = targetEl.props.forces?.[idx];
+          if (f) {
+            if (vtype === 'ang') {
+              const mag = Math.hypot(parseFloat(f.fx)||0, parseFloat(f.fy)||0) || (parseFloat(f.fMod)||0);
+              f.fAngle = val;
+              f.fx = mag * Math.cos(val * Math.PI / 180);
+              f.fy = mag * Math.sin(val * Math.PI / 180);
+            } else if (vtype === 'mag') {
+              const ang = (Math.abs(parseFloat(f.fx)||0) < 1e-9 && Math.abs(parseFloat(f.fy)||0) < 1e-9)
+                ? ((parseFloat(f.fAngle)||0) * Math.PI / 180)
+                : Math.atan2(parseFloat(f.fy)||0, parseFloat(f.fx)||0);
+              f.fMod = val;
+              f.fx = val * Math.cos(ang);
+              f.fy = val * Math.sin(ang);
+            }
+          }
+        } else {
+          targetEl.props[activeKey] = val;
+          if (targetEl.type === 'inclined_plane') {
+            if (activeKey === 'height') targetEl.props.inputMode = 'angle+height';
+            if (activeKey === 'length') targetEl.props.inputMode = 'angle+length';
+            if (activeKey === 'base')   targetEl.props.inputMode = 'angle+base';
+          }
+        }
+      }
+    }
+    render();
+    updatePropsPanel();
+    return;
+  }
+
+  // U → unisci elemento selezionato alla superficie sottostante
+  if (e.key === 'u' || e.key === 'U') {
+    const tag = document.activeElement?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if (!selectedId) return;
+    const child = elements.find(el => el.id === selectedId);
+    if (!child) return;
+    if (child.parentId) {
+      showToast('Già agganciato — doppio click per sganciare');
+      return;
+    }
+    const parent = getOverlappingParent(child);
+    if (parent) {
+      bindElement(child.id, parent.id);
+    } else {
+      showToast('Nessuna superficie compatibile sotto l\'elemento');
+    }
+  }
+});
+
+function findElementGroup(node) {
+  while (node && node !== canvas) {
+    if (node.classList && node.classList.contains('diagram-element')) {
+      // Se è una molla agganciata a una leva, ritorna il gruppo della leva
+      if (node.dataset.leverId) {
+        const leverG = canvas.querySelector(`g[data-id="${node.dataset.leverId}"]`);
+        if (leverG) return leverG;
+      }
+      return node;
+    }
+    node = node.parentNode;
+  }
+  return null;
+}
+
+function findSliderKnob(node) {
+  while (node && node !== canvas) {
+    if (node.getAttribute && node.getAttribute('data-action') === 'slider-drag') return node;
+    node = node.parentNode;
+  }
+  return null;
+}
+
+function findArrowTail(node) {
+  while (node && node !== canvas) {
+    if (node.getAttribute && node.getAttribute('data-action') === 'arrow-drag-tail') return node;
+    node = node.parentNode;
+  }
+  return null;
+}
+
+function findArrowTip(node) {
+  while (node && node !== canvas) {
+    if (node.getAttribute && node.getAttribute('data-action') === 'arrow-drag-tip') return node;
+    node = node.parentNode;
+  }
+  return null;
+}
+
+function findTableRowHit(node) {
+  while (node && node !== canvas) {
+    if (node.getAttribute && node.getAttribute('data-action') === 'table-row-select') return node;
+    node = node.parentNode;
+  }
+  return null;
+}
+
+function findOptionHit(node) {
+  while (node && node !== canvas) {
+    if (node.getAttribute && node.getAttribute('data-action') === 'option-open') return node;
+    node = node.parentNode;
+  }
+  return null;
+}
+
+function findDeleteBtn(node) {
+  while (node && node !== canvas) {
+    if (node.dataset && node.dataset.action === 'delete') return node;
+    node = node.parentNode;
+  }
+  return null;
+}
+
+function findOriginHandle(node) {
+  while (node && node !== canvas) {
+    if (node.dataset?.action === 'drag-origin') return node;
+    node = node.parentNode;
+  }
+  return null;
+}
+
+// Doppio click → sgancia dal parent
+let lastClickTime = 0;
+let lastClickId = null;
+
+canvas.addEventListener('mousedown', e => {
+  const now = Date.now();
+
+  // Open link
+  const linkTgt = e.target;
+  if (linkTgt?.getAttribute?.('data-action') === 'open-link') {
+    const url = linkTgt.getAttribute('data-url');
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    return;
+  }
+
+  // Arrow tail drag — sposta la coda mantenendo la punta ferma
+  const arrowTail = findArrowTail(e.target);
+  if (arrowTail) {
+    e.stopPropagation();
+    const elId = parseInt(arrowTail.getAttribute('data-id'));
+    const arrowEl = elements.find(x => x.id === elId);
+    if (!arrowEl) return;
+
+    const svg = canvas;
+    const origDx = parseFloat(arrowEl.props.dx) || 0;
+    const origDy = parseFloat(arrowEl.props.dy) || 0;
+    const origX  = arrowEl.x;
+    const origY  = arrowEl.y;
+
+    // Punta in coordinate SVG assolute — deve restare ferma
+    const tipAbsX = origX + origDx;
+    const tipAbsY = origY + origDy;
+
+    function onTailMove(me) {
+      const pt = svg.createSVGPoint();
+      pt.x = me.clientX; pt.y = me.clientY;
+      const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+      // Nuova posizione coda
+      arrowEl.x = svgP.x;
+      arrowEl.y = svgP.y;
+      // Aggiusta dx/dy per mantenere la punta ferma
+      arrowEl.props.dx = tipAbsX - svgP.x;
+      arrowEl.props.dy = tipAbsY - svgP.y;
+      render();
+    }
+    function onTailUp() {
+      document.removeEventListener('mousemove', onTailMove);
+      document.removeEventListener('mouseup', onTailUp);
+    }
+    document.addEventListener('mousemove', onTailMove);
+    document.addEventListener('mouseup', onTailUp);
+    return;
+  }
+
+  // Arrow tip drag
+  const arrowTip = findArrowTip(e.target);
+  if (arrowTip) {
+    e.stopPropagation();
+    const elId = parseInt(arrowTip.getAttribute('data-id'));
+    const arrowEl = elements.find(x => x.id === elId);
+    if (!arrowEl) return;
+
+    const svg = canvas;
+    const pt0 = svg.createSVGPoint();
+    pt0.x = e.clientX; pt0.y = e.clientY;
+    const svgP0 = pt0.matrixTransform(svg.getScreenCTM().inverse());
+
+    const origDx = parseFloat(arrowEl.props.dx) || 0;
+    const origDy = parseFloat(arrowEl.props.dy) || 0;
+
+    // Posizione origine freccia in SVG coords
+    const gEl = canvas.querySelector(`g[data-id="${elId}"]`);
+    const m = gEl?.getCTM();
+    const origX = m ? m.e : arrowEl.x;
+    const origY = m ? m.f : arrowEl.y;
+
+    function onTipMove(me) {
+      const pt = svg.createSVGPoint();
+      pt.x = me.clientX; pt.y = me.clientY;
+      const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+      arrowEl.props.dx = svgP.x - origX;
+      arrowEl.props.dy = svgP.y - origY;
+      render();
+    }
+    function onTipUp() {
+      document.removeEventListener('mousemove', onTipMove);
+      document.removeEventListener('mouseup', onTipUp);
+    }
+    document.addEventListener('mousemove', onTipMove);
+    document.addEventListener('mouseup', onTipUp);
+    return;
+  }
+
+  // Table pagination
+  const pageTgt = e.target;
+  const pageAction = pageTgt?.getAttribute?.('data-action');
+  if (pageAction === 'table-page-prev' || pageAction === 'table-page-next') {
+    e.stopPropagation();
+    const tblId = parseInt(pageTgt.getAttribute('data-id'));
+    const tblEl = elements.find(x => x.id === tblId);
+    if (tblEl) {
+      const pageSize = Math.max(1, parseInt(tblEl.props.pageSize ?? 5));
+      const totalPages = Math.max(1, Math.ceil(tblEl.props.rows.length / pageSize));
+      if (pageAction === 'table-page-prev') tblEl.props.currentPage = Math.max(0, (tblEl.props.currentPage||0) - 1);
+      else tblEl.props.currentPage = Math.min(totalPages-1, (tblEl.props.currentPage||0) + 1);
+      render();
+    }
+    return;
+  }
+
+  // Table row click — PRIMA di findElementGroup, NON apre pannello
+  const tableRowHit = findTableRowHit(e.target);
+  if (tableRowHit) {
+    e.stopPropagation();
+    const tblId = parseInt(tableRowHit.getAttribute('data-id'));
+    const rowIdx = parseInt(tableRowHit.getAttribute('data-row'));
+    const tblEl = elements.find(x => x.id === tblId);
+    if (!tblEl) return;
+    tblEl.props.selectedRow = tblEl.props.selectedRow === rowIdx ? -1 : rowIdx;
+    const tableRels = relations.filter(r =>
+      r.type === 'table_prop' && (r.aId === tblId || r.bId === tblId)
+    );
+    for (const rel of tableRels) {
+      const targetEl = elements.find(e =>
+        e.id === (rel.aId === tblId ? rel.bId : rel.aId)
+      );
+      if (!targetEl || tblEl.props.selectedRow < 0) continue;
+      const colIdx = parseInt(rel.props?.colIdx ?? 0);
+      const propKey = rel.props?.propKey;
+      const val = tblEl.props.rows?.[tblEl.props.selectedRow]?.[colIdx];
+      if (propKey && val !== undefined) {
+        const num = parseFloat(val);
+        targetEl.props[propKey] = isNaN(num) ? val : num;
+      }
+    }
+    render(); // solo render, NON updatePropsPanel
+    return;
+  }
+
+  // Option list — apre dropdown
+  const optHit = findOptionHit(e.target);
+  if (optHit) {
+    e.preventDefault(); e.stopPropagation();
+    const optId = parseInt(optHit.dataset.id);
+    const optEl = elements.find(x => x.id === optId);
+    if (!optEl) return;
+
+    // Rimuovi dropdown precedente
+    const existing = document.getElementById('__optDropdown');
+    if (existing) {
+      // Se clicco di nuovo sullo stesso componente → chiudi e basta (toggle)
+      const existingId = existing.dataset.ownerId;
+      if (existingId && parseInt(existingId) === optId) {
+        existing.remove();
+        return;
+      }
+      existing.remove();
+    }
+
+    const canvasRect = canvas.getBoundingClientRect();
+    const gEl = canvas.querySelector(`g[data-id="${optId}"]`);
+    const svgRect = gEl?.getBoundingClientRect() || { left: e.clientX, bottom: e.clientY };
+    // Usa la posizione canvas-corretta basata sulle coordinate elemento
+    const pan_opt = (typeof getCanvasPan === 'function') ? getCanvasPan() : { x: 0, y: 0 };
+    const dropLeft = canvasRect.left + optEl.x + pan_opt.x;
+    const dropTop = canvasRect.top + optEl.y + pan_opt.y + (optEl._hPx || 36);
+
+    const drop = document.createElement('div');
+    drop.id = '__optDropdown';
+    drop.dataset.ownerId = optId;
+    const col = optEl.props?.color || '#ffffff';
+    const maxH = 220;
+    const dropW = Math.max(180, optEl._wPx || 180);
+    drop.style.cssText = `position:fixed;left:${dropLeft}px;top:${dropTop}px;
+      min-width:${dropW}px;max-width:320px;max-height:${maxH}px;overflow-y:auto;
+      background:#1a1520;border:1.5px solid ${col}44;border-radius:6px;
+      box-shadow:0 4px 16px rgba(0,0,0,0.5);z-index:9999;`;
+
+    // Popola prima per misurare l'altezza
+    (optEl.props.options || []).forEach((opt, i) => {
+      const item = document.createElement('div');
+      const isSelected = i === parseInt(optEl.props.selected ?? 0);
+      item.style.cssText = `display:flex;justify-content:space-between;align-items:center;
+        padding:7px 12px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:12px;
+        color:${isSelected ? col : '#c0c0d0'};
+        background:${isSelected ? col+'18' : 'transparent'};
+        border-left:2px solid ${isSelected ? col : 'transparent'};`;
+      const showVal = optEl.props?.showValue || false;
+      item.innerHTML = `<span>${opt.label}</span>${showVal ? `<span style="opacity:0.6;font-size:11px">${opt.value??''}</span>` : ''}`;
+      item.addEventListener('mouseenter', () => { if (!isSelected) item.style.background = '#2a2030'; });
+      item.addEventListener('mouseleave', () => { if (!isSelected) item.style.background = 'transparent'; });
+      item.addEventListener('click', () => {
+        optEl.props.selected = i;
+        const propRel = relations.find(r =>
+          r.type === 'option_prop' && (r.aId === optId || r.bId === optId)
+        );
+        if (propRel) {
+          const targetEl = elements.find(e =>
+            e.id === (propRel.aId === optId ? propRel.bId : propRel.aId)
+          );
+          const propKey = propRel.props?.propKey;
+          const val = parseFloat(opt.value);
+          if (targetEl && propKey && !isNaN(val)) targetEl.props[propKey] = val;
+        }
+        drop.remove();
+        render();
+        updatePropsPanel();
+      });
+      drop.appendChild(item);
+    });
+
+    document.body.appendChild(drop);
+
+    // Posiziona: sopra o sotto in base allo spazio disponibile
+    const dropH = Math.min(drop.scrollHeight, maxH);
+    const spaceBelow = window.innerHeight - dropTop - 8;
+    const spaceAbove = dropTop - (optEl._hPx || 36) - 8;
+    if (spaceBelow >= dropH || spaceBelow >= spaceAbove) {
+      drop.style.top = `${dropTop}px`;
+    } else {
+      drop.style.top = `${dropTop - (optEl._hPx || 36) - dropH - 2}px`;
+    }
+
+    // Chiudi cliccando fuori — su mousedown così non interferisce col canvas
+    function onOutsideDown(ev) {
+      if (!drop.contains(ev.target) && ev.target.getAttribute?.('data-action') !== 'option-open') {
+        drop.remove();
+        document.removeEventListener('mousedown', onOutsideDown);
+      }
+    }
+    setTimeout(() => document.addEventListener('mousedown', onOutsideDown), 0);
+    return;
+  }
+
+  // Slider knob drag
+  const sliderKnob = findSliderKnob(e.target);
+  if (sliderKnob) {
+    e.preventDefault(); e.stopPropagation();
+    const slId = parseInt(sliderKnob.dataset.id);
+    const slEl = elements.find(x => x.id === slId);
+    if (!slEl) return;
+    // NON selezioniamo lo slider durante il drag del knob
+    const canvasRect = canvas.getBoundingClientRect();
+    const pan = (typeof getCanvasPan === 'function') ? getCanvasPan() : { x: 0, y: 0 };
+    const trackX0 = slEl.x + pan.x + 16;
+    const trackW  = 200 - 32;
+    let lastMouseX = null;
+    let accumDelta = 0; // accumula delta frazionario
+
+    function onSliderMove(ev) {
+      const mx = ev.clientX - canvasRect.left;
+      const min = parseFloat(slEl.props.min ?? 0);
+      const max = parseFloat(slEl.props.max ?? 10);
+      const step = parseFloat(slEl.props.step ?? 0.1);
+      const totalSteps = step > 0 ? (max - min) / step : 100;
+      const pxPerStep = trackW / totalSteps;
+
+      let val;
+      if (pxPerStep < 3 && lastMouseX !== null) {
+        // Range fitto: accumula delta frazionario per non saltare step
+        const dPx = mx - lastMouseX;
+        accumDelta += dPx / pxPerStep;
+        const stepsToMove = Math.trunc(accumDelta); // solo la parte intera
+        if (stepsToMove === 0) { lastMouseX = mx; return; }
+        accumDelta -= stepsToMove; // mantieni il resto
+        val = parseFloat(slEl.props.value ?? min) + stepsToMove * step;
+      } else {
+        accumDelta = 0;
+        const frac = Math.max(0, Math.min(1, (mx - trackX0) / trackW));
+        val = min + frac * (max - min);
+      }
+      if (step > 0) val = Math.round(val / step) * step;
+      val = Math.max(min, Math.min(max, parseFloat(val.toFixed(6))));
+      lastMouseX = mx;
+      slEl.props.value = val;
+
+      // Aggiorna proprietà collegata
+      const propRel = relations.find(r =>
+        r.type === 'slider_prop' && (r.aId === slId || r.bId === slId)
+      );
+      if (propRel) {
+        const targetEl = elements.find(e =>
+          e.id === (propRel.aId === slId ? propRel.bId : propRel.aId)
+        );
+        const propKey = propRel.props?.propKey;
+        const subKey  = propRel.props?.subKey;
+        const activeKey = subKey || propKey;
+        if (targetEl && activeKey) {
+          const forceMatch = activeKey.match(/^forces\[(\d+)\]\.(\w+)$/);
+          const virtualMatch = activeKey.match(/^forces\[(\d+)\]\.__(\w+)$/);
+          if (virtualMatch) {
+            const idx = parseInt(virtualMatch[1]);
+            const vtype = virtualMatch[2]; // mag o ang
+            const f = targetEl.props.forces?.[idx];
+            if (f) {
+              if (vtype === 'mag') {
+                // Mantieni angolo, cambia modulo — usa fAngle se fx/fy sono entrambi 0
+                const ang = (Math.abs(parseFloat(f.fx)||0) < 1e-9 && Math.abs(parseFloat(f.fy)||0) < 1e-9)
+                  ? ((parseFloat(f.fAngle) || 0) * Math.PI / 180)
+                  : Math.atan2(parseFloat(f.fy)||0, parseFloat(f.fx)||0);
+                f.fMod = val;
+                f.fx = val * Math.cos(ang);
+                f.fy = val * Math.sin(ang);
+              } else if (vtype === 'ang') {
+                // Mantieni modulo, cambia angolo — salva sempre fAngle
+                const mag = Math.hypot(parseFloat(f.fx)||0, parseFloat(f.fy)||0) || (parseFloat(f.fMod)||0);
+                const rad = val * Math.PI / 180;
+                f.fAngle = val;
+                f.fx = mag * Math.cos(rad);
+                f.fy = mag * Math.sin(rad);
+              }
+            }
+          } else if (forceMatch) {
+            const idx = parseInt(forceMatch[1]);
+            const sub = forceMatch[2];
+            if (targetEl.props.forces?.[idx]) targetEl.props.forces[idx][sub] = val;
+          } else {
+            targetEl.props[activeKey] = val;
+            // Per piano inclinato: aggiorna inputMode in base alla prop modificata
+            if (targetEl.type === 'inclined_plane') {
+              if (activeKey === 'height')  targetEl.props.inputMode = 'angle+height';
+              if (activeKey === 'length')  targetEl.props.inputMode = 'angle+length';
+              if (activeKey === 'base')    targetEl.props.inputMode = 'angle+base';
+            }
+          }
+        }
+      }
+      render();
+      if (selectedId === slId) updatePropsPanel();
+    }
+
+    function onSliderUp() {
+      document.removeEventListener('mousemove', onSliderMove);
+      document.removeEventListener('mouseup', onSliderUp);
+    }
+
+    document.addEventListener('mousemove', onSliderMove);
+    document.addEventListener('mouseup', onSliderUp);
+    onSliderMove(e);
+    return;
+  }
+
+  // Delete button
+  const delBtn = findDeleteBtn(e.target);
+  if (delBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    deleteElement(parseInt(delBtn.dataset.id));
+    return;
+  }
+
+  // 2. Drag origine del sistema di riferimento
+  const originHandle = findOriginHandle(e.target);
+  if (originHandle) {
+    e.preventDefault();
+    e.stopPropagation();
+    const refId = parseInt(originHandle.dataset.id);
+    const ref = elements.find(x => x.id === refId);
+    if (!ref) return;
+    const canvasRect = canvas.getBoundingClientRect();
+    dragging = {
+      id: refId,
+      mode: 'origin',
+      startMouseX: e.clientX - canvasRect.left,
+      startMouseY: e.clientY - canvasRect.top,
+      origOx: ref.props.ox,
+      origOy: ref.props.oy,
+      moved: false
+    };
+    return;
+  }
+
+  // 3. Elemento normale — prima controlla funi per coordinate
+  // Converti coordinate mouse in coordinate SVG
+  let mx, my;
+  try {
+    const pt = canvas.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    const svgP = pt.matrixTransform(canvas.getScreenCTM().inverse());
+    mx = svgP.x; my = svgP.y;
+  } catch(_) {
+    const cr = canvas.getBoundingClientRect();
+    mx = e.clientX - cr.left; my = e.clientY - cr.top;
+  }
+
+  const hitRope = elements.find(el => {
+    if (el.type !== 'rope' || el._lx === undefined) return false;
+    const dx = el._rx - el._lx, dy = el._ry - el._ly;
+    const len2 = dx*dx + dy*dy;
+    if (len2 < 1e-6) return false;
+    const t = Math.max(0, Math.min(1, ((mx-el._lx)*dx + (my-el._ly)*dy) / len2));
+    const px = el._lx + t*dx - mx, py = el._ly + t*dy - my;
+    return Math.hypot(px, py) < 10;
+  });
+
+  if (hitRope) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.ctrlKey && selectedId && selectedId !== hitRope.id) {
+      handleCtrlClick(hitRope.id);
+      return;
+    }
+    selectedId = hitRope.id;
+    render();
+    updatePropsPanel(true);
+    openPropsPanel();
+    dragging = {
+      id: hitRope.id, mode: 'element',
+      startMouseX: mx, startMouseY: my,
+      origX: hitRope.x, origY: hitRope.y,
+      origAll: elements.reduce((acc, e2) => { acc[e2.id] = {x: e2.x, y: e2.y}; return acc; }, {}),
+      moved: false
+    };
+    return;
+  }
+
+  const group = findElementGroup(e.target);
+  if (!group) {
+    selectedId = null;
+    render();
+    updatePropsPanel();
+    closePropsPanel();
+    return;
+  }
+
+  e.preventDefault();
+  e.stopPropagation();
+  const id = parseInt(group.dataset.id);
+  const el = elements.find(x => x.id === id);
+  if (!el) return;
+
+  // Ctrl+click → apre modal relazione tra selectedId e questo elemento
+  if (e.ctrlKey && selectedId && selectedId !== id) {
+    handleCtrlClick(id);
+    return;
+  }
+
+  // Doppio click → sgancia
+  const isDoubleClick = (now - lastClickTime < 350) && (lastClickId === id);
+  lastClickTime = now;
+  lastClickId = id;
+  if (isDoubleClick) {
+    if (el.parentId) unbindElement(id);
+    return;
+  }
+
+  // Toggle selezione / riapertura pannello
+  if (selectedId === id) {
+    openPropsPanel();
+    return;
+  }
+  selectedId = id;
+  render();
+  updatePropsPanel();
+
+  const canvasRect = canvas.getBoundingClientRect();
+  dragging = {
+    id,
+    mode: 'element',
+    startMouseX: e.clientX - canvasRect.left,
+    startMouseY: e.clientY - canvasRect.top,
+    origX: el.x,
+    origY: el.y,
+    origAll: elements.reduce((acc, e2) => { acc[e2.id] = {x: e2.x, y: e2.y}; return acc; }, {}),
+    moved: false
+  };
+});
+
+// Aggiorna le linee di relazione nel DOM senza full re-render
+function updateRelationLines() {
+  for (const rel of relations) {
+    const line = canvas.querySelector(`line[data-rel-id="${rel.id}"]`);
+    if (!line) continue;
+    const a = elements.find(e => e.id === rel.aId);
+    const b = elements.find(e => e.id === rel.bId);
+    if (!a || !b) continue;
+    const da = DEFS[a.type], db = DEFS[b.type];
+    line.setAttribute('x1', a.x + da.w/2);
+    line.setAttribute('y1', a.y + da.h/2);
+    line.setAttribute('x2', b.x + db.w/2);
+    line.setAttribute('y2', b.y + db.h/2);
+  }
+}
+
+
+function getRelationGroup(startId) {
+  const visited = new Set();
+  const queue = [startId];
+  while (queue.length) {
+    const id = queue.shift();
+    if (visited.has(id)) continue;
+    visited.add(id);
+    for (const rel of relations) {
+      // slider_prop e display_prop non trascinano insieme gli elementi
+      if (rel.type === 'slider_prop' || rel.type === 'display_prop' || rel.type === 'option_prop' || rel.type === 'table_prop' || rel.type === 'chart_prop' || rel.type === 'stats_prop') continue;
+      if (rel.aId === id && !visited.has(rel.bId)) queue.push(rel.bId);
+      if (rel.bId === id && !visited.has(rel.aId)) queue.push(rel.aId);
+    }
+  }
+  return visited;
+}
+
+document.addEventListener('mousemove', e => {
+  if (!dragging) return;
+
+  const canvasRect = canvas.getBoundingClientRect();
+  const mx = e.clientX - canvasRect.left;
+  const my = e.clientY - canvasRect.top;
+  const dx = mx - dragging.startMouseX;
+  const dy = my - dragging.startMouseY;
+
+  if (!dragging.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+  dragging.moved = true;
+
+  const el = elements.find(x => x.id === dragging.id);
+  if (!el) return;
+  const isRef = DEFS[el.type]?.isRefSystem;
+
+  if (isRef) {
+    window._isDraggingRef = true;
+    el.x = dragging.origX + dx;
+    el.y = dragging.origY + dy;
+
+    // Salva posizioni di TUTTI i corpi prima di applyRelationPositions
+    const savedPositions = {};
+    for (const e of elements) {
+      if (e.type === 'rect_body' || e.type === 'point_mass' || e.type === 'block' || e.type === 'sphere') {
+        savedPositions[e.id] = { x: e.x, y: e.y };
+      }
+    }
+
+    applyRelationPositions();
+
+    // Ripristina TUTTI i corpi — la posizione corretta è quella salvata prima
+    // (include sia corpi con molla che corpi liberi con fune)
+    for (const [idStr, pos] of Object.entries(savedPositions)) {
+      const bod = elements.find(e => e.id === parseInt(idStr));
+      if (bod) { bod.x = pos.x; bod.y = pos.y; }
+    }
+
+    // Se ci sono leve, render completo per mantenere molle sincronizzate
+    if (elements.some(e => e.type === 'lever')) { render(); return; }
+
+    // Aggiorna funi per ripristinare _rotation dei corpi hanging
+    if (typeof updateRopePosition === 'function') {
+      for (const e2 of elements) {
+        if (e2.type === 'rope') try { updateRopePosition(e2); } catch(ee) {}
+      }
+    }
+
+    // Aggiorna DOM di tutti — includendo rotazione e pan
+    const pan = (typeof getCanvasPan === 'function') ? getCanvasPan() : { x: 0, y: 0 };
+    for (const other of elements) {
+      const gEl = canvas.querySelector(`g[data-id="${other.id}"]`);
+      if (gEl) {
+        const bx = other.x + pan.x;
+        const by = other.y + pan.y;
+        const transform = other._rotation
+          ? `translate(${bx}, ${by}) rotate(${other._rotation.angle}, ${other._rotation.cx}, ${other._rotation.cy})`
+          : `translate(${bx}, ${by})`;
+        gEl.setAttribute('transform', transform);
+      }
+    }
+    updateRelationLines();
+    return;
+  }
+
+  // Elemento normale — muovi tutto il gruppo insieme
+  const group = getRelationGroup(el.id);
+
+  if (group.size > 1) {
+    // Muovi tutti gli elementi del gruppo con lo stesso dx/dy
+    for (const gId of group) {
+      const gEl_data = elements.find(x => x.id === gId);
+      if (!gEl_data || !dragging.origAll[gId]) continue;
+      gEl_data.x = dragging.origAll[gId].x + dx;
+      gEl_data.y = dragging.origAll[gId].y + dy;
+    }
+    // Ricalcola posizioni relative all'interno del gruppo
+    applyRelationPositions();
+    // Aggiorna funi nel gruppo (ripristina _rotation dei corpi hanging)
+    for (const gId of group) {
+      const gEl_rope = elements.find(x => x.id === gId && x.type === 'rope');
+      if (gEl_rope && typeof updateRopePosition === 'function') {
+        try { updateRopePosition(gEl_rope); } catch(e) {}
+      }
+    }
+    // Aggiorna anche funi collegate a elementi del gruppo
+    for (const el2 of elements) {
+      if (el2.type !== 'rope') continue;
+      const ropeInGroup = relations.some(r =>
+        (r.aId === el2.id || r.bId === el2.id) && group.has(r.aId === el2.id ? r.bId : r.aId)
+      );
+      if (ropeInGroup && typeof updateRopePosition === 'function') {
+        try { updateRopePosition(el2); } catch(e) {}
+      }
+    }
+    // Se il gruppo contiene un corpo rettangolare ruotato, serve render completo
+    // per aggiornare i vettori (che sono nel sistema canvas assoluto)
+    const hasRotated = [...group].some(gId => {
+      const gd = elements.find(x => x.id === gId);
+      return gd?._rotation != null;
+    });
+    const hasSpringSpring = [...group].some(gId =>
+      relations.some(r => r.type === 'spring_spring' && (r.aId === gId || r.bId === gId))
+    );
+    const hasRope = [...group].some(gId =>
+      elements.find(x => x.id === gId)?.type === 'rope' ||
+      relations.some(r => r.type === 'rope_body' && (r.aId === gId || r.bId === gId))
+    );
+    const hasLever = [...group].some(gId =>
+      elements.find(x => x.id === gId)?.type === 'lever'
+    );
+    if (hasRotated || hasSpringSpring || hasRope || hasLever) {
+      render();
+      return;
+    }
+    // Aggiorna DOM
+    const pan_grp = (typeof getCanvasPan === 'function') ? getCanvasPan() : { x: 0, y: 0 };
+    for (const gId of group) {
+      const gEl_data = elements.find(x => x.id === gId);
+      const gEl = canvas.querySelector(`g[data-id="${gId}"]`);
+      if (gEl && gEl_data) {
+        const bx = gEl_data.x + pan_grp.x;
+        const by = gEl_data.y + pan_grp.y;
+        gEl.setAttribute('transform', gEl_data._rotation
+          ? `translate(${bx}, ${by}) rotate(${gEl_data._rotation.angle}, ${gEl_data._rotation.cx}, ${gEl_data._rotation.cy})`
+          : `translate(${bx}, ${by})`);
+      }
+    }
+    updateRelationLines();
+    return;
+  }
+
+  // Elemento singolo senza relazioni — snap normale
+  let nx = dragging.origX + dx;
+  let ny = dragging.origY + dy;
+  const def = DEFS[el.type];
+  let snapped = false;
+
+  // text_label non fa snap — si posiziona liberamente
+  // Alt tenuto = snap disabilitato
+  if (el.type !== 'text_label' && !e.altKey) {
+  for (const other of elements) {
+    if (other.id === el.id) continue;
+    if (DEFS[other.type]?.isRefSystem) continue;
+    const od = DEFS[other.type];
+    const snapPoints = [
+      { x: other.x,          y: other.y },
+      { x: other.x + od.w,   y: other.y },
+      { x: other.x,          y: other.y + od.h },
+      { x: other.x + od.w,   y: other.y + od.h },
+      { x: other.x + od.w/2, y: other.y + od.h/2 },
+    ];
+    const anchors = [
+      { sx: 0,       sy: 0 },
+      { sx: def.w,   sy: 0 },
+      { sx: 0,       sy: def.h },
+      { sx: def.w,   sy: def.h },
+      { sx: def.w/2, sy: def.h/2 },
+    ];
+    outer: for (const sp of snapPoints) {
+      for (const an of anchors) {
+        if (Math.hypot((nx + an.sx) - sp.x, (ny + an.sy) - sp.y) < SNAP_DIST) {
+          nx = sp.x - an.sx; ny = sp.y - an.sy; snapped = true; break outer;
+        }
+      }
+    }
+    if (snapped) break;
+  }
+  } // fine if text_label
+
+  el.x = Math.max(-40, nx);
+  el.y = Math.max(-40, ny);
+
+  // Leva: render completo per mantenere molle sincronizzate
+  if (el.type === 'lever') {
+    render();
+    return;
+  }
+
+  const gEl = canvas.querySelector(`g[data-id="${el.id}"]`);
+  if (gEl) {
+    const pan_el = (typeof getCanvasPan === 'function') ? getCanvasPan() : { x: 0, y: 0 };
+    const bx_el = el.x + pan_el.x;
+    const by_el = el.y + pan_el.y;
+    gEl.setAttribute('transform', el._rotation
+      ? `translate(${bx_el}, ${by_el}) rotate(${el._rotation.angle}, ${el._rotation.cx}, ${el._rotation.cy})`
+      : `translate(${bx_el}, ${by_el})`);
+    gEl.classList.toggle('snapping', snapped);
+  }
+
+  // Aggiorna overlay chart durante il drag
+  if (el.type === 'chart' && typeof updateChartOverlays === 'function') updateChartOverlays();
+  // Vecchio sistema parentId (backward compat)
+  for (const child of elements) {
+    if (child.parentId === el.id) {
+      const cx = el.x + child.offsetX;
+      const cy = el.y + child.offsetY;
+      const cEl = canvas.querySelector(`g[data-id="${child.id}"]`);
+      if (cEl) cEl.setAttribute('transform', `translate(${cx}, ${cy})`);
+    }
+  }
+  updateRelationLines();
+});
+
+document.addEventListener('mouseup', e => {
+  if (!dragging) return;
+  const wasDragging = dragging.moved;
+  const draggedId = dragging.id;
+  const mode = dragging.mode;
+  dragging = null;
+  window._isDraggingRef = false;
+
+  if (wasDragging) {
+    // Consolida parentId children
+    if (mode === 'element') {
+      const parent = elements.find(x => x.id === draggedId);
+      if (parent) {
+        for (const child of elements) {
+          if (child.parentId === draggedId) {
+            child.x = parent.x + child.offsetX;
+            child.y = parent.y + child.offsetY;
+          }
+        }
+      }
+    }
+    applyRelationPositions();
+    // Reset cache posizioni di riposo
+    Object.keys(window).filter(k =>
+      k.startsWith('_restDist_') || k.startsWith('_xOffARest_') || k.startsWith('_xBRest_')
+    ).forEach(k => delete window[k]);
+    render();
+    updatePropsPanel();
+  }
+});
+
+
+// ─── Editing in-place per text_label ──────────────────────────────────────────
+canvas.addEventListener('dblclick', e => {
+  // Trova l'elemento cliccato
+  let node = e.target;
+  let gNode = null;
+  while (node && node !== canvas) {
+    if (node.classList && node.classList.contains('diagram-element')) { gNode = node; break; }
+    node = node.parentNode;
+  }
+  if (!gNode) return;
+  const id = parseInt(gNode.dataset.id);
+  const el = elements.find(x => x.id === id);
+  if (!el || el.type !== 'text_label') return;
+
+  e.preventDefault();
+  e.stopPropagation();
+  startTextEdit(el);
+});
+
+function startTextEdit(el) {
+  // Rimuovi editor precedente se esiste
+  const existing = document.getElementById('text-label-editor');
+  if (existing) existing.remove();
+
+  const canvasRect = canvas.getBoundingClientRect();
+  const svgW = canvas.viewBox?.baseVal?.width  || canvas.clientWidth;
+  const svgH = canvas.viewBox?.baseVal?.height || canvas.clientHeight;
+  const scaleX = canvasRect.width  / svgW;
+  const scaleY = canvasRect.height / svgH;
+
+  const fontSize = parseFloat(el.props?.fontSize) || 18;
+  const color    = el.props?.color  || '#e8e8ec';
+  const bold     = el.props?.bold   ? 'bold'   : 'normal';
+  const italic   = el.props?.italic ? 'italic' : 'normal';
+
+  // Posizione assoluta nel DOM
+  const left = canvasRect.left + el.x * scaleX;
+  const top  = canvasRect.top  + el.y * scaleY;
+  const w    = Math.max(120, (el._wPx || 160) * scaleX);
+  const h    = Math.max(40,  (el._hPx || 40)  * scaleY);
+
+  const editor = document.createElement('textarea');
+  editor.id = 'text-label-editor';
+  editor.value = el.props?.text || '';
+  editor.style.cssText = `
+    position: fixed;
+    left: ${left}px;
+    top: ${top}px;
+    min-width: ${w}px;
+    min-height: ${h}px;
+    font-size: ${fontSize * scaleY}px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: ${bold};
+    font-style: ${italic};
+    color: ${color};
+    background: rgba(20,20,28,0.92);
+    border: 1.5px solid #c8f060;
+    border-radius: 3px;
+    outline: none;
+    resize: both;
+    padding: 2px 4px;
+    line-height: 1.3;
+    z-index: 1000;
+    box-sizing: border-box;
+    white-space: pre;
+    overflow: hidden;
+  `;
+
+  document.body.appendChild(editor);
+  editor.focus();
+  editor.select();
+
+  // Auto-resize mentre si scrive
+  editor.addEventListener('input', () => {
+    editor.style.height = 'auto';
+    editor.style.height = editor.scrollHeight + 'px';
+    editor.style.width  = 'auto';
+    // Stima larghezza in base al testo più lungo
+    const lines = editor.value.split('\n');
+    const maxLen = Math.max(...lines.map(l => l.length), 5);
+    editor.style.width = Math.max(120, maxLen * fontSize * scaleX * 0.62 + 16) + 'px';
+  });
+
+  function commitEdit() {
+    const newText = editor.value;
+    el.props = el.props || {};
+    el.props.text = newText;
+    editor.remove();
+    render();
+    updatePropsPanel();
+  }
+
+  // Escape = annulla, Ctrl+Enter = conferma, click fuori = conferma
+  editor.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { editor.remove(); render(); return; }
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); commitEdit(); }
+  });
+
+  editor.addEventListener('blur', () => {
+    // Piccolo delay per evitare doppio trigger
+    setTimeout(commitEdit, 100);
+  });
+}
+
+// ─── Menubar ──────────────────────────────────────────────────────────────────
+function toggleMenu(menuId) {
+  const item = document.getElementById(menuId);
+  const isOpen = item.classList.contains('open');
+  closeMenus();
+  if (!isOpen) item.classList.add('open');
+}
+
+function closeMenus() {
+  document.querySelectorAll('.menu-item.open').forEach(m => m.classList.remove('open'));
+}
+
+// Chiudi menu cliccando fuori
+document.addEventListener('click', e => {
+  if (!e.target.closest('.menu-item')) closeMenus();
+});
+
+// ═══ MODULE: status.js ═══
+// ─── Status bar (rimosso) ─────────────────────────────────────────────────────
+function updateStatus() {}
+function hideHint() {}
+function showHint() {}
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+window.onerror = (msg, src, line, col, err) => {
+  console.error(`JS Error at line ${line}: ${msg}`, err);
+  console.error('Stack:', err?.stack);
+  return false;
+};
+try {
+  render();
+  updateRefSystemBtn();
+} catch(e) {
+  console.error('Init error:', e);
+}
+
+// ═══ MODULE: slides.js ═══
+// ─── Slides / Presentazione ───────────────────────────────────────────────────
+
+function slidesUpdateBar() {
+  const list = document.getElementById('slides-list');
+  if (!list) return;
+  list.innerHTML = '';
+  _slides.forEach((slide, i) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'slide-thumb' + (i === _currentSlide ? ' active' : '');
+    thumb.title = 'Click: vai · Doppio click: rinomina · Tasto destro: opzioni';
+
+    const preview = document.createElement('div');
+    preview.className = 'slide-thumb-preview';
+    preview.style.position = 'relative';
+    const numEl = slide.elements?.length || 0;
+    preview.innerHTML = `<span style="font-size:14px;font-weight:bold;color:var(--accent)">${i+1}</span>`;
+    if (numEl > 0) {
+      const sub = document.createElement('span');
+      sub.style.cssText = 'position:absolute;bottom:2px;right:4px;font-size:8px;color:var(--muted)';
+      sub.textContent = `${numEl} el.`;
+      preview.appendChild(sub);
+    }
+
+    // Label rinominabile inline
+    const lbl = document.createElement('div');
+    lbl.className = 'slide-thumb-label';
+    lbl.textContent = slide.title || `Slide ${i+1}`;
+    lbl.title = slide.title || `Slide ${i+1}`;
+
+    // Drag & drop per riordinare le slides
+    thumb.draggable = true;
+    thumb.addEventListener('dragstart', e => {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(i));
+      thumb.style.opacity = '0.4';
+    });
+    thumb.addEventListener('dragend', () => {
+      thumb.style.opacity = '';
+      document.querySelectorAll('.slide-thumb').forEach(t => t.classList.remove('drag-over'));
+    });
+    thumb.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      document.querySelectorAll('.slide-thumb').forEach(t => t.classList.remove('drag-over'));
+      thumb.classList.add('drag-over');
+    });
+    thumb.addEventListener('dragleave', () => {
+      thumb.classList.remove('drag-over');
+    });
+    thumb.addEventListener('drop', e => {
+      e.preventDefault();
+      thumb.classList.remove('drag-over');
+      const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
+      const toIdx = i;
+      if (fromIdx === toIdx) return;
+      // Salva slide corrente prima di riordinare
+      saveCurrentSlide();
+      // Sposta la slide
+      const moved = _slides.splice(fromIdx, 1)[0];
+      _slides.splice(toIdx, 0, moved);
+      // Aggiorna indice corrente
+      if (_currentSlide === fromIdx) {
+        _currentSlide = toIdx;
+      } else if (fromIdx < _currentSlide && toIdx >= _currentSlide) {
+        _currentSlide--;
+      } else if (fromIdx > _currentSlide && toIdx <= _currentSlide) {
+        _currentSlide++;
+      }
+      slidesUpdateBar();
+    });
+
+    // Click → vai a slide
+    thumb.addEventListener('click', e => {
+      if (e.target.tagName === 'INPUT') return;
+      goToSlide(i);
+      render();
+      slidesUpdateBar();
+    });
+
+    // Doppio click → rinomina inline
+    thumb.addEventListener('dblclick', e => {
+      e.stopPropagation();
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = slide.title || `Slide ${i+1}`;
+      input.style.cssText = `width:64px;font-size:9px;font-family:'IBM Plex Mono',monospace;
+        background:var(--hover);border:1px solid var(--accent);border-radius:3px;
+        color:var(--text);padding:1px 3px;text-align:center;outline:none;`;
+      lbl.innerHTML = '';
+      lbl.appendChild(input);
+      input.focus(); input.select();
+      const confirm = () => {
+        slide.title = input.value || `Slide ${i+1}`;
+        slidesUpdateBar();
+      };
+      input.addEventListener('blur', confirm);
+      input.addEventListener('keydown', e2 => {
+        if (e2.key === 'Enter') { confirm(); }
+        if (e2.key === 'Escape') { slidesUpdateBar(); }
+      });
+    });
+
+    // Tasto destro → menu contestuale
+    thumb.addEventListener('contextmenu', e => {
+      e.preventDefault();
+      document.getElementById('__slideCtxMenu')?.remove();
+      const menu = document.createElement('div');
+      menu.id = '__slideCtxMenu';
+      menu.style.cssText = `position:fixed;background:var(--panel);border:1px solid var(--border);border-radius:6px;
+        z-index:9999;overflow:hidden;min-width:150px;`;
+      const items = [
+        { label: 'Rinomina', action: () => thumb.dispatchEvent(new MouseEvent('dblclick')) },
+        { label: 'Duplica', action: () => { duplicateSlide(i); render(); slidesUpdateBar(); } },
+        { label: '─', separator: true },
+        { label: 'Elimina', action: () => { deleteSlide(i); render(); slidesUpdateBar(); }, danger: true },
+      ];
+      items.forEach(item => {
+        if (item.separator) {
+          const sep = document.createElement('div');
+          sep.style.cssText = 'height:1px;background:var(--border);margin:2px 0';
+          menu.appendChild(sep); return;
+        }
+        const btn = document.createElement('button');
+        btn.style.cssText = `display:block;width:100%;text-align:left;padding:7px 12px;
+          background:none;border:none;cursor:pointer;font-size:12px;
+          font-family:'IBM Plex Mono',monospace;
+          color:${item.danger ? '#cc3333' : 'var(--text)'};`;
+        btn.textContent = item.label;
+        btn.addEventListener('click', () => { menu.remove(); item.action(); });
+        btn.addEventListener('mouseenter', () => btn.style.background = 'var(--hover)');
+        btn.addEventListener('mouseleave', () => btn.style.background = 'none');
+        menu.appendChild(btn);
+      });
+      document.body.appendChild(menu);
+
+      // Posiziona — flip verso l'alto se troppo vicino al bordo inferiore
+      const mH = menu.offsetHeight;
+      const mW = menu.offsetWidth;
+      const spaceBelow = window.innerHeight - e.clientY - 8;
+      const spaceRight = window.innerWidth - e.clientX - 8;
+      const top  = spaceBelow >= mH ? e.clientY : e.clientY - mH;
+      const left = spaceRight >= mW ? e.clientX : e.clientX - mW;
+      menu.style.top  = `${Math.max(4, top)}px`;
+      menu.style.left = `${Math.max(4, left)}px`;
+      setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 0);
+    });
+
+    thumb.appendChild(preview);
+    thumb.appendChild(lbl);
+    list.appendChild(thumb);
+  });
+}
+
+function slidesAddSlide() {
+  addEmptySlide();
+  render();
+  slidesUpdateBar();
+}
+
+function enterSlidesModeUI() {
+  initSlidesMode();
+  document.getElementById('slides-bar').style.display = 'flex';
+  slidesUpdateBar();
+}
+
+function closeSlideModeUI() {
+  // Non più usata — mantenuta per compatibilità
+  exitSlidesModeUI();
+}
+
+function exitSlidesModeUI() {
+  exitSlidesMode();
+  document.getElementById('slides-bar').style.display = 'none';
+  render();
+}
+
+// ─── Presentazione fullscreen ─────────────────────────────────────────────────
+// Nasconde la UI e mostra solo il canvas (rimane interattivo!)
+
+let _presentIdx = 0;
+
+function startPresentation() {
+  if (!_slidesMode || _slides.length === 0) return;
+  saveCurrentSlide();
+  _presentIdx = _currentSlide;
+
+  // Nasconde UI
+  document.getElementById('toolbar').style.display = 'none';
+  document.getElementById('sidebar').style.display = 'none';
+  document.getElementById('props-panel').style.display = 'none';
+  document.getElementById('slides-bar').style.display = 'none';
+  document.body.classList.add('presenting');
+
+  // Mostra overlay navigazione
+  document.getElementById('present-overlay').style.display = 'flex';
+  document.getElementById('present-overlay').style.background = 'transparent';
+  document.getElementById('present-overlay').style.pointerEvents = 'none';
+  document.getElementById('present-nav').style.pointerEvents = 'all';
+  document.getElementById('btn-exit-present').style.pointerEvents = 'all';
+
+  renderPresentSlide();
+  document.addEventListener('keydown', onPresentKey);
+}
+
+function stopPresentation() {
+  // Ripristina UI
+  document.getElementById('toolbar').style.display = '';
+  document.getElementById('sidebar').style.display = '';
+  document.getElementById('props-panel').style.display = '';
+  document.getElementById('slides-bar').style.display = 'flex';
+  document.getElementById('present-overlay').style.display = 'none';
+  document.body.classList.remove('presenting');
+  document.removeEventListener('keydown', onPresentKey);
+
+  // Ripristina slide corrente nel workspace
+  _loadSlideData(_slides[_currentSlide]);
+  if (typeof updateRefSystemBtn === 'function') updateRefSystemBtn();
+  render();
+  slidesUpdateBar();
+}
+
+function onPresentKey(e) {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') presentNext();
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') presentPrev();
+  else if (e.key === 'Escape') stopPresentation();
+}
+
+function presentNext() {
+  if (_presentIdx < _slides.length - 1) {
+    saveCurrentSlide();
+    _presentIdx++;
+    renderPresentSlide();
+  }
+}
+function presentPrev() {
+  if (_presentIdx > 0) {
+    saveCurrentSlide();
+    _presentIdx--;
+    renderPresentSlide();
+  }
+}
+
+function renderPresentSlide() {
+  const slide = _slides[_presentIdx];
+  if (!slide) return;
+
+  document.getElementById('present-counter').textContent = `${_presentIdx + 1} / ${_slides.length}`;
+  document.getElementById('present-title').textContent = slide.title || '';
+
+  // Carica dati slide — il canvas rimane interattivo
+  _loadSlideData(slide);
+  _currentSlide = _presentIdx;
+  render();
+
+  document.getElementById('btn-prev-slide').style.opacity = _presentIdx === 0 ? '0.3' : '1';
+  document.getElementById('btn-next-slide').style.opacity = _presentIdx === _slides.length - 1 ? '0.3' : '1';
+}
+
+function newWorkspace() {
+  // Usa clearCanvas ma resetta anche la modalità slides
+  const wasSlidesMode = _slidesMode;
+  if (wasSlidesMode) {
+    // Esci prima dalla modalità slides silenziosamente
+    exitSlidesMode();
+    document.getElementById('slides-bar').style.display = 'none';
+  }
+  clearCanvas(); // ha già il dialog di conferma
+}
+
+// ═══ MODULE: init.js ═══
+document.addEventListener('DOMContentLoaded', () => {
+  render();
+  updatePropsPanel();
+  if (typeof initCanvasPan === 'function') initCanvasPan();
+});
+// ─── Tema ─────────────────────────────────────────────────────────────────────
+const THEMES = ['dark', 'light', 'blueprint', 'amber'];
+
+function setTheme(name) {
+  const body = document.body;
+  THEMES.forEach(t => body.classList.remove('theme-' + t));
+  if (name !== 'dark') body.classList.add('theme-' + name);
+  localStorage.setItem('physics-composer-theme', name);
+  // Aggiorna checkmark nei bottoni
+  THEMES.forEach(t => {
+    const btn = document.getElementById('theme-btn-' + t);
+    if (btn) btn.style.fontWeight = (t === name) ? '700' : '';
+  });
+}
+
+// Applica tema salvato all'avvio
+(function() {
+  const saved = localStorage.getItem('physics-composer-theme') || 'dark';
+  setTheme(saved);
+})();</script>
+</body>
+</html>
