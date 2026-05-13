@@ -346,47 +346,51 @@
     </div>
 </section>
 
-    <section id="pionieri" class="pionieri-section">
+<section id="pionieri" class="pionieri-section">
         <div class="pionieri-card">
             <div class="counter">Solo 26 posti rimasti per il test gratuito</div>
-            <h2>Per A.S. 2026/2027</h2>
+            
+            <!-- Specifichiamo subito che è un pre-order/prenotazione -->
+            <h2>Prenota il tuo posto per l'A.S. 2026/2027</h2>
+            
             <p style="margin-bottom: 2rem; color: var(--text-light);">
-                Cerchiamo docenti innovatori per rifinire gli ultimi moduli. Unisciti a noi e trasforma il modo in cui i tuoi studenti vedono la fisica.
+                Cerchiamo docenti innovatori per rifinire gli ultimi moduli. Iscriviti ora per <strong>assicurarti l'accesso prioritario al lancio di Settembre.</strong>
             </p>
             
-			<ul style="text-align: left; max-width: 500px; margin: 0 auto 2.5rem; list-style-type: '✓ '; padding-left: 1rem; font-size: 0.95rem;">
-				<li><strong>Licenza FULL gratuita</strong> per 12 mesi</li>
-				<li>Accesso immediato ai moduli core (Molle, Carrucole, Leve)</li>
-				<li><strong>Nuovi moduli in arrivo ogni mese:</strong> Termodinamica, Ottica, Fluidodinamica</li>
-				<li>Possibilità di influenzare lo sviluppo delle nuove funzioni</li>
-				<li>Sconto riservato per l'attivazione con <strong>Carta del Docente</strong></li>
-			</ul>
+            <ul style="text-align: left; max-width: 500px; margin: 0 auto 2.5rem; list-style-type: '✓ '; padding-left: 1rem; font-size: 0.95rem;">
+                <li><strong>Licenza FULL gratuita</strong> per l'intero anno scolastico 26/27</li>
+                <li><strong>Anteprima immediata:</strong> Accesso ai moduli beta (Molle, Carrucole, Leve)</li>
+                <li><strong>Settembre 2026:</strong> Rilascio ufficiale della versione di produzione</li>
+                <li>Possibilità di influenzare lo sviluppo delle nuove funzioni</li>
+                <li>Sconto riservato per il rinnovo con <strong>Carta del Docente</strong></li>
+            </ul>
 
             <div class="form-container">
-                <!-- Sostituisci l'action con il tuo link Formspree o Mailchimp -->
-				<form id="pionieri-form" action="https://formspree.io/f/mvzllrwg" method="POST">
-					<div class="form-group">
-						<label for="email" style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">Email Istituzionale</label>
-						<!-- Importante: aggiungi name="email" così Formspree sa cosa sta ricevendo -->
-						<input type="email" id="email" name="email" placeholder="nome.cognome@scuola.it" required>
-					</div>
+                <form id="pionieri-form" action="https://formspree.io/f/mvzllrwg" method="POST">
+                    <div class="form-group">
+                        <label for="email" style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">Email Istituzionale</label>
+                        <input type="email" id="email" name="email" placeholder="nome.cognome@scuola.it" required>
+                    </div>
                     <div class="privacy-group">
                         <input type="checkbox" id="privacy" name="privacy" required>
                         <label for="privacy" class="privacy-text">
-                            Ho letto l'informativa sulla <a href="privacy.html">Privacy Policy</a> e acconsento al trattamento della mia email per ricevere aggiornamenti sul progetto PhysicsComposer.
+                            Ho letto l'informativa sulla <a href="privacy.html">Privacy Policy</a> e acconsento al trattamento dei dati per la prenotazione della licenza 2026/2027.
                         </label>
                     </div>
 
-                    <button id="submit-btn" type="submit" class="cta-button" style="width: 100%;">Ottieni l'accesso gratuito</button>
-					<!-- Link per chi è già registrato -->
-    <p style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-light);">
-        Hai già ricevuto le credenziali? <a href="app/index.html" style="color: var(--primary); font-weight: 600; text-decoration: none;">Accedi qui al software</a>
-    </p>
+                    <!-- Cambiato il testo del bottone per dare l'idea di prenotazione -->
+                    <button id="submit-btn" type="submit" class="cta-button" style="width: 100%;">Prenota licenza gratuita 2026/27</button>
+                    
+                    <p style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-light);">
+                        Hai già ricevuto le credenziali per la beta? <a href="app/index.html" style="color: var(--primary); font-weight: 600; text-decoration: none;">Accedi qui</a>
+                    </p>
                 </form>
-				<div id="success-message" style="display: none; padding: 2rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; text-align: center; margin-top: 1rem;">
-					<h3 style="color: #166534; margin-bottom: 0.5rem;">✓ Richiesta inviata!</h3>
-					<p style="color: #166534; font-size: 0.9rem;">Grazie Pioniere. Controlla la tua inbox, riceverai presto le istruzioni per l'accesso.</p>
-				</div>
+                
+                <!-- Messaggio di successo più specifico -->
+                <div id="success-message" style="display: none; padding: 2rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; text-align: center; margin-top: 1rem;">
+                    <h3 style="color: #166534; margin-bottom: 0.5rem;">✓ Posto riservato!</h3>
+                    <p style="color: #166534; font-size: 0.9rem;">Grazie Pioniere. Ti abbiamo inviato una conferma. Riceverai le credenziali ufficiali all'inizio dell'A.S. 2026/2027.</p>
+                </div>
             </div>
         </div>
     </section>
