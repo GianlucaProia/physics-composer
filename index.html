@@ -236,6 +236,21 @@
             margin-bottom: 1.5rem;
         }
 
+		header .logo {
+    margin: 0;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+@media (max-width: 600px) {
+    header img {
+        height: 24px;
+    }
+    .logo {
+        font-size: 1.1rem;
+    }
+}
+
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
             .pionieri-card { padding: 2rem 1.5rem; }
@@ -257,7 +272,10 @@
 <body>
 
 <header>
-    <div class="logo">PhysicsComposer</div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="images/logo.svg" alt="Logo" style="height: 32px; width: auto;">
+        <div class="logo">PhysicsComposer</div>
+    </div>
     <div style="display: flex; gap: 1.5rem; align-items: center;">
         <a href="#pionieri" class="btn-ghost">Supporto Docenti</a>
         <a href="app/index.html" class="cta-button" style="padding: 0.5rem 1.2rem; font-size: 0.9rem;">Accedi</a>
