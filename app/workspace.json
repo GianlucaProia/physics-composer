@@ -1,234 +1,41 @@
 {
   "version": 1,
-  "savedAt": "2026-05-20T14:17:13.207Z",
+  "savedAt": "2026-05-20T14:18:39.908Z",
   "elements": [
     {
-      "id": 2,
+      "id": 1,
       "type": "text_label",
-      "x": 24,
-      "y": 15,
+      "x": 578,
+      "y": 186,
       "props": {
-        "text": "Equilibrio statico",
-        "fontSize": 25,
-        "bold": true
+        "text": "Physics Composer",
+        "fontSize": 60
       }
     },
     {
       "id": 3,
-      "type": "axis_xy",
-      "x": -127,
-      "y": 546,
-      "props": {
-        "gravity": 9.81,
-        "halfX": 5,
-        "halfY": 5,
-        "flipX": false,
-        "flipY": false
-      }
-    },
-    {
-      "id": 4,
       "type": "text_label",
-      "x": 26,
-      "y": 62,
+      "x": 387,
+      "y": 274,
       "props": {
-        "text": "Un corpo è in equilibrio quando la risultante di tutte le forze è zero."
-      }
-    },
-    {
-      "id": 6,
-      "type": "text_label",
-      "x": 298,
-      "y": 89,
-      "props": {
-        "text": "$$\\displaystyle\\sum_{i=1}^{n} \\vec{F}_i = \\vec{0}$$"
-      }
-    },
-    {
-      "id": 8,
-      "type": "text_label",
-      "x": 24,
-      "y": 194,
-      "props": {
-        "text": "Cambia il modulo e verso della forza per visualizzare la risultante."
-      }
-    },
-    {
-      "id": 10,
-      "type": "point_mass",
-      "x": 582,
-      "y": 387,
-      "props": {
-        "mass": 1,
-        "v0Mode": "comp",
-        "v0x": "",
-        "v0y": "",
-        "v0Mod": "",
-        "v0Angle": "",
-        "v0s": "",
-        "forces": [
-          {
-            "name": "F1",
-            "mode": "polar",
-            "fx": 11.593972121062457,
-            "fy": 12.43301292752588,
-            "fMod": 17,
-            "fAngle": 47
-          }
-        ],
-        "showV0": false,
-        "showF": true,
-        "showA": false,
-        "showR": true,
-        "showN": true,
-        "showFriction": true,
-        "visible": true,
-        "_T_rope": null,
-        "_Fx": 11.594,
-        "_Fy": 2.623,
-        "_F_mag": 11.887,
-        "_planeN": null,
-        "_N_plane": 0,
-        "_f_friction": 0,
-        "_friction_type": null,
-        "_friction_type_n": 0,
-        "_friction_type_label": "",
-        "_ax": 11.594,
-        "_ay": 2.623,
-        "_a_mag": 11.887
-      }
-    },
-    {
-      "id": 11,
-      "type": "slider",
-      "x": 263,
-      "y": 304,
-      "props": {
-        "min": 0,
-        "max": 200,
-        "step": 0.5,
-        "value": 17,
-        "label": "|F|",
-        "color": "#f0a060",
-        "title": "Modulo"
-      }
-    },
-    {
-      "id": 12,
-      "type": "slider",
-      "x": 264,
-      "y": 406,
-      "props": {
-        "min": -180,
-        "max": 180,
-        "step": 1,
-        "value": 47,
-        "label": "θ",
-        "color": "#f0a060",
-        "title": "Angolo rispetto all'asse x"
-      }
-    },
-    {
-      "id": 15,
-      "type": "display",
-      "x": 783,
-      "y": 343,
-      "props": {
-        "color": "#60c0f0",
-        "title": "Accelerazione",
-        "decimals": 2,
-        "label": "|a|",
-        "unit": "m/s²",
-        "_displayValue": 11.887
-      }
-    },
-    {
-      "id": 16,
-      "type": "display",
-      "x": 783,
-      "y": 437,
-      "props": {
-        "color": "#60c0f0",
-        "title": "Forza risultante",
-        "decimals": 2,
-        "label": "|F|",
-        "unit": "N",
-        "_displayValue": 11.887
+        "text": "Cosa succede alla forza elastica se raddoppio la massa?\nE se uso due molle in parallelo invece di una?",
+        "italic": true,
+        "fontSize": 30
       }
     }
   ],
   "relations": [
     {
-      "id": 5,
-      "aId": 2,
-      "bId": 4,
+      "id": 4,
+      "aId": 1,
+      "bId": 3,
       "type": "generic",
       "props": {
         "height": 0
-      }
-    },
-    {
-      "id": 7,
-      "aId": 6,
-      "bId": 4,
-      "type": "generic",
-      "props": {
-        "height": 0
-      }
-    },
-    {
-      "id": 9,
-      "aId": 8,
-      "bId": 4,
-      "type": "generic",
-      "props": {
-        "height": 0
-      }
-    },
-    {
-      "id": 13,
-      "aId": 11,
-      "bId": 10,
-      "type": "slider_prop",
-      "props": {
-        "height": 0,
-        "propKey": "forces[0].__polar",
-        "subKey": "forces[0].__mag"
-      }
-    },
-    {
-      "id": 14,
-      "aId": 12,
-      "bId": 10,
-      "type": "slider_prop",
-      "props": {
-        "height": 0,
-        "propKey": "forces[0].__polar",
-        "subKey": "forces[0].__ang"
-      }
-    },
-    {
-      "id": 17,
-      "aId": 15,
-      "bId": 10,
-      "type": "display_prop",
-      "props": {
-        "height": 0,
-        "propKey": "_a_mag"
-      }
-    },
-    {
-      "id": 18,
-      "aId": 16,
-      "bId": 10,
-      "type": "display_prop",
-      "props": {
-        "height": 0,
-        "propKey": "_F_mag"
       }
     }
   ],
-  "idCounter": 18,
+  "idCounter": 4,
   "viewSettings": {
     "vectorScale": 120,
     "vectorStroke": 2.5,
@@ -880,5 +687,5 @@
       "idCounter": 1
     }
   ],
-  "currentSlide": 2
+  "currentSlide": 0
 }
