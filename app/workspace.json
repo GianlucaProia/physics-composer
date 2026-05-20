@@ -1,12 +1,23 @@
 {
   "version": 1,
-  "savedAt": "2026-05-20T12:45:51.417Z",
+  "savedAt": "2026-05-20T14:17:13.207Z",
   "elements": [
     {
-      "id": 1,
+      "id": 2,
+      "type": "text_label",
+      "x": 24,
+      "y": 15,
+      "props": {
+        "text": "Equilibrio statico",
+        "fontSize": 25,
+        "bold": true
+      }
+    },
+    {
+      "id": 3,
       "type": "axis_xy",
-      "x": -117,
-      "y": 576,
+      "x": -127,
+      "y": 546,
       "props": {
         "gravity": 9.81,
         "halfX": 5,
@@ -16,32 +27,37 @@
       }
     },
     {
-      "id": 8,
-      "type": "spring",
-      "x": 333,
-      "y": 310,
+      "id": 4,
+      "type": "text_label",
+      "x": 26,
+      "y": 62,
       "props": {
-        "anchor": "left",
-        "k": 100,
-        "L0": 0.5,
-        "forces": [],
-        "springMode": "auto",
-        "dx": "",
-        "visScale": 5,
-        "showRest": false,
-        "showF": false,
-        "visible": true,
-        "_L_calc": 0.7861611475317609,
-        "_delta_x": 0.286161,
-        "_F_el": 28.616115,
-        "_showReaction": false
+        "text": "Un corpo è in equilibrio quando la risultante di tutte le forze è zero."
+      }
+    },
+    {
+      "id": 6,
+      "type": "text_label",
+      "x": 298,
+      "y": 89,
+      "props": {
+        "text": "$$\\displaystyle\\sum_{i=1}^{n} \\vec{F}_i = \\vec{0}$$"
+      }
+    },
+    {
+      "id": 8,
+      "type": "text_label",
+      "x": 24,
+      "y": 194,
+      "props": {
+        "text": "Cambia il modulo e verso della forza per visualizzare la risultante."
       }
     },
     {
       "id": 10,
-      "type": "rect_body",
-      "x": 445,
-      "y": 310,
+      "type": "point_mass",
+      "x": 582,
+      "y": 387,
       "props": {
         "mass": 1,
         "v0Mode": "comp",
@@ -54,147 +70,12 @@
           {
             "name": "F1",
             "mode": "polar",
-            "fx": 8.91995969293194,
-            "fy": 16.776004264319635,
-            "fMod": 19,
-            "fAngle": 62
+            "fx": 11.593972121062457,
+            "fy": 12.43301292752588,
+            "fMod": 17,
+            "fAngle": 47
           }
         ],
-        "showV0": false,
-        "showF": true,
-        "showA": false,
-        "showR": false,
-        "showN": true,
-        "showFriction": true,
-        "visible": true,
-        "_Fx": 0,
-        "_Fy": 0,
-        "_F_mag": 0,
-        "_ax": 0,
-        "_ay": 0,
-        "_a_mag": 0,
-        "_T_rope": null,
-        "_planeN": null,
-        "_N_plane": 0,
-        "_f_friction": 0,
-        "_friction_type": null,
-        "_friction_type_n": 0,
-        "_friction_type_label": ""
-      }
-    },
-    {
-      "id": 32,
-      "type": "display",
-      "x": 730,
-      "y": 71,
-      "props": {
-        "color": "#60c0f0",
-        "title": "Allungamento",
-        "decimals": 2,
-        "label": "Δx",
-        "unit": "m",
-        "_displayValue": 0.2861611475317609
-      }
-    },
-    {
-      "id": 33,
-      "type": "display",
-      "x": 547,
-      "y": 60,
-      "props": {
-        "color": "#60c0f0",
-        "title": "$F_x$",
-        "decimals": 2,
-        "label": "F1.fx",
-        "unit": "N",
-        "_displayValue": 8.91995969293194
-      }
-    },
-    {
-      "id": 35,
-      "type": "slider",
-      "x": 44,
-      "y": 55,
-      "props": {
-        "min": 0,
-        "max": 200,
-        "step": 0.5,
-        "value": 19,
-        "label": "|F|",
-        "color": "#f0a060",
-        "title": ""
-      }
-    },
-    {
-      "id": 38,
-      "type": "slider",
-      "x": 42,
-      "y": 139,
-      "props": {
-        "min": -180,
-        "max": 180,
-        "step": 1,
-        "value": 62,
-        "label": "θ",
-        "color": "#f0a060",
-        "title": ""
-      }
-    },
-    {
-      "id": 40,
-      "type": "rope",
-      "x": 491,
-      "y": 301.16221867996836,
-      "props": {
-        "forceF": 10,
-        "forceAngle": 10,
-        "visible": true
-      }
-    },
-    {
-      "id": 50,
-      "type": "rope",
-      "x": 491,
-      "y": 322,
-      "props": {
-        "forceF": 10,
-        "forceAngle": -10,
-        "visible": true
-      }
-    },
-    {
-      "id": 88,
-      "type": "inclined_plane",
-      "x": 767,
-      "y": 274,
-      "props": {
-        "inputMode": "angle+base",
-        "angle": 34,
-        "base": 10,
-        "height": "",
-        "length": "",
-        "flipX": false,
-        "visible": true,
-        "_derivedBase": "10.0000",
-        "_derivedHeight": "6.7451",
-        "_derivedLength": "12.0622",
-        "_derivedAngle": "34.00"
-      }
-    },
-    {
-      "id": 89,
-      "type": "rect_body",
-      "x": 822.0611334737798,
-      "y": 350.70074697920137,
-      "props": {
-        "mass": 18.1,
-        "v0Mode": "comp",
-        "v0x": "",
-        "v0y": "",
-        "v0Mod": "",
-        "v0Angle": "",
-        "v0s": "",
-        "forces": [],
         "showV0": false,
         "showF": true,
         "showA": false,
@@ -202,120 +83,111 @@
         "showN": true,
         "showFriction": true,
         "visible": true,
-        "_Fx": -82.3158,
-        "_Fy": -55.5227,
-        "_F_mag": 99.2909,
-        "_ax": -4.5478,
-        "_ay": -3.0676,
-        "_a_mag": 5.4857,
         "_T_rope": null,
-        "_planeN": {
-          "NMag": 147.20474042044577,
-          "NValid": true,
-          "geo": {
-            "angle": 34,
-            "scaleX": 26.6,
-            "scaleY": 22.6,
-            "lenPx": 272.60525636188265,
-            "lenM": 12.062179485039055,
-            "x0": 0,
-            "y0": 152.43892480638846,
-            "x1": 226,
-            "y1": 0,
-            "dx": 0.8290375725550416,
-            "dy": -0.5591929034707469,
-            "nx": -0.5591929034707469,
-            "ny": -0.8290375725550416,
-            "dx_fis": 0.8290375725550416,
-            "dy_fis": 0.5591929034707469,
-            "nx_fis": -0.5591929034707469,
-            "ny_fis": 0.8290375725550416,
-            "bPx": 226,
-            "hPx": 152.43892480638846,
-            "flipX": false
-          },
-          "Ppar": -99.29085113316931,
-          "Fext_par": 0,
-          "friction": {
-            "type": "static",
-            "value": 0,
-            "max": 0,
-            "sliding": true
-          }
-        },
-        "_N_plane": 147.2047,
+        "_Fx": 11.594,
+        "_Fy": 2.623,
+        "_F_mag": 11.887,
+        "_planeN": null,
+        "_N_plane": 0,
         "_f_friction": 0,
-        "_friction_type": "static",
-        "_friction_type_n": 1,
-        "_friction_type_label": "statico"
+        "_friction_type": null,
+        "_friction_type_n": 0,
+        "_friction_type_label": "",
+        "_ax": 11.594,
+        "_ay": 2.623,
+        "_a_mag": 11.887
       }
     },
     {
-      "id": 91,
+      "id": 11,
+      "type": "slider",
+      "x": 263,
+      "y": 304,
+      "props": {
+        "min": 0,
+        "max": 200,
+        "step": 0.5,
+        "value": 17,
+        "label": "|F|",
+        "color": "#f0a060",
+        "title": "Modulo"
+      }
+    },
+    {
+      "id": 12,
+      "type": "slider",
+      "x": 264,
+      "y": 406,
+      "props": {
+        "min": -180,
+        "max": 180,
+        "step": 1,
+        "value": 47,
+        "label": "θ",
+        "color": "#f0a060",
+        "title": "Angolo rispetto all'asse x"
+      }
+    },
+    {
+      "id": 15,
       "type": "display",
-      "x": 1042,
-      "y": 286,
+      "x": 783,
+      "y": 343,
       "props": {
         "color": "#60c0f0",
         "title": "Accelerazione",
         "decimals": 2,
         "label": "|a|",
         "unit": "m/s²",
-        "_displayValue": 5.4857
+        "_displayValue": 11.887
       }
     },
     {
-      "id": 93,
-      "type": "slider",
-      "x": 845,
-      "y": 178,
+      "id": 16,
+      "type": "display",
+      "x": 783,
+      "y": 437,
       "props": {
-        "min": 0,
-        "max": 20,
-        "step": 0.1,
-        "value": 18.1,
-        "label": "m",
-        "color": "#f0a060",
-        "title": ""
-      }
-    },
-    {
-      "id": 95,
-      "type": "slider",
-      "x": 1075,
-      "y": 181,
-      "props": {
-        "min": 0,
-        "max": 89,
-        "step": 1,
-        "value": 34,
-        "label": "θ",
-        "color": "#f0a060",
-        "title": ""
+        "color": "#60c0f0",
+        "title": "Forza risultante",
+        "decimals": 2,
+        "label": "|F|",
+        "unit": "N",
+        "_displayValue": 11.887
       }
     }
   ],
   "relations": [
     {
-      "id": 12,
-      "aId": 8,
-      "bId": 10,
-      "type": "spring_body",
-      "props": {}
-    },
-    {
-      "id": 34,
-      "aId": 10,
-      "bId": 33,
-      "type": "display_prop",
+      "id": 5,
+      "aId": 2,
+      "bId": 4,
+      "type": "generic",
       "props": {
-        "height": 0,
-        "propKey": "forces[0].fx"
+        "height": 0
       }
     },
     {
-      "id": 36,
-      "aId": 35,
+      "id": 7,
+      "aId": 6,
+      "bId": 4,
+      "type": "generic",
+      "props": {
+        "height": 0
+      }
+    },
+    {
+      "id": 9,
+      "aId": 8,
+      "bId": 4,
+      "type": "generic",
+      "props": {
+        "height": 0
+      }
+    },
+    {
+      "id": 13,
+      "aId": 11,
       "bId": 10,
       "type": "slider_prop",
       "props": {
@@ -325,18 +197,8 @@
       }
     },
     {
-      "id": 37,
-      "aId": 32,
-      "bId": 8,
-      "type": "display_prop",
-      "props": {
-        "height": 0,
-        "propKey": "_delta_x"
-      }
-    },
-    {
-      "id": 39,
-      "aId": 38,
+      "id": 14,
+      "aId": 12,
       "bId": 10,
       "type": "slider_prop",
       "props": {
@@ -346,39 +208,9 @@
       }
     },
     {
-      "id": 41,
-      "aId": 40,
+      "id": 17,
+      "aId": 15,
       "bId": 10,
-      "type": "rope_body",
-      "props": {
-        "height": 0,
-        "anchor": "left"
-      }
-    },
-    {
-      "id": 51,
-      "aId": 50,
-      "bId": 10,
-      "type": "rope_body",
-      "props": {
-        "height": 0,
-        "anchor": "left"
-      }
-    },
-    {
-      "id": 90,
-      "aId": 89,
-      "bId": 88,
-      "type": "body_on_plane",
-      "props": {
-        "height": 0,
-        "s": 5
-      }
-    },
-    {
-      "id": 92,
-      "aId": 89,
-      "bId": 91,
       "type": "display_prop",
       "props": {
         "height": 0,
@@ -386,35 +218,667 @@
       }
     },
     {
-      "id": 94,
-      "aId": 93,
-      "bId": 89,
-      "type": "slider_prop",
+      "id": 18,
+      "aId": 16,
+      "bId": 10,
+      "type": "display_prop",
       "props": {
         "height": 0,
-        "propKey": "mass",
-        "subKey": null
-      }
-    },
-    {
-      "id": 96,
-      "aId": 95,
-      "bId": 88,
-      "type": "slider_prop",
-      "props": {
-        "height": 0,
-        "propKey": "angle",
-        "subKey": null
+        "propKey": "_F_mag"
       }
     }
   ],
-  "idCounter": 96,
+  "idCounter": 18,
   "viewSettings": {
-    "vectorScale": 130,
-    "vectorStroke": 4,
-    "vectorHead": 15,
+    "vectorScale": 120,
+    "vectorStroke": 2.5,
+    "vectorHead": 11,
     "vectorFontSize": 13
   },
-  "slides": null,
-  "currentSlide": 0
+  "slides": [
+    {
+      "id": 1779281921680,
+      "title": "INTRO",
+      "elements": [
+        {
+          "id": 1,
+          "type": "text_label",
+          "x": 578,
+          "y": 186,
+          "props": {
+            "text": "Physics Composer",
+            "fontSize": 60
+          }
+        },
+        {
+          "id": 3,
+          "type": "text_label",
+          "x": 387,
+          "y": 274,
+          "props": {
+            "text": "Cosa succede alla forza elastica se raddoppio la massa?\nE se uso due molle in parallelo invece di una?",
+            "italic": true,
+            "fontSize": 30
+          }
+        }
+      ],
+      "relations": [
+        {
+          "id": 4,
+          "aId": 1,
+          "bId": 3,
+          "type": "generic",
+          "props": {
+            "height": 0
+          }
+        }
+      ],
+      "idCounter": 4
+    },
+    {
+      "id": 1779281996381,
+      "title": "LEGGE DI HOOK",
+      "elements": [
+        {
+          "id": 2,
+          "type": "text_label",
+          "x": 44,
+          "y": 16,
+          "props": {
+            "text": "La legge di Hook",
+            "fontSize": 25,
+            "bold": true
+          }
+        },
+        {
+          "id": 3,
+          "type": "text_label",
+          "x": 42,
+          "y": 68,
+          "props": {
+            "text": "Una molla si allunga in modo proporzionale alla forza applicata: ",
+            "fontSize": 20,
+            "bold": true
+          }
+        },
+        {
+          "id": 4,
+          "type": "text_label",
+          "x": 813,
+          "y": 56,
+          "props": {
+            "text": "$\\vec{F_{el}}=-k \\cdot \\vec{\\Delta x}$",
+            "fontSize": 20
+          }
+        },
+        {
+          "id": 5,
+          "type": "text_label",
+          "x": 43,
+          "y": 86,
+          "props": {
+            "text": "Prova: cambia la massa con lo slider. Cosa osservi su $\\Delta x$?",
+            "fontSize": 20,
+            "bold": false
+          }
+        },
+        {
+          "id": 6,
+          "type": "axis_xy",
+          "x": -142,
+          "y": 485,
+          "props": {
+            "gravity": 9.81,
+            "halfX": 5,
+            "halfY": 5,
+            "flipX": false,
+            "flipY": false
+          }
+        },
+        {
+          "id": 7,
+          "type": "spring",
+          "x": 191,
+          "y": 183,
+          "props": {
+            "anchor": "top",
+            "k": 100,
+            "L0": 0.5,
+            "forces": [],
+            "springMode": "auto",
+            "dx": "",
+            "visScale": 5,
+            "showRest": false,
+            "showF": false,
+            "visible": true,
+            "_L_calc": 1.0101200000000001,
+            "_delta_x": 0.51012,
+            "_F_el": 51.012
+          }
+        },
+        {
+          "id": 8,
+          "type": "rect_body",
+          "x": 182,
+          "y": 315,
+          "props": {
+            "mass": 5.2,
+            "v0Mode": "comp",
+            "v0x": "",
+            "v0y": "",
+            "v0Mod": "",
+            "v0Angle": "",
+            "v0s": "",
+            "forces": [],
+            "showV0": false,
+            "showF": true,
+            "showA": false,
+            "showR": false,
+            "showN": true,
+            "showFriction": true,
+            "visible": true
+          }
+        },
+        {
+          "id": 10,
+          "type": "slider",
+          "x": 275,
+          "y": 193,
+          "props": {
+            "min": 0,
+            "max": 20,
+            "step": 0.1,
+            "value": 5.2,
+            "label": "m",
+            "color": "#ffffff",
+            "title": "Massa corpo"
+          }
+        },
+        {
+          "id": 12,
+          "type": "display",
+          "x": 281,
+          "y": 296,
+          "props": {
+            "color": "#60c0f0",
+            "title": "Allungamento molla",
+            "decimals": 2,
+            "label": "Δx",
+            "unit": "m",
+            "_displayValue": 0.5101200000000001
+          }
+        },
+        {
+          "id": 14,
+          "type": "text_label",
+          "x": 71,
+          "y": 246,
+          "props": {
+            "text": "$k = 100 \\frac{N}{m}$"
+          }
+        },
+        {
+          "id": 20,
+          "type": "spring",
+          "x": 722,
+          "y": 186,
+          "props": {
+            "anchor": "top",
+            "k": 100,
+            "L0": 0.5,
+            "forces": [],
+            "springMode": "auto",
+            "dx": "",
+            "visScale": 5,
+            "showRest": false,
+            "showF": false,
+            "visible": true,
+            "_L_calc": 0.77468,
+            "_delta_x": 0.27468,
+            "_F_el": 27.468
+          }
+        },
+        {
+          "id": 21,
+          "type": "spring",
+          "x": 678,
+          "y": 186,
+          "props": {
+            "anchor": "top",
+            "k": 100,
+            "L0": 0.5,
+            "forces": [],
+            "springMode": "auto",
+            "dx": "",
+            "visScale": 5,
+            "showRest": false,
+            "showF": false,
+            "visible": true,
+            "_L_calc": 0.77468,
+            "_delta_x": 0.27468,
+            "_F_el": 27.468
+          }
+        },
+        {
+          "id": 23,
+          "type": "rect_body",
+          "x": 691,
+          "y": 307,
+          "props": {
+            "mass": 5.6,
+            "v0Mode": "comp",
+            "v0x": "",
+            "v0y": "",
+            "v0Mod": "",
+            "v0Angle": "",
+            "v0s": "",
+            "forces": [],
+            "showV0": false,
+            "showF": true,
+            "showA": false,
+            "showR": false,
+            "showN": true,
+            "showFriction": true,
+            "visible": true
+          }
+        },
+        {
+          "id": 25,
+          "type": "text_label",
+          "x": 543,
+          "y": 202,
+          "props": {
+            "text": "$k_1 = 100 \\frac{N}{m}$\n$k_2 = 100 \\frac{N}{m}$"
+          }
+        },
+        {
+          "id": 27,
+          "type": "slider",
+          "x": 806,
+          "y": 192,
+          "props": {
+            "min": 0,
+            "max": 20,
+            "step": 0.1,
+            "value": 5.6,
+            "label": "m",
+            "color": "#ffffff",
+            "title": ""
+          }
+        },
+        {
+          "id": 29,
+          "type": "display",
+          "x": 809,
+          "y": 287,
+          "props": {
+            "color": "#60c0f0",
+            "title": "Allungamento molle",
+            "decimals": 2,
+            "label": "Δx",
+            "unit": "m",
+            "_displayValue": 0.27468000000000004
+          }
+        }
+      ],
+      "relations": [
+        {
+          "id": 9,
+          "aId": 8,
+          "bId": 7,
+          "type": "spring_body",
+          "props": {
+            "height": 0
+          }
+        },
+        {
+          "id": 11,
+          "aId": 10,
+          "bId": 8,
+          "type": "slider_prop",
+          "props": {
+            "height": 0,
+            "propKey": "mass",
+            "subKey": null
+          }
+        },
+        {
+          "id": 13,
+          "aId": 12,
+          "bId": 7,
+          "type": "display_prop",
+          "props": {
+            "height": 0,
+            "propKey": "_delta_x"
+          }
+        },
+        {
+          "id": 16,
+          "aId": 14,
+          "bId": 7,
+          "type": "generic",
+          "props": {
+            "height": 0
+          }
+        },
+        {
+          "id": 17,
+          "aId": 2,
+          "bId": 3,
+          "type": "generic",
+          "props": {
+            "height": 0
+          }
+        },
+        {
+          "id": 18,
+          "aId": 4,
+          "bId": 3,
+          "type": "generic",
+          "props": {
+            "height": 0
+          }
+        },
+        {
+          "id": 19,
+          "aId": 5,
+          "bId": 3,
+          "type": "generic",
+          "props": {
+            "height": 0
+          }
+        },
+        {
+          "id": 22,
+          "aId": 21,
+          "bId": 20,
+          "type": "spring_spring",
+          "props": {
+            "height": 0,
+            "layout": "parallel"
+          }
+        },
+        {
+          "id": 24,
+          "aId": 23,
+          "bId": 21,
+          "type": "spring_body",
+          "props": {
+            "height": 0
+          }
+        },
+        {
+          "id": 26,
+          "aId": 21,
+          "bId": 25,
+          "type": "generic",
+          "props": {
+            "height": 0
+          }
+        },
+        {
+          "id": 28,
+          "aId": 23,
+          "bId": 27,
+          "type": "slider_prop",
+          "props": {
+            "height": 0,
+            "propKey": "mass",
+            "subKey": null
+          }
+        },
+        {
+          "id": 30,
+          "aId": 20,
+          "bId": 29,
+          "type": "display_prop",
+          "props": {
+            "height": 0,
+            "propKey": "_delta_x"
+          }
+        }
+      ],
+      "idCounter": 30
+    },
+    {
+      "id": 1779282725386,
+      "title": "EQUILIBRIO STATICO",
+      "elements": [
+        {
+          "id": 2,
+          "type": "text_label",
+          "x": 24,
+          "y": 15,
+          "props": {
+            "text": "Equilibrio statico",
+            "fontSize": 25,
+            "bold": true
+          }
+        },
+        {
+          "id": 3,
+          "type": "axis_xy",
+          "x": -127,
+          "y": 546,
+          "props": {
+            "gravity": 9.81,
+            "halfX": 5,
+            "halfY": 5,
+            "flipX": false,
+            "flipY": false
+          }
+        },
+        {
+          "id": 4,
+          "type": "text_label",
+          "x": 26,
+          "y": 62,
+          "props": {
+            "text": "Un corpo è in equilibrio quando la risultante di tutte le forze è zero."
+          }
+        },
+        {
+          "id": 6,
+          "type": "text_label",
+          "x": 298,
+          "y": 89,
+          "props": {
+            "text": "$$\\displaystyle\\sum_{i=1}^{n} \\vec{F}_i = \\vec{0}$$"
+          }
+        },
+        {
+          "id": 8,
+          "type": "text_label",
+          "x": 24,
+          "y": 194,
+          "props": {
+            "text": "Cambia il modulo e verso della forza per visualizzare la risultante."
+          }
+        },
+        {
+          "id": 10,
+          "type": "point_mass",
+          "x": 582,
+          "y": 387,
+          "props": {
+            "mass": 1,
+            "v0Mode": "comp",
+            "v0x": "",
+            "v0y": "",
+            "v0Mod": "",
+            "v0Angle": "",
+            "v0s": "",
+            "forces": [
+              {
+                "name": "F1",
+                "mode": "polar",
+                "fx": 11.593972121062457,
+                "fy": 12.43301292752588,
+                "fMod": 17,
+                "fAngle": 47
+              }
+            ],
+            "showV0": false,
+            "showF": true,
+            "showA": false,
+            "showR": true,
+            "showN": true,
+            "showFriction": true,
+            "visible": true,
+            "_T_rope": null,
+            "_Fx": 11.594,
+            "_Fy": 2.623,
+            "_F_mag": 11.887,
+            "_planeN": null,
+            "_N_plane": 0,
+            "_f_friction": 0,
+            "_friction_type": null,
+            "_friction_type_n": 0,
+            "_friction_type_label": "",
+            "_ax": 11.594,
+            "_ay": 2.623,
+            "_a_mag": 11.887
+          }
+        },
+        {
+          "id": 11,
+          "type": "slider",
+          "x": 263,
+          "y": 304,
+          "props": {
+            "min": 0,
+            "max": 200,
+            "step": 0.5,
+            "value": 17,
+            "label": "|F|",
+            "color": "#f0a060",
+            "title": "Modulo"
+          }
+        },
+        {
+          "id": 12,
+          "type": "slider",
+          "x": 264,
+          "y": 406,
+          "props": {
+            "min": -180,
+            "max": 180,
+            "step": 1,
+            "value": 47,
+            "label": "θ",
+            "color": "#f0a060",
+            "title": "Angolo rispetto all'asse x"
+          }
+        },
+        {
+          "id": 15,
+          "type": "display",
+          "x": 783,
+          "y": 343,
+          "props": {
+            "color": "#60c0f0",
+            "title": "Accelerazione",
+            "decimals": 2,
+            "label": "|a|",
+            "unit": "m/s²",
+            "_displayValue": 11.887
+          }
+        },
+        {
+          "id": 16,
+          "type": "display",
+          "x": 783,
+          "y": 437,
+          "props": {
+            "color": "#60c0f0",
+            "title": "Forza risultante",
+            "decimals": 2,
+            "label": "|F|",
+            "unit": "N",
+            "_displayValue": 11.887
+          }
+        }
+      ],
+      "relations": [
+        {
+          "id": 5,
+          "aId": 2,
+          "bId": 4,
+          "type": "generic",
+          "props": {
+            "height": 0
+          }
+        },
+        {
+          "id": 7,
+          "aId": 6,
+          "bId": 4,
+          "type": "generic",
+          "props": {
+            "height": 0
+          }
+        },
+        {
+          "id": 9,
+          "aId": 8,
+          "bId": 4,
+          "type": "generic",
+          "props": {
+            "height": 0
+          }
+        },
+        {
+          "id": 13,
+          "aId": 11,
+          "bId": 10,
+          "type": "slider_prop",
+          "props": {
+            "height": 0,
+            "propKey": "forces[0].__polar",
+            "subKey": "forces[0].__mag"
+          }
+        },
+        {
+          "id": 14,
+          "aId": 12,
+          "bId": 10,
+          "type": "slider_prop",
+          "props": {
+            "height": 0,
+            "propKey": "forces[0].__polar",
+            "subKey": "forces[0].__ang"
+          }
+        },
+        {
+          "id": 17,
+          "aId": 15,
+          "bId": 10,
+          "type": "display_prop",
+          "props": {
+            "height": 0,
+            "propKey": "_a_mag"
+          }
+        },
+        {
+          "id": 18,
+          "aId": 16,
+          "bId": 10,
+          "type": "display_prop",
+          "props": {
+            "height": 0,
+            "propKey": "_F_mag"
+          }
+        }
+      ],
+      "idCounter": 18
+    },
+    {
+      "id": 1779286582535,
+      "title": "PIANO INCLINATO",
+      "elements": [],
+      "relations": [],
+      "idCounter": 1
+    }
+  ],
+  "currentSlide": 2
 }
