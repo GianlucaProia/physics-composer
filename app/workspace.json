@@ -1,1 +1,29 @@
-
+{
+  "version": 1,
+  "savedAt": "2026-05-20T00:00:00.000Z",
+  "elements": [
+    {
+      "id": 1,
+      "type": "axis_xy",
+      "x": -117,
+      "y": 576,
+      "props": {
+        "gravity": 9.81,
+        "halfX": 5,
+        "halfY": 5,
+        "flipX": false,
+        "flipY": false
+      }
+    }
+  ],
+  "relations": [],
+  "idCounter": 10,
+  "viewSettings": {
+    "vectorScale": 140,
+    "vectorStroke": 1.5,
+    "vectorHead": 9,
+    "vectorFontSize": 13
+  },
+  "slides": null,
+  "currentSlide": 0
+}
