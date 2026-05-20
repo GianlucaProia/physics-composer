@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "savedAt": "2026-05-20T00:00:00.000Z",
+  "savedAt": "2026-05-20T12:45:51.417Z",
   "elements": [
     {
       "id": 1,
@@ -14,14 +14,405 @@
         "flipX": false,
         "flipY": false
       }
+    },
+    {
+      "id": 8,
+      "type": "spring",
+      "x": 333,
+      "y": 310,
+      "props": {
+        "anchor": "left",
+        "k": 100,
+        "L0": 0.5,
+        "forces": [],
+        "springMode": "auto",
+        "dx": "",
+        "visScale": 5,
+        "showRest": false,
+        "showF": false,
+        "visible": true,
+        "_L_calc": 0.7861611475317609,
+        "_delta_x": 0.286161,
+        "_F_el": 28.616115,
+        "_showReaction": false
+      }
+    },
+    {
+      "id": 10,
+      "type": "rect_body",
+      "x": 445,
+      "y": 310,
+      "props": {
+        "mass": 1,
+        "v0Mode": "comp",
+        "v0x": "",
+        "v0y": "",
+        "v0Mod": "",
+        "v0Angle": "",
+        "v0s": "",
+        "forces": [
+          {
+            "name": "F1",
+            "mode": "polar",
+            "fx": 8.91995969293194,
+            "fy": 16.776004264319635,
+            "fMod": 19,
+            "fAngle": 62
+          }
+        ],
+        "showV0": false,
+        "showF": true,
+        "showA": false,
+        "showR": false,
+        "showN": true,
+        "showFriction": true,
+        "visible": true,
+        "_Fx": 0,
+        "_Fy": 0,
+        "_F_mag": 0,
+        "_ax": 0,
+        "_ay": 0,
+        "_a_mag": 0,
+        "_T_rope": null,
+        "_planeN": null,
+        "_N_plane": 0,
+        "_f_friction": 0,
+        "_friction_type": null,
+        "_friction_type_n": 0,
+        "_friction_type_label": ""
+      }
+    },
+    {
+      "id": 32,
+      "type": "display",
+      "x": 730,
+      "y": 71,
+      "props": {
+        "color": "#60c0f0",
+        "title": "Allungamento",
+        "decimals": 2,
+        "label": "Δx",
+        "unit": "m",
+        "_displayValue": 0.2861611475317609
+      }
+    },
+    {
+      "id": 33,
+      "type": "display",
+      "x": 547,
+      "y": 60,
+      "props": {
+        "color": "#60c0f0",
+        "title": "$F_x$",
+        "decimals": 2,
+        "label": "F1.fx",
+        "unit": "N",
+        "_displayValue": 8.91995969293194
+      }
+    },
+    {
+      "id": 35,
+      "type": "slider",
+      "x": 44,
+      "y": 55,
+      "props": {
+        "min": 0,
+        "max": 200,
+        "step": 0.5,
+        "value": 19,
+        "label": "|F|",
+        "color": "#f0a060",
+        "title": ""
+      }
+    },
+    {
+      "id": 38,
+      "type": "slider",
+      "x": 42,
+      "y": 139,
+      "props": {
+        "min": -180,
+        "max": 180,
+        "step": 1,
+        "value": 62,
+        "label": "θ",
+        "color": "#f0a060",
+        "title": ""
+      }
+    },
+    {
+      "id": 40,
+      "type": "rope",
+      "x": 491,
+      "y": 301.16221867996836,
+      "props": {
+        "forceF": 10,
+        "forceAngle": 10,
+        "visible": true
+      }
+    },
+    {
+      "id": 50,
+      "type": "rope",
+      "x": 491,
+      "y": 322,
+      "props": {
+        "forceF": 10,
+        "forceAngle": -10,
+        "visible": true
+      }
+    },
+    {
+      "id": 88,
+      "type": "inclined_plane",
+      "x": 767,
+      "y": 274,
+      "props": {
+        "inputMode": "angle+base",
+        "angle": 34,
+        "base": 10,
+        "height": "",
+        "length": "",
+        "flipX": false,
+        "visible": true,
+        "_derivedBase": "10.0000",
+        "_derivedHeight": "6.7451",
+        "_derivedLength": "12.0622",
+        "_derivedAngle": "34.00"
+      }
+    },
+    {
+      "id": 89,
+      "type": "rect_body",
+      "x": 822.0611334737798,
+      "y": 350.70074697920137,
+      "props": {
+        "mass": 18.1,
+        "v0Mode": "comp",
+        "v0x": "",
+        "v0y": "",
+        "v0Mod": "",
+        "v0Angle": "",
+        "v0s": "",
+        "forces": [],
+        "showV0": false,
+        "showF": true,
+        "showA": false,
+        "showR": true,
+        "showN": true,
+        "showFriction": true,
+        "visible": true,
+        "_Fx": -82.3158,
+        "_Fy": -55.5227,
+        "_F_mag": 99.2909,
+        "_ax": -4.5478,
+        "_ay": -3.0676,
+        "_a_mag": 5.4857,
+        "_T_rope": null,
+        "_planeN": {
+          "NMag": 147.20474042044577,
+          "NValid": true,
+          "geo": {
+            "angle": 34,
+            "scaleX": 26.6,
+            "scaleY": 22.6,
+            "lenPx": 272.60525636188265,
+            "lenM": 12.062179485039055,
+            "x0": 0,
+            "y0": 152.43892480638846,
+            "x1": 226,
+            "y1": 0,
+            "dx": 0.8290375725550416,
+            "dy": -0.5591929034707469,
+            "nx": -0.5591929034707469,
+            "ny": -0.8290375725550416,
+            "dx_fis": 0.8290375725550416,
+            "dy_fis": 0.5591929034707469,
+            "nx_fis": -0.5591929034707469,
+            "ny_fis": 0.8290375725550416,
+            "bPx": 226,
+            "hPx": 152.43892480638846,
+            "flipX": false
+          },
+          "Ppar": -99.29085113316931,
+          "Fext_par": 0,
+          "friction": {
+            "type": "static",
+            "value": 0,
+            "max": 0,
+            "sliding": true
+          }
+        },
+        "_N_plane": 147.2047,
+        "_f_friction": 0,
+        "_friction_type": "static",
+        "_friction_type_n": 1,
+        "_friction_type_label": "statico"
+      }
+    },
+    {
+      "id": 91,
+      "type": "display",
+      "x": 1042,
+      "y": 286,
+      "props": {
+        "color": "#60c0f0",
+        "title": "Accelerazione",
+        "decimals": 2,
+        "label": "|a|",
+        "unit": "m/s²",
+        "_displayValue": 5.4857
+      }
+    },
+    {
+      "id": 93,
+      "type": "slider",
+      "x": 845,
+      "y": 178,
+      "props": {
+        "min": 0,
+        "max": 20,
+        "step": 0.1,
+        "value": 18.1,
+        "label": "m",
+        "color": "#f0a060",
+        "title": ""
+      }
+    },
+    {
+      "id": 95,
+      "type": "slider",
+      "x": 1075,
+      "y": 181,
+      "props": {
+        "min": 0,
+        "max": 89,
+        "step": 1,
+        "value": 34,
+        "label": "θ",
+        "color": "#f0a060",
+        "title": ""
+      }
     }
   ],
-  "relations": [],
-  "idCounter": 10,
+  "relations": [
+    {
+      "id": 12,
+      "aId": 8,
+      "bId": 10,
+      "type": "spring_body",
+      "props": {}
+    },
+    {
+      "id": 34,
+      "aId": 10,
+      "bId": 33,
+      "type": "display_prop",
+      "props": {
+        "height": 0,
+        "propKey": "forces[0].fx"
+      }
+    },
+    {
+      "id": 36,
+      "aId": 35,
+      "bId": 10,
+      "type": "slider_prop",
+      "props": {
+        "height": 0,
+        "propKey": "forces[0].__polar",
+        "subKey": "forces[0].__mag"
+      }
+    },
+    {
+      "id": 37,
+      "aId": 32,
+      "bId": 8,
+      "type": "display_prop",
+      "props": {
+        "height": 0,
+        "propKey": "_delta_x"
+      }
+    },
+    {
+      "id": 39,
+      "aId": 38,
+      "bId": 10,
+      "type": "slider_prop",
+      "props": {
+        "height": 0,
+        "propKey": "forces[0].__polar",
+        "subKey": "forces[0].__ang"
+      }
+    },
+    {
+      "id": 41,
+      "aId": 40,
+      "bId": 10,
+      "type": "rope_body",
+      "props": {
+        "height": 0,
+        "anchor": "left"
+      }
+    },
+    {
+      "id": 51,
+      "aId": 50,
+      "bId": 10,
+      "type": "rope_body",
+      "props": {
+        "height": 0,
+        "anchor": "left"
+      }
+    },
+    {
+      "id": 90,
+      "aId": 89,
+      "bId": 88,
+      "type": "body_on_plane",
+      "props": {
+        "height": 0,
+        "s": 5
+      }
+    },
+    {
+      "id": 92,
+      "aId": 89,
+      "bId": 91,
+      "type": "display_prop",
+      "props": {
+        "height": 0,
+        "propKey": "_a_mag"
+      }
+    },
+    {
+      "id": 94,
+      "aId": 93,
+      "bId": 89,
+      "type": "slider_prop",
+      "props": {
+        "height": 0,
+        "propKey": "mass",
+        "subKey": null
+      }
+    },
+    {
+      "id": 96,
+      "aId": 95,
+      "bId": 88,
+      "type": "slider_prop",
+      "props": {
+        "height": 0,
+        "propKey": "angle",
+        "subKey": null
+      }
+    }
+  ],
+  "idCounter": 96,
   "viewSettings": {
-    "vectorScale": 140,
-    "vectorStroke": 1.5,
-    "vectorHead": 9,
+    "vectorScale": 130,
+    "vectorStroke": 4,
+    "vectorHead": 15,
     "vectorFontSize": 13
   },
   "slides": null,
