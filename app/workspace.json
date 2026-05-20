@@ -1,41 +1,560 @@
 {
   "version": 1,
-  "savedAt": "2026-05-20T14:32:40.062Z",
+  "savedAt": "2026-05-20T14:34:59.355Z",
   "elements": [
     {
-      "id": 1,
-      "type": "text_label",
-      "x": 578,
-      "y": 186,
+      "id": 2,
+      "type": "axis_xy",
+      "x": -102,
+      "y": 554,
       "props": {
-        "text": "Physics Composer",
-        "fontSize": 60
+        "gravity": 9.81,
+        "halfX": 5,
+        "halfY": 5,
+        "flipX": false,
+        "flipY": false
       }
     },
     {
       "id": 3,
-      "type": "text_label",
-      "x": 387,
-      "y": 274,
+      "type": "inclined_plane",
+      "x": 300,
+      "y": 181,
       "props": {
-        "text": "Cosa succede alla forza elastica se raddoppio la massa?\nE se uso due molle in parallelo invece di una?",
-        "italic": true,
-        "fontSize": 30
+        "inputMode": "angle+base",
+        "angle": 45,
+        "base": 10,
+        "height": "",
+        "length": "",
+        "flipX": false,
+        "visible": true,
+        "_derivedBase": "10.0000",
+        "_derivedHeight": "10.0000",
+        "_derivedLength": "14.1421",
+        "_derivedAngle": "45.00"
+      }
+    },
+    {
+      "id": 4,
+      "type": "spring",
+      "x": 292,
+      "y": 375,
+      "props": {
+        "anchor": "left",
+        "k": 100,
+        "L0": 0.5,
+        "forces": [],
+        "springMode": "auto",
+        "dx": "",
+        "visScale": 5,
+        "showRest": false,
+        "showF": false,
+        "visible": true,
+        "_L_calc": 0.5911359072259168,
+        "_delta_x": 0.091136,
+        "_F_el": 9.113591
+      }
+    },
+    {
+      "id": 6,
+      "type": "rect_body",
+      "x": 332.52691193458116,
+      "y": 329.21825406947977,
+      "props": {
+        "mass": 0.8,
+        "v0Mode": "comp",
+        "v0x": "",
+        "v0y": "",
+        "v0Mod": "",
+        "v0Angle": "",
+        "v0s": "",
+        "forces": [
+          {
+            "name": "F1",
+            "mode": "polar",
+            "fx": 21.486902780910537,
+            "fy": -0.7503391791037701,
+            "fMod": 21.5,
+            "fAngle": -2
+          }
+        ],
+        "showV0": false,
+        "showF": true,
+        "showA": false,
+        "showR": true,
+        "showN": true,
+        "showFriction": true,
+        "visible": true,
+        "_Fx": 0,
+        "_Fy": 0,
+        "_F_mag": 0,
+        "_T_rope": null,
+        "_planeN": {
+          "NMag": 21.273478603564172,
+          "NValid": true,
+          "geo": {
+            "angle": 45,
+            "scaleX": 26.6,
+            "scaleY": 22.6,
+            "lenPx": 319.61226509631945,
+            "lenM": 14.14213562373095,
+            "x0": 0,
+            "y0": 225.99999999999997,
+            "x1": 226,
+            "y1": 0,
+            "dx": 0.7071067811865476,
+            "dy": -0.7071067811865475,
+            "nx": -0.7071067811865475,
+            "ny": -0.7071067811865476,
+            "dx_fis": 0.7071067811865476,
+            "dy_fis": 0.7071067811865475,
+            "nx_fis": -0.7071067811865475,
+            "ny_fis": 0.7071067811865476,
+            "bPx": 226,
+            "hPx": 225.99999999999997,
+            "flipX": false
+          },
+          "Ppar": -5.549374018752025,
+          "Fext_par": 14.662964741343705,
+          "friction": {
+            "type": "static",
+            "value": 0,
+            "max": 0,
+            "sliding": false
+          }
+        },
+        "_N_plane": 21.2735,
+        "_f_friction": 0,
+        "_friction_type": "static",
+        "_friction_type_n": 1,
+        "_friction_type_label": "statico",
+        "_ax": 0,
+        "_ay": 0,
+        "_a_mag": 0
+      }
+    },
+    {
+      "id": 9,
+      "type": "text_label",
+      "x": 34,
+      "y": 43,
+      "props": {
+        "text": "Come cambia l'allungamento di una molla su un piano inclinato?",
+        "fontSize": 25
+      }
+    },
+    {
+      "id": 11,
+      "type": "slider",
+      "x": 23,
+      "y": 126,
+      "props": {
+        "min": 0,
+        "max": 1,
+        "step": 0.1,
+        "value": 0.8,
+        "label": "m",
+        "color": "#f0a060",
+        "title": ""
+      }
+    },
+    {
+      "id": 13,
+      "type": "display",
+      "x": 591,
+      "y": 270,
+      "props": {
+        "color": "#60c0f0",
+        "title": "Accelerazione",
+        "decimals": 2,
+        "label": "|a|",
+        "unit": "m/s²",
+        "_displayValue": 0
+      }
+    },
+    {
+      "id": 14,
+      "type": "display",
+      "x": 594,
+      "y": 172,
+      "props": {
+        "color": "#60c0f0",
+        "title": "Allungamento",
+        "decimals": 2,
+        "label": "Δx",
+        "unit": "m",
+        "_displayValue": 0.0911359072259168
+      }
+    },
+    {
+      "id": 17,
+      "type": "display",
+      "x": 591,
+      "y": 370,
+      "props": {
+        "color": "#60c0f0",
+        "title": "Forza risultante",
+        "decimals": 2,
+        "label": "|F|",
+        "unit": "N",
+        "_displayValue": 0
+      }
+    },
+    {
+      "id": 19,
+      "type": "slider",
+      "x": 23,
+      "y": 208,
+      "props": {
+        "min": 0,
+        "max": 200,
+        "step": 0.5,
+        "value": 21.5,
+        "label": "|F|",
+        "color": "#f0a060",
+        "title": ""
+      }
+    },
+    {
+      "id": 21,
+      "type": "slider",
+      "x": 26,
+      "y": 293,
+      "props": {
+        "min": -180,
+        "max": 180,
+        "step": 1,
+        "value": -2,
+        "label": "θ",
+        "color": "#f0a060",
+        "title": ""
+      }
+    },
+    {
+      "id": 23,
+      "type": "inclined_plane",
+      "x": 901,
+      "y": 197,
+      "props": {
+        "inputMode": "angle+base",
+        "angle": 45,
+        "base": 10,
+        "height": "",
+        "length": "",
+        "flipX": false,
+        "visible": true,
+        "_derivedBase": "10.0000",
+        "_derivedHeight": "10.0000",
+        "_derivedLength": "14.1421",
+        "_derivedAngle": "45.00"
+      }
+    },
+    {
+      "id": 24,
+      "type": "spring",
+      "x": 893,
+      "y": 391,
+      "props": {
+        "anchor": "left",
+        "k": 100,
+        "L0": 0.5,
+        "forces": [],
+        "springMode": "auto",
+        "dx": "",
+        "visScale": 5,
+        "showRest": false,
+        "showF": false,
+        "visible": true,
+        "_L_calc": 0.91202
+      }
+    },
+    {
+      "id": 26,
+      "type": "rope",
+      "x": 971.2462120245875,
+      "y": 181.68629150101523,
+      "props": {
+        "forceF": "",
+        "forceAngle": "",
+        "visible": true
+      }
+    },
+    {
+      "id": 28,
+      "type": "pulley_simple",
+      "x": 1111,
+      "y": 181,
+      "props": {
+        "anchor": "vertex"
+      }
+    },
+    {
+      "id": 31,
+      "type": "rect_body",
+      "x": 1159,
+      "y": 303.55826,
+      "props": {
+        "mass": 4.2,
+        "v0Mode": "comp",
+        "v0x": "",
+        "v0y": "",
+        "v0Mod": "",
+        "v0Angle": "",
+        "v0s": "",
+        "forces": [],
+        "showV0": false,
+        "showF": true,
+        "showA": false,
+        "showR": false,
+        "showN": true,
+        "showFriction": true,
+        "visible": true
+      }
+    },
+    {
+      "id": 33,
+      "type": "slider",
+      "x": 1196,
+      "y": 176,
+      "props": {
+        "min": 100,
+        "max": 500,
+        "step": 1,
+        "value": 100,
+        "label": "k",
+        "color": "#f0a060",
+        "title": ""
+      }
+    },
+    {
+      "id": 34,
+      "type": "slider",
+      "x": 1196,
+      "y": 266,
+      "props": {
+        "min": 0,
+        "max": 20,
+        "step": 0.1,
+        "value": 4.2,
+        "label": "m",
+        "color": "#f0a060",
+        "title": ""
+      }
+    },
+    {
+      "id": 35,
+      "type": "display",
+      "x": 1200,
+      "y": 369,
+      "props": {
+        "color": "#60c0f0",
+        "title": "Allungamento",
+        "decimals": 2,
+        "label": "Δx",
+        "unit": "m",
+        "_displayValue": 0.41202000000000005
+      }
+    },
+    {
+      "id": 37,
+      "type": "display",
+      "x": 1200,
+      "y": 458,
+      "props": {
+        "color": "#60c0f0",
+        "title": "Forza elastica",
+        "decimals": 2,
+        "label": "F",
+        "unit": "N",
+        "_displayValue": 41.202000000000005
       }
     }
   ],
   "relations": [
     {
-      "id": 4,
-      "aId": 1,
+      "id": 5,
+      "aId": 4,
       "bId": 3,
-      "type": "generic",
+      "type": "spring_on_plane",
+      "props": {
+        "height": 0,
+        "sAnchor": 0
+      }
+    },
+    {
+      "id": 7,
+      "aId": 6,
+      "bId": 3,
+      "type": "body_on_plane",
+      "props": {
+        "height": 0,
+        "s": 3.4513274336283177,
+        "attachToSpring": true,
+        "springId": 4
+      }
+    },
+    {
+      "id": 8,
+      "aId": 4,
+      "bId": 6,
+      "type": "spring_body",
+      "props": {}
+    },
+    {
+      "id": 12,
+      "aId": 11,
+      "bId": 6,
+      "type": "slider_prop",
+      "props": {
+        "height": 0,
+        "propKey": "mass",
+        "subKey": null
+      }
+    },
+    {
+      "id": 15,
+      "aId": 14,
+      "bId": 4,
+      "type": "display_prop",
+      "props": {
+        "height": 0,
+        "propKey": "_delta_x"
+      }
+    },
+    {
+      "id": 16,
+      "aId": 13,
+      "bId": 6,
+      "type": "display_prop",
+      "props": {
+        "height": 0,
+        "propKey": "_a_mag"
+      }
+    },
+    {
+      "id": 18,
+      "aId": 17,
+      "bId": 6,
+      "type": "display_prop",
+      "props": {
+        "height": 0,
+        "propKey": "_F_mag"
+      }
+    },
+    {
+      "id": 20,
+      "aId": 19,
+      "bId": 6,
+      "type": "slider_prop",
+      "props": {
+        "height": 0,
+        "propKey": "forces[0].__polar",
+        "subKey": "forces[0].__mag"
+      }
+    },
+    {
+      "id": 22,
+      "aId": 21,
+      "bId": 6,
+      "type": "slider_prop",
+      "props": {
+        "height": 0,
+        "propKey": "forces[0].__polar",
+        "subKey": "forces[0].__ang"
+      }
+    },
+    {
+      "id": 25,
+      "aId": 24,
+      "bId": 23,
+      "type": "spring_on_plane",
+      "props": {
+        "height": 0,
+        "sAnchor": 0
+      }
+    },
+    {
+      "id": 27,
+      "aId": 26,
+      "bId": 24,
+      "type": "rope_spring",
       "props": {
         "height": 0
       }
+    },
+    {
+      "id": 29,
+      "aId": 28,
+      "bId": 23,
+      "type": "pulley_on_plane",
+      "props": {
+        "height": 0
+      }
+    },
+    {
+      "id": 30,
+      "aId": 26,
+      "bId": 28,
+      "type": "rope_on_pulley",
+      "props": {
+        "height": 0,
+        "side": "left"
+      }
+    },
+    {
+      "id": 32,
+      "aId": 31,
+      "bId": 26,
+      "type": "rope_body",
+      "props": {
+        "height": 0,
+        "anchor": "hanging"
+      }
+    },
+    {
+      "id": 36,
+      "aId": 35,
+      "bId": 24,
+      "type": "display_prop",
+      "props": {
+        "height": 0,
+        "propKey": "_delta_x"
+      }
+    },
+    {
+      "id": 38,
+      "aId": 37,
+      "bId": 24,
+      "type": "display_prop",
+      "props": {
+        "height": 0,
+        "propKey": "_F_el"
+      }
+    },
+    {
+      "id": 39,
+      "aId": 33,
+      "bId": 24,
+      "type": "slider_prop",
+      "props": {
+        "height": 0,
+        "propKey": "k",
+        "subKey": null
+      }
+    },
+    {
+      "id": 40,
+      "aId": 34,
+      "bId": 31,
+      "type": "slider_prop",
+      "props": {
+        "height": 0,
+        "propKey": "mass",
+        "subKey": null
+      }
     }
   ],
-  "idCounter": 4,
+  "idCounter": 40,
   "viewSettings": {
     "vectorScale": 120,
     "vectorStroke": 2.5,
@@ -50,8 +569,8 @@
         {
           "id": 1,
           "type": "text_label",
-          "x": 578,
-          "y": 186,
+          "x": 573,
+          "y": 188,
           "props": {
             "text": "Physics Composer",
             "fontSize": 60
@@ -60,8 +579,8 @@
         {
           "id": 3,
           "type": "text_label",
-          "x": 387,
-          "y": 274,
+          "x": 382,
+          "y": 276,
           "props": {
             "text": "Cosa succede alla forza elastica se raddoppio la massa?\nE se uso due molle in parallelo invece di una?",
             "italic": true,
@@ -961,18 +1480,18 @@
             "showRest": false,
             "showF": false,
             "visible": true,
-            "_L_calc": 0.5772624721790367,
-            "_delta_x": 0.077262,
-            "_F_el": 7.726247
+            "_L_calc": 0.5911359072259168,
+            "_delta_x": 0.091136,
+            "_F_el": 9.113591
           }
         },
         {
           "id": 6,
           "type": "rect_body",
-          "x": 331.11269837220806,
-          "y": 330.6324676318529,
+          "x": 332.52691193458116,
+          "y": 329.21825406947977,
           "props": {
-            "mass": 1,
+            "mass": 0.8,
             "v0Mode": "comp",
             "v0x": "",
             "v0y": "",
@@ -1001,7 +1520,7 @@
             "_F_mag": 0,
             "_T_rope": null,
             "_planeN": {
-              "NMag": 22.66082210825218,
+              "NMag": 21.273478603564172,
               "NValid": true,
               "geo": {
                 "angle": 45,
@@ -1025,16 +1544,16 @@
                 "hPx": 225.99999999999997,
                 "flipX": false
               },
-              "Ppar": -6.936717523440031,
+              "Ppar": -5.549374018752025,
               "Fext_par": 14.662964741343705,
               "friction": {
                 "type": "static",
                 "value": 0,
                 "max": 0,
-                "sliding": true
+                "sliding": false
               }
             },
-            "_N_plane": 22.6608,
+            "_N_plane": 21.2735,
             "_f_friction": 0,
             "_friction_type": "static",
             "_friction_type_n": 1,
@@ -1063,7 +1582,7 @@
             "min": 0,
             "max": 1,
             "step": 0.1,
-            "value": 1,
+            "value": 0.8,
             "label": "m",
             "color": "#f0a060",
             "title": ""
@@ -1094,7 +1613,7 @@
             "decimals": 2,
             "label": "Δx",
             "unit": "m",
-            "_displayValue": 0.0772624721790367
+            "_displayValue": 0.0911359072259168
           }
         },
         {
@@ -1167,7 +1686,7 @@
           "y": 391,
           "props": {
             "anchor": "left",
-            "k": 182,
+            "k": 100,
             "L0": 0.5,
             "forces": [],
             "springMode": "auto",
@@ -1176,13 +1695,13 @@
             "showRest": false,
             "showF": false,
             "visible": true,
-            "_L_calc": 0.9204285714285714
+            "_L_calc": 0.91202
           }
         },
         {
           "id": 26,
           "type": "rope",
-          "x": 971.9533188057741,
+          "x": 971.2462120245875,
           "y": 181.68629150101523,
           "props": {
             "forceF": "",
@@ -1203,9 +1722,9 @@
           "id": 31,
           "type": "rect_body",
           "x": 1159,
-          "y": 304.50842857142857,
+          "y": 303.55826,
           "props": {
-            "mass": 7.8,
+            "mass": 4.2,
             "v0Mode": "comp",
             "v0x": "",
             "v0y": "",
@@ -1228,10 +1747,10 @@
           "x": 1196,
           "y": 176,
           "props": {
-            "min": 0,
+            "min": 100,
             "max": 500,
             "step": 1,
-            "value": 182,
+            "value": 100,
             "label": "k",
             "color": "#f0a060",
             "title": ""
@@ -1246,7 +1765,7 @@
             "min": 0,
             "max": 20,
             "step": 0.1,
-            "value": 7.8,
+            "value": 4.2,
             "label": "m",
             "color": "#f0a060",
             "title": ""
@@ -1263,7 +1782,7 @@
             "decimals": 2,
             "label": "Δx",
             "unit": "m",
-            "_displayValue": 0.4204285714285714
+            "_displayValue": 0.41202000000000005
           }
         },
         {
@@ -1277,7 +1796,7 @@
             "decimals": 2,
             "label": "F",
             "unit": "N",
-            "_displayValue": 76.51799999999999
+            "_displayValue": 41.202000000000005
           }
         }
       ],
@@ -1299,7 +1818,7 @@
           "type": "body_on_plane",
           "props": {
             "height": 0,
-            "s": 3.3628318584070787,
+            "s": 3.4513274336283177,
             "attachToSpring": true,
             "springId": 4
           }
@@ -1468,5 +1987,5 @@
       "idCounter": 40
     }
   ],
-  "currentSlide": 0
+  "currentSlide": 4
 }
