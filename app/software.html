@@ -986,6 +986,10 @@ body.presenting #present-title {
 /* Nasconde l'SVG clonato in presentazione (non lo usiamo più) */
 #present-canvas { display: none; }
 </style>
+
+  <style>
+    #menu-file, #menu-edit { display: none !important; }
+  </style>
 </head>
 <body>
 
@@ -1059,30 +1063,30 @@ body.presenting #present-title {
   <div class="menu-item" id="menu-view">
     <button class="menu-btn" onclick="toggleMenu('menu-view')">Vista</button>
     <div class="menu-dropdown" id="menu-view-dropdown" style="min-width:230px;padding:10px 14px;">
-      <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Vettori</div>
+      <div style="font-size:10px;color:#fff;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;font-weight:600;">Vettori</div>
 
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);min-width:70px;">Scala</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#fff;min-width:70px;">Scala</span>
         <input type="range" id="vector-scale" min="30" max="400" value="140" step="5"
           style="flex:1;accent-color:var(--accent);cursor:pointer;"
           oninput="window._vectorScale=parseInt(this.value);document.getElementById('vector-scale-val').textContent=this.value;render()">
-        <span id="vector-scale-val" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);min-width:24px;text-align:right;">140</span>
+        <span id="vector-scale-val" style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);min-width:24px;text-align:right;">140</span>
       </div>
 
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);min-width:70px;">Spessore</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#fff;min-width:70px;">Spessore</span>
         <input type="range" id="vector-stroke" min="1" max="6" value="1.5" step="0.5"
           style="flex:1;accent-color:var(--accent);cursor:pointer;"
           oninput="window._vectorStroke=parseFloat(this.value);document.getElementById('vector-stroke-val').textContent=this.value;render()">
-        <span id="vector-stroke-val" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);min-width:24px;text-align:right;">1.5</span>
+        <span id="vector-stroke-val" style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);min-width:24px;text-align:right;">1.5</span>
       </div>
 
       <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);min-width:70px;">Punta</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#fff;min-width:70px;">Punta</span>
         <input type="range" id="vector-head" min="5" max="20" value="9" step="1"
           style="flex:1;accent-color:var(--accent);cursor:pointer;"
           oninput="window._vectorHead=parseInt(this.value);document.getElementById('vector-head-val').textContent=this.value;render()">
-        <span id="vector-head-val" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);min-width:24px;text-align:right;">9</span>
+        <span id="vector-head-val" style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);min-width:24px;text-align:right;">9</span>
       </div>
     </div>
   </div>
@@ -1380,7 +1384,7 @@ if (sessionStorage.getItem('beta_access') !== 'true') {
     window.location.href = 'index.html';
 }
   </script>
-  
+
   <script>
 // ═══ MODULE: state.js ═══
 // ─── State ───────────────────────────────────────────────────────────────────
@@ -2205,7 +2209,7 @@ const DEFS = {
             const sey = ay + dir * geoSp.dy * fLen2;
             arrow(g, ax, ay, sex, sey, Scol);
             const angS = Math.atan2(sey - ay, sex - ax);
-            text(g, sex + 8*Math.cos(angS), sey + 8*Math.sin(angS) + 4, 'Fs', Scol, '12px', 'middle');
+            text(g, sex + 8*Math.cos(angS), sey + 8*Math.sin(angS) + 4, 'F', Scol, '12px', 'middle');
           }
         }
       }
@@ -2546,7 +2550,71 @@ const DEFS = {
       const Lv_chk = parseFloat(el.props?._L_calc);
       const hasPhys  = !isNaN(k2) && !isNaN(L0v) && !isNaN(Lv_chk) && L0v > 1e-9;
 
-      // ── Forza di reazione quando il corpo è nascosto ──────────────────────
+      // Vettore F in modalità forces sulla molla
+      // Mostra se: molla ha forze inserite esplicitamente E (no corpo in catena OPPURE valore forza inserito)
+      const isSeriesLastOrSingle = !el._seriesRole || el._seriesRole === 'last';
+      const springHasExplicitForces = (() => {
+        // Per parallelo: solo la molla con _Ftot esplicito mostra il vettore
+        if (el._inParallel) {
+          const ftot = parseFloat(el.props?._Ftot);
+          return !isNaN(ftot) && Math.abs(ftot) > 1e-9;
+        }
+        return (el.props?.forces || []).some(f => {
+          const v = parseFloat(f.val);
+          return !isNaN(v) && Math.abs(v) > 1e-9;
+        });
+      })();
+      const hasBodyInChain = (() => {
+        const chainIds = [el.id];
+        const serRels = relations.filter(r => r.type === 'spring_spring' && r.props?.layout === 'series');
+        serRels.forEach(r => {
+          if (r.aId === el.id) chainIds.push(r.bId);
+          if (r.bId === el.id) chainIds.push(r.aId);
+        });
+        return chainIds.some(sid => relations.some(r =>
+          r.type === 'spring_body' && (r.aId === sid || r.bId === sid)
+        ));
+      })();
+      const showSpringFVec = el.props?.springMode === 'forces' && isSeriesLastOrSingle && springHasExplicitForces;
+      if (showSpringFVec) {
+        const F_show = el._inParallel
+          ? (parseFloat(el.props?._Ftot) || 0)
+          : (parseFloat(el.props?._F_el) || 0);
+        if (Math.abs(F_show) > 1e-9) {
+          const fCol2 = '#f0a060';
+          const MAX_LEN_s = window._vectorScale || 140;
+          const MIN_LEN_s = Math.max(10, MAX_LEN_s * 0.15);
+          // Per parallelo: usa il max tra tutti i _Ftot del gruppo come riferimento
+          let refF = Math.abs(F_show);
+          if (el._inParallel) {
+            const parGroup = elements.filter(e =>
+              e.type === 'spring' && e._inParallel && relations.some(r =>
+                r.type === 'spring_spring' && r.props?.layout === 'parallel' &&
+                ((r.aId === el.id && r.bId === e.id) || (r.bId === el.id && r.aId === e.id))
+              )
+            ).concat([el]);
+            refF = Math.max(...parGroup.map(s => Math.abs(parseFloat(s.props?._Ftot) || 0)), 1e-9);
+          } else {
+            el._refMaxF = Math.max(Math.abs(F_show), el._refMaxF || 0);
+            refF = el._refMaxF || Math.abs(F_show);
+          }
+          const fLen_f = Math.max(MIN_LEN_s, Math.abs(F_show) * MAX_LEN_s / refF);
+          if (horiz) {
+            const cy_f = 16;
+            const dir_f = F_show > 0 ? 1 : -1;
+            const xFree_f = anchor === 'left' ? 8 + tailAnchor + zigLen + tailFree : 0;
+            arrow(g, xFree_f, cy_f, xFree_f + dir_f * fLen_f, cy_f, fCol2);
+            text(g, xFree_f + dir_f*fLen_f + (dir_f>0?6:-6), cy_f-8, 'F', fCol2, '13px', dir_f>0?'start':'end');
+          } else {
+            const cx_f = 16;
+            const dir_f = F_show > 0 ? 1 : -1;
+            const yFree_f = anchor === 'top' ? 8 + tailAnchor + zigLen + tailFree : 0;
+            arrow(g, cx_f, yFree_f, cx_f, yFree_f + dir_f*fLen_f, fCol2);
+            text(g, cx_f-8, yFree_f + dir_f*fLen_f*0.5+4, 'F', fCol2, '13px', 'end');
+          }
+        }
+      }
+      // Forza di reazione quando il corpo è nascosto
       if (el.props?._showReaction) {
         el.props._showReaction = false;
         const Lv3 = parseFloat(el.props?._L_calc);
@@ -2571,6 +2639,46 @@ const DEFS = {
             const yFree4 = anchor === 'top' ? 8 + tailAnchor + zigLen + tailFree : 0;
             arrow(g, cx4, yFree4, cx4, yFree4 + dir_f4 * fLen3, fCol);
             text(g, cx4 - 8, yFree4 + dir_f4 * fLen3 * 0.5 + 4, 'F', fCol, '13px', 'end');
+          }
+        }
+      }
+
+      // ── Reazioni da molle nascoste in serie/parallelo ─────────────────────
+      if (el._showJunctionReaction?.length) {
+        const reactions = el._showJunctionReaction;
+        el._showJunctionReaction = null;
+        // Scala condivisa tra tutte le reazioni
+        const refF_j = Math.max(...reactions.map(r => Math.abs(r.F)), 1e-9);
+        const MAX_LEN_j = window._vectorScale || 140;
+        const fCol_j = '#a060f0';
+        for (const rj of reactions) {
+          const fLen_j = Math.max(12, Math.abs(rj.F) * MAX_LEN_j / refF_j);
+          if (rj.atFreeEnd) {
+            // Parallelo: disegna al free end (stesso lato del corpo)
+            if (horiz) {
+              const xF_j = anchor === 'left' ? 8 + tailAnchor + zigLen + tailFree : 0;
+              const dir_j = rj.F > 0 ? (anchor === 'left' ? 1 : -1) : (anchor === 'left' ? -1 : 1);
+              arrow(g, xF_j, 32, xF_j + dir_j * fLen_j, 32, fCol_j);
+              text(g, xF_j + dir_j * fLen_j + (dir_j>0?5:-5), 24, 'F', fCol_j, '12px', dir_j>0?'start':'end');
+            } else {
+              const yF_j = anchor === 'top' ? 8 + tailAnchor + zigLen + tailFree : 0;
+              const dir_j = rj.F > 0 ? (anchor === 'top' ? 1 : -1) : (anchor === 'top' ? -1 : 1);
+              arrow(g, 28, yF_j, 28, yF_j + dir_j * fLen_j, fCol_j);
+              text(g, 36, yF_j + dir_j * fLen_j * 0.5, 'F', fCol_j, '12px', 'start');
+            }
+          } else {
+            // Serie: disegna all'anchor end (giunzione con molla nascosta)
+            if (horiz) {
+              const xA_j = anchor === 'left' ? 0 : 8 + tailAnchor + zigLen + tailFree;
+              const dir_j = rj.F > 0 ? (anchor === 'left' ? -1 : 1) : (anchor === 'left' ? 1 : -1);
+              arrow(g, xA_j, 16, xA_j + dir_j * fLen_j, 16, fCol_j);
+              text(g, xA_j + dir_j * fLen_j + (dir_j>0?5:-5), 8, 'F', fCol_j, '12px', dir_j>0?'start':'end');
+            } else {
+              const yA_j = anchor === 'top' ? 0 : 8 + tailAnchor + zigLen + tailFree;
+              const dir_j = rj.F > 0 ? (anchor === 'top' ? -1 : 1) : (anchor === 'top' ? 1 : -1);
+              arrow(g, 16, yA_j, 16, yA_j + dir_j * fLen_j, fCol_j);
+              text(g, 6, yA_j + dir_j * fLen_j * 0.5, 'F', fCol_j, '12px', 'end');
+            }
           }
         }
       }
@@ -3093,8 +3201,8 @@ DEFS.text_label = {
         const div = document.createElement('div');
         div.style.cssText = `color:${color};font-size:${fontSize}px;
           font-weight:${bold};font-style:${italic};
-          white-space:nowrap;overflow:visible;
-          display:flex;align-items:center;min-height:${foH}px;`;
+          white-space:pre-wrap;overflow:visible;
+          display:flex;align-items:center;flex-wrap:wrap;min-height:${foH}px;`;
 
         try {
           div.innerHTML = renderMixedLatex(lineText || '', color, fontSize);
@@ -3335,6 +3443,7 @@ DEFS.display = {
     const numVal = (val !== undefined && val !== null) ? parseFloat(val) : NaN;
     const dispVal = displayText
       ? displayText
+      : !isFinite(numVal) && numVal > 0 ? '∞'
       : isNaN(numVal) ? '—'
       : numVal === 0 ? '—'
       : numVal.toFixed(dec);
@@ -4798,7 +4907,7 @@ function drawBodyVectors(g, el, cx, cy, anchorOverride) {
           // Forza elastica molla (se collegato)
           const springFdraw = getSpringForce(el);
           if (springFdraw && Math.abs(springFdraw.F) > 1e-9) {
-            drawVec(springFdraw.fx, springFdraw.fy, '#a060f0', 'Fₛ', false, 'left');
+            drawVec(springFdraw.fx, springFdraw.fy, '#a060f0', 'F', false, 'left');
           }
           // Tensioni dal sistema di funi — usa solver NoSpring per corpi con molla
           if (typeof getRopeSystemForceOnBody === 'function') {
@@ -5587,6 +5696,27 @@ function computeTotalForces(el) {
     springAdded = true;
   }
 
+  // ── Reazione perpendicolare molla orizzontale in forces mode ────────────────
+  // La molla orizzontale vincola anche in direzione verticale (bilancia il peso)
+  const springC_perp = getSpringConstraint(el);
+  const spring_perp = springC_perp ? elements.find(e => e.id === (springC_perp.aId === el.id ? springC_perp.bId : springC_perp.aId)) : null;
+  if (spring_perp?.props?.springMode === 'forces') {
+    const anch_p = spring_perp.props?.anchor || 'left';
+    const horiz_p = anch_p === 'left' || anch_p === 'right';
+    if (horiz_p) {
+      // Molla orizzontale: reazione verticale = bilancia gravità
+      const ref_p = getRefSystem();
+      const g_p = parseFloat(ref_p?.props?.gravity) || 0;
+      const m_p = parseFloat(el.props?.mass) || 0;
+      const flipY_p = ref_p?.props?.flipY;
+      const pesoFy_p = (g_p > 0 && m_p > 0) ? (flipY_p ? +m_p*g_p : -m_p*g_p) : 0;
+      // Sottrai le forze verticali esterne già incluse
+      let Fext_y = 0;
+      (el.props?.forces || []).forEach(f => { Fext_y += parseFloat(f.fy) || 0; });
+      Fy += -(pesoFy_p + Fext_y); // reazione che bilancia peso + forze esterne verticali
+    }
+  }
+
   // ── Forza fune ─────────────────────────────────────────────────────────────
   if (typeof getRopeForceOnBody === 'function') {
     const ropeF_early = getRopeForceOnBody(el);
@@ -5915,6 +6045,23 @@ function getSpringForce(el) {
   if (!springC) return null;
   const spring = elements.find(e => e.id === (springC.aId === el.id ? springC.bId : springC.aId));
   if (!spring) return null;
+
+  // In forces mode: restituisce la forza elastica assiale (k·Δx) lungo l'asse della molla
+  // La reazione perpendicolare (peso su molla orizzontale) è gestita in computeTotalForcesWithWall
+  if (spring.props?.springMode === 'forces') {
+    const anch_fm = spring.props?.anchor || 'left';
+    const horiz_fm = anch_fm === 'left' || anch_fm === 'right';
+    const F_el_fm = parseFloat(spring.props?._F_el) || 0;
+    if (Math.abs(F_el_fm) < 1e-9) return null;
+    let fx = 0, fy = 0;
+    if (horiz_fm) {
+      fx = anch_fm === 'left' ? -F_el_fm : F_el_fm;
+    } else {
+      fy = anch_fm === 'top' ? F_el_fm : -F_el_fm;
+    }
+    return { F: Math.abs(F_el_fm), fx, fy, dx: parseFloat(spring.props?._delta_x)||0, spring };
+  }
+
   const L0 = parseFloat(spring.props?.L0);
   if (isNaN(L0) || L0 <= 0) return null;
 
@@ -7363,7 +7510,8 @@ function updateRopePosition(ropeEl) {
         seg1End = { x: pCX + geo2.nx * r_eff, y: pCY + geo2.ny * r_eff };
 
         // seg2: carrucola → corpo appeso (verticale)
-        const seg2StartX = pCX + r_eff;
+        // Per flipX=true: corpo pende a sinistra; per flipX=false: a destra
+        const seg2StartX = geo2.flipX ? pCX - r_eff : pCX + r_eff;
         const seg2StartY = pCY;
         const seg2Start_sop = { x: seg2StartX, y: seg2StartY };
 
@@ -7461,11 +7609,15 @@ function updateRopePosition(ropeEl) {
     }
     // Se c'è sia springEl che hangingBody, vanno su lati opposti
     if (springEl && hangingBody) {
-      // Lato molla: determinato da side
-      const springAttachX = pulleySide === 'left' ? pCX - r : pCX + r;
+      const flipX_sh = planeEl2 ? getPlaneGeometry(planeEl2).flipX : false;
+      // Per flipX=true: molla viene da destra, corpo pende a sinistra (invertito)
+      const springAttachX = flipX_sh
+        ? pCX + r  // molla a destra della carrucola
+        : (pulleySide === 'left' ? pCX - r : pCX + r);
       const springAttachY = pCY;
-      // Lato corpo: opposto
-      const bodyAttachX2 = pulleySide === 'left' ? pCX + r : pCX - r;
+      const bodyAttachX2 = flipX_sh
+        ? pCX - r  // corpo a sinistra della carrucola
+        : (pulleySide === 'left' ? pCX + r : pCX - r);
       const bodyAttachY2 = pCY;
 
       // Posiziona molla — tieni fissa la base (parete), sposta l'estremo libero in alto
@@ -7518,28 +7670,36 @@ function updateRopePosition(ropeEl) {
       }
       hangingBody.y = baseBodyY + dxPx_bps;
 
-      // Segmenti
-      // Estremo libero della molla = springEl.y (bordo superiore con anchor=bottom)
+      // Segmenti con punti di attacco alla carrucola per l'arco
       const springFreeY = (anchor_sp2 === 'bottom') ? springEl.y : springEl.y + springH;
       const segSpring = [
-        { x: springAttachX, y: springAttachY },
-        { x: springAttachX, y: springFreeY }
+        { x: springAttachX, y: springFreeY },  // estremo libero molla
+        { x: springAttachX, y: springAttachY }  // attacco alla carrucola
       ];
       const segBody = [
-        { x: bodyAttachX2, y: bodyAttachY2 },
-        { x: bodyAttachX2, y: hangingBody.y }
+        { x: bodyAttachX2, y: bodyAttachY2 },  // attacco alla carrucola
+        { x: bodyAttachX2, y: hangingBody.y }   // corpo appeso
       ];
 
-      ropeEl._seg1 = segBody;   // corpo = seg1
-      ropeEl._seg2 = segSpring; // molla = seg2
+      ropeEl._seg1 = segSpring; // molla = seg1 (lato piano)
+      ropeEl._seg2 = segBody;   // corpo = seg2 (lato appeso)
       ropeEl._isAtwood = false;
       ropeEl._pulleyPath = null;
+      // Dati per l'arco attorno alla carrucola
+      ropeEl._isPlane = true;
+      ropeEl._pulleyCX = pCX;
+      ropeEl._pulleyCY = pCY;
+      ropeEl._pulleyR = r;
+      console.log('[ROPE_SH] flipX='+flipX_sh+' pCX='+pCX.toFixed(1)+' r='+r.toFixed(1));
+      console.log('[ROPE_SH] springAttachX='+springAttachX.toFixed(1)+' bodyAttachX2='+bodyAttachX2.toFixed(1));
+      console.log('[ROPE_SH] seg1='+ JSON.stringify(segSpring.map(p=>({x:Math.round(p.x),y:Math.round(p.y)}))));
+      console.log('[ROPE_SH] seg2='+ JSON.stringify(segBody.map(p=>({x:Math.round(p.x),y:Math.round(p.y)}))));
 
       const allPts = [...segSpring, ...segBody];
       const allX = allPts.map(p => p.x);
       const allY = allPts.map(p => p.y);
-      ropeEl._lx = segBody[0].x; ropeEl._ly = segBody[0].y;
-      ropeEl._rx = segSpring[0].x; ropeEl._ry = segSpring[0].y;
+      ropeEl._lx = segSpring[0].x; ropeEl._ly = segSpring[0].y;
+      ropeEl._rx = segBody[0].x;   ropeEl._ry = segBody[0].y;
       ropeEl.x = Math.min(...allX) - 4;
       ropeEl.y = Math.min(...allY) - 4;
       ropeEl._wPx = Math.max(...allX) - Math.min(...allX) + 8;
@@ -7910,6 +8070,7 @@ function drawRopeElement(g, el) {
       c.setAttribute('r', 3); c.setAttribute('fill', col);
       g.appendChild(c);
     });
+    _drawRopeTensions(g, el);
     return;
   }
 
@@ -7952,6 +8113,69 @@ function drawRopeElement(g, el) {
     c.setAttribute('r', 3); c.setAttribute('fill', col);
     g.appendChild(c);
   });
+  _drawRopeTensions(g, el);
+}
+
+function _drawRopeTensions(g, el) {
+  const tensions = el._showTensions;
+  if (!tensions || tensions.length === 0) return;
+  el._showTensions = null;
+  const MAX_LEN = window._vectorScale || 140;
+  const MIN_LEN = Math.max(14, MAX_LEN * 0.2);
+  const strokeW = window._vectorStroke || 1.5;
+  const headSize = window._vectorHead || 9;
+  const fontSize = window._vectorFontSize || 13;
+
+  for (const { anchor, T, Tfx, Tfy, refMaxMag } of tensions) {
+    if (T < 1e-9) continue;
+    let attachX, attachY;
+    if (anchor === 'hanging') {
+      const s2 = el._seg2;
+      const p = s2 ? s2[s2.length - 1] : null;
+      attachX = (p?.x ?? el._rx ?? el.x) - el.x;
+      attachY = (p?.y ?? el._ry ?? el.y) - el.y;
+    } else if (anchor === 'spring') {
+      // rope_spring: seg1[0] = lato molla
+      const s1 = el._seg1;
+      const p = s1 ? s1[0] : null;
+      attachX = (p?.x ?? el._lx ?? el.x) - el.x;
+      attachY = (p?.y ?? el._ly ?? el.y) - el.y;
+    } else {
+      // seg1 va da corpo (indice 0) a carrucola (indice last) → usiamo [0]
+      const s1 = el._seg1;
+      const p = s1 ? s1[0] : null;
+      attachX = (p?.x ?? el._lx ?? el.x) - el.x;
+      attachY = (p?.y ?? el._ly ?? el.y) - el.y;
+    }
+    // Reazione sulla fune: coordinata fisica → SVG (x uguale, y invertito)
+    const ux = -Tfx / T;
+    const uy = +Tfy / T;
+    const len = Math.max(MIN_LEN, T * MAX_LEN / Math.max(refMaxMag, 1));
+    const ex = attachX + ux * len;
+    const ey = attachY + uy * len;
+    const Tcol = '#60a0f0';
+    const ang = Math.atan2(ey - attachY, ex - attachX);
+    // Linea
+    const ln2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    ln2.setAttribute('x1', attachX); ln2.setAttribute('y1', attachY);
+    ln2.setAttribute('x2', ex); ln2.setAttribute('y2', ey);
+    ln2.setAttribute('stroke', Tcol); ln2.setAttribute('stroke-width', strokeW);
+    g.appendChild(ln2);
+    // Punta
+    const h = headSize;
+    const arrHead = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    arrHead.setAttribute('points', `${ex},${ey} ${ex - h*Math.cos(ang-0.4)},${ey - h*Math.sin(ang-0.4)} ${ex - h*Math.cos(ang+0.4)},${ey - h*Math.sin(ang+0.4)}`);
+    arrHead.setAttribute('fill', Tcol);
+    g.appendChild(arrHead);
+    // Label
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    lbl.setAttribute('x', ex + 10*Math.cos(ang)); lbl.setAttribute('y', ey + 10*Math.sin(ang));
+    lbl.setAttribute('fill', Tcol); lbl.setAttribute('font-size', fontSize);
+    lbl.setAttribute('font-style', 'italic'); lbl.setAttribute('font-weight', '700');
+    lbl.setAttribute('text-anchor', 'middle'); lbl.setAttribute('dominant-baseline', 'central');
+    lbl.textContent = 'T';
+    g.appendChild(lbl);
+  }
 }
 
 // Calcola tensione della fune
@@ -9941,6 +10165,7 @@ function openRelationModal(a, b, existing, type) {
       lever:         ['d1', 'length'],
       axis_xy:       ['gravity'],
       floor:         [],
+      rope:          ['forceF', 'forceAngle'],
     };
     const availProps = propMap[targetEl.type] || [];
     const selRow = document.createElement('div');
@@ -10059,6 +10284,10 @@ function openRelationModal(a, b, existing, type) {
         { key: 'length', label: 'L',  title: 'Lunghezza leva',   unit: 'm' },
       ],
       axis_xy:       [{ key: 'gravity', label: 'g',  title: 'Accelerazione di gravità', unit: 'm/s²' }],
+      rope:          [
+        { key: 'forceF',     label: 'F',  title: 'Forza applicata', unit: 'N' },
+        { key: 'forceAngle', label: 'θ',  title: 'Angolo forza',    unit: '°' },
+      ],
     };
     const rawProps = propMap[targetEl.type];
     const scalarProps = rawProps
@@ -10136,7 +10365,17 @@ function openRelationModal(a, b, existing, type) {
       axis_xy:       ['gravity'],
       floor:         [],
     };
-    const scalarProps = propMap[targetEl.type] || [];
+    let scalarProps = propMap[targetEl.type] ? [...propMap[targetEl.type]] : [];
+    // Per molle in parallelo: aggiungi _Ftot
+    if (targetEl.type === 'spring' && targetEl._inParallel) {
+      scalarProps.push('_Ftot');
+    }
+    // Per molle singole/serie in forces mode: aggiungi le forze dirette
+    if (targetEl.type === 'spring' && targetEl.props?.springMode === 'forces' && !targetEl._inParallel) {
+      (targetEl.props?.forces || []).forEach((f, i) => {
+        scalarProps.push(`forces[${i}].__val`);
+      });
+    }
 
     // Aggiungi forze applicate se presenti
     const forces = targetEl.props?.forces || [];
@@ -10153,9 +10392,29 @@ function openRelationModal(a, b, existing, type) {
       }
     });
 
+    const propLabels = {
+      k: 'k (N/m)', L0: 'L₀ (m)', _Ftot: 'F (N)',
+      forceF:    'Forza (N)',
+      forceAngle: 'Angolo θ (°)',
+      gravity: 'Gravità (m/s²)',
+      mass: 'Massa (kg)',
+      angle: 'Angolo (°)',
+      base: 'Base (m)',
+      height: 'Altezza (m)',
+      length: 'Lunghezza (m)',
+      d1: 'Braccio sinistro (m)',
+    };
+    // Per molle parallele: mostra solo _Ftot (le forces[i].val vengono ignorate dal render)
+    const filteredForceProps = targetEl._inParallel ? [] : forceProps;
     const allProps = [
-      ...scalarProps.map(p => ({ key: p, label: p })),
-      ...forceProps
+      ...scalarProps.filter(p => !p.includes('.__val')).map(p => ({ key: p, label: propLabels[p] || p })),
+      // forces[i].__val: forze scalari su molla singola/serie (non parallelo)
+      ...scalarProps.filter(p => p.includes('.__val')).map(p => {
+        const idx = parseInt(p.match(/\[(\d+)\]/)?.[1] ?? 0);
+        const f = targetEl.props?.forces?.[idx];
+        return { key: p, label: `${f?.name || `F${idx+1}`} (N)` };
+      }),
+      ...filteredForceProps
     ];
 
     if (allProps.length === 0) {
@@ -10201,6 +10460,7 @@ function openRelationModal(a, b, existing, type) {
         d1:      { min:0.1, max:9.9,  step:0.1, label:'d₁' },
         length:  { min:1,   max:20,   step:0.5, label:'L'  },
         gravity: { min:0,   max:30,   step:0.1, label:'g'  },
+        _Ftot:   { min:-500, max:500, step:1,   label:'F'  },
       };
 
       function updateSubSel(mainKey) {
@@ -11587,6 +11847,9 @@ function render() {
   const existingIds = new Set(elements.map(e => e.id));
   relations = relations.filter(r => r && r.aId != null && r.bId != null && existingIds.has(r.aId) && existingIds.has(r.bId));
 
+  // Imposta _seriesRole PRIMA del calcolo molle (necessario al primo render/caricamento)
+  if (typeof applySeriesChains === 'function') applySeriesChains();
+
   // Calcola _inParallel PRIMA di tutto
   for (const el of elements) {
     if (el.type !== 'spring') { el._inParallel = false; continue; }
@@ -11615,16 +11878,94 @@ function render() {
     if (mode === 'forces') {
       const k_f = parseFloat(sp.props?.k);
       const L0_f = parseFloat(sp.props?.L0);
+      const forces = sp.props.forces || [];
+      let Ftot = 0;
+      forces.forEach(f => { Ftot += parseFloat(f.val) || 0; });
       if (!isNaN(k_f) && k_f > 0 && !isNaN(L0_f) && L0_f > 0) {
         const forces = sp.props.forces || [];
-        if (forces.length > 0 && forces.some(f => f.val !== '' && f.val != null)) {
+        // Per parallelo: raccogli forze da tutto il gruppo prima di decidere
+        if (sp._inParallel) {
+          const group_f = elements.filter(e =>
+            e.type === 'spring' && relations.some(r =>
+              r.type === 'spring_spring' && r.props?.layout === 'parallel' &&
+              ((r.aId === sp.id && r.bId === e.id) || (r.bId === sp.id && r.aId === e.id))
+            )
+          ).concat([sp]);
+          // Per parallelo: usa _Ftot (campo della UI parallelo) o forces[].val
+          let FtotPar = 0;
+          group_f.forEach(s => {
+            const ftot = parseFloat(s.props?._Ftot);
+            if (!isNaN(ftot)) { FtotPar += ftot; }
+            else {
+              (s.props?.forces || []).forEach(f => { FtotPar += parseFloat(f.val) || 0; });
+            }
+          });
+          // Aggiungi contributo del corpo agganciato (peso + forze esterne assiali)
+          const bodyRelPar = relations.find(r => r.type === 'spring_body' &&
+            group_f.some(s => r.aId === s.id || r.bId === s.id));
+          if (bodyRelPar) {
+            const bodyElPar = elements.find(e => e.id === (
+              group_f.some(s => s.id === bodyRelPar.aId) ? bodyRelPar.bId : bodyRelPar.aId
+            ));
+            if (bodyElPar) {
+              const ref_par = getRefSystem();
+              const g_par = parseFloat(ref_par?.props?.gravity) || 0;
+              const m_par = parseFloat(bodyElPar.props?.mass) || 0;
+              const anch_par = sp.props?.anchor || 'left';
+              const horiz_par = anch_par === 'left' || anch_par === 'right';
+              if (!horiz_par) FtotPar += m_par * g_par; // peso lungo asse verticale
+              (bodyElPar.props?.forces || []).forEach(f => {
+                FtotPar += horiz_par ? (parseFloat(f.fx)||0) : (parseFloat(f.fy)||0);
+              });
+            }
+          }
+          const keq_f = group_f.reduce((sum, s) => sum + (parseFloat(s.props?.k) || 0), 0);
+          if (keq_f > 0 && Math.abs(FtotPar) > 1e-9) {
+            const L_f = L0_f + FtotPar / keq_f;
+            group_f.forEach(s => {
+              s.props._L_calc = L_f;
+              s.props._delta_x = parseFloat((L_f - (parseFloat(s.props.L0) || L0_f)).toFixed(6));
+              s.props._F_el = parseFloat((parseFloat(s.props.k) * s.props._delta_x).toFixed(6));
+            });
+          } else if (Math.abs(FtotPar) < 1e-9) {
+            // Forza zero: reset a L0
+            group_f.forEach(s => {
+              const L0s = parseFloat(s.props?.L0) || 0;
+              s.props._L_calc = L0s;
+              s.props._delta_x = 0;
+              s.props._F_el = 0;
+            });
+          }
+        } else if (forces.length > 0 && forces.some(f => f.val !== '' && f.val != null)) {
           let Ftot = 0;
           forces.forEach(f => { Ftot += parseFloat(f.val) || 0; });
-          sp.props._L_calc = L0_f + Ftot / k_f;
+          // Aggiungi contributo del corpo agganciato
+          const bodyRelSingle = relations.find(r => r.type === 'spring_body' && (r.aId === sp.id || r.bId === sp.id));
+          if (bodyRelSingle) {
+            const bodyElSingle = elements.find(e => e.id === (bodyRelSingle.aId === sp.id ? bodyRelSingle.bId : bodyRelSingle.aId));
+            if (bodyElSingle) {
+              const ref_s = getRefSystem();
+              const g_s = parseFloat(ref_s?.props?.gravity) || 0;
+              const m_s = parseFloat(bodyElSingle.props?.mass) || 0;
+              const anch_s = sp.props?.anchor || 'left';
+              const horiz_s = anch_s === 'left' || anch_s === 'right';
+              if (!horiz_s) Ftot += m_s * g_s;
+              (bodyElSingle.props?.forces || []).forEach(f => {
+                Ftot += horiz_s ? (parseFloat(f.fx)||0) : (parseFloat(f.fy)||0);
+              });
+            }
+          }
+          if (sp._seriesRole) {
+            // Serie con forces dirette: gestito nel blocco serie
+          } else {
+            sp.props._L_calc = L0_f + Ftot / k_f;
+            sp.props._delta_x = parseFloat((Ftot / k_f).toFixed(6));
+            sp.props._F_el = parseFloat(Ftot.toFixed(6));
+          }
         }
-        // Se forces vuoto: preserva _L_calc corrente
       }
-      continue;
+      if (!sp._seriesRole) continue;
+      // Se _seriesRole: non fare continue — cade nel blocco serie con F iniettata
     }
 
     // ── Modalità dx: Δx → L = L0 + Δx ───────────────────────────────────────
@@ -11643,9 +11984,9 @@ function render() {
     }
 
     if (mode !== 'auto') {
-      // Eccezione: se la molla ha rope_spring, deve essere gestita comunque
+      // Eccezione: se la molla ha rope_spring o è in serie, deve essere gestita comunque
       const hasRopeSpring2 = relations.some(r => r.type === 'rope_spring' && (r.aId === sp.id || r.bId === sp.id));
-      if (!hasRopeSpring2) continue;
+      if (!hasRopeSpring2 && !sp._seriesRole) continue;
     }
 
     // Se in serie: gestisci tutta la catena insieme, una volta sola
@@ -11704,17 +12045,27 @@ function render() {
         else                           F2series = -Fext2;
         break;
       }
+      // Aggiungi forze inserite direttamente sulle molle della catena
+      for (const spC of chainAuto) {
+        (spC.props?.forces || []).forEach(f => {
+          const fv = parseFloat(f.val);
+          if (!isNaN(fv)) F2series += fv;
+        });
+      }
       if (!foundBody) {
-        // Cerca forze dirette sulla molla con _seriesRole (modalità forces)
+        // Cerca forze dirette su qualsiasi molla della catena (modalità forces)
+        // Usa la somma di tutte le forze dirette applicate
+        let Fdir = 0;
+        let hasFdir = false;
         for (const spC of chainAuto) {
-          if (spC.props?.springMode === 'forces' && Array.isArray(spC.props?.forces)) {
-            let Fdir = 0;
-            spC.props.forces.forEach(f => { Fdir += parseFloat(f.val) || 0; });
-            F2series = Fdir;
-            foundBody = true;
-            break;
+          if (Array.isArray(spC.props?.forces)) {
+            spC.props.forces.forEach(f => {
+              const fv = parseFloat(f.val);
+              if (!isNaN(fv)) { Fdir += fv; hasFdir = true; }
+            });
           }
         }
+        if (hasFdir) { F2series = Fdir; foundBody = true; }
       }
       if (!foundBody) {
         chainAuto.forEach(s => { const L0s = parseFloat(s.props?.L0); if (!isNaN(L0s)) s.props._L_calc = L0s; });
@@ -11726,6 +12077,8 @@ function render() {
         const L0s = parseFloat(s.props?.L0);
         if (!isNaN(ks) && ks > 0 && !isNaN(L0s) && L0s > 0) {
           s.props._L_calc = L0s + F2series / ks;
+          s.props._delta_x = parseFloat((F2series / ks).toFixed(6));
+          s.props._F_el = parseFloat(F2series.toFixed(6));
         }
       });
       continue;
@@ -11733,7 +12086,14 @@ function render() {
 
     const k  = parseFloat(sp.props?.k);
     const L0 = parseFloat(sp.props?.L0);
-    if (isNaN(k) || k <= 0 || isNaN(L0) || L0 <= 0) continue;
+    if (isNaN(L0) || L0 <= 0) continue;
+    if (isNaN(k) || k <= 0) {
+      // k=0: molla non può sostenere il carico → allungamento infinito
+      sp.props._L_calc = L0; // mantieni lunghezza a riposo graficamente
+      sp.props._delta_x = (k === 0) ? Infinity : null;
+      sp.props._F_el = 0;
+      continue;
+    }
 
     // ── Caso rope_spring: molla agganciata a fune con corpo appeso ────────────
     const ropeSpringRel2 = relations.find(r => r.type === 'rope_spring' && (r.aId === sp.id || r.bId === sp.id));
@@ -11897,10 +12257,25 @@ function render() {
       }
       const keq2 = group2.reduce((sum, s) => sum + (parseFloat(s.props?.k) || 0), 0);
       if (keq2 <= 0) continue;
-      sp.props._L_calc = L0 + F2 / keq2;
-      group2.forEach(s => { if (s.id !== sp.id) s.props._L_calc = sp.props._L_calc; });
+      const deltaX_par = F2 / keq2;
+      group2.forEach(s => {
+        const L0g = parseFloat(s.props?.L0) || 0;
+        const kg = parseFloat(s.props?.k) || 0;
+        s.props._L_calc = L0g + deltaX_par;
+        s.props._delta_x = parseFloat(deltaX_par.toFixed(6));
+        s.props._F_el = parseFloat((kg * deltaX_par).toFixed(6));
+      });
     } else {
-      sp.props._L_calc = L0 + F2 / k;
+      if (k <= 0) {
+        sp.props._L_calc = L0;
+        sp.props._delta_x = Infinity;
+        sp.props._F_el = 0;
+      } else {
+        const deltaX_s = F2 / k;
+        sp.props._L_calc = L0 + deltaX_s;
+        sp.props._delta_x = parseFloat(deltaX_s.toFixed(6));
+        sp.props._F_el = parseFloat(F2.toFixed(6));
+      }
     }
   }
 
@@ -12398,7 +12773,24 @@ function render() {
     // Includi la forza elastica della molla
     const springF_pm = getSpringForce(el);
     if (springF_pm && Math.abs(springF_pm.F) > 1e-9) mags_pm.push(Math.abs(springF_pm.F));
+    // Atwood: includi tensione nella scala
+    if (typeof getPulleyForceOnAtwoodBody === 'function') {
+      const ta_pm = getPulleyForceOnAtwoodBody(el);
+      if (ta_pm && Math.abs(ta_pm.T) > 1e-9) mags_pm.push(Math.abs(ta_pm.T));
+    }
     el._vecMaxMag = mags_pm.length > 0 ? Math.max(...mags_pm) : 1;
+  }
+
+  // Normalizza _vecMaxMag tra coppie Atwood (stesso riferimento di scala)
+  for (const ropeEl5 of elements.filter(e => e.type === 'rope')) {
+    const hangRels = relations.filter(r =>
+      r.type === 'rope_body' && (r.aId === ropeEl5.id || r.bId === ropeEl5.id) &&
+      (r.props?.anchor === 'hanging' || r.props?.anchor === 'hanging_left' || r.props?.anchor === 'hanging_right')
+    );
+    if (hangRels.length < 2) continue;
+    const bodies5 = hangRels.map(r => elements.find(e => e.id === (r.aId === ropeEl5.id ? r.bId : r.aId))).filter(Boolean);
+    const sharedMax = Math.max(...bodies5.map(b => b._vecMaxMag || 0));
+    bodies5.forEach(b => { b._vecMaxMag = sharedMax; });
   }
 
   // ── Disegna funi PRIMA degli elementi (sotto) ─────────────────────────────
@@ -12410,7 +12802,20 @@ function render() {
     const springRel2 = relations.find(r => r.type === 'spring_body' && (r.aId === el.id || r.bId === el.id));
     if (springRel2) {
       const springEl2 = elements.find(e => e.id === (springRel2.aId === el.id ? springRel2.bId : springRel2.aId));
-      if (springEl2 && springEl2.props?.visible !== false) springEl2.props._showReaction = true;
+      if (springEl2 && springEl2.props?.visible !== false) {
+        if (springEl2._inParallel) {
+          // Parallelo: mostra reazione su TUTTE le molle del gruppo
+          const parGroup2 = elements.filter(e =>
+            e.type === 'spring' && e.props?.visible !== false && (e.id === springEl2.id ||
+            relations.some(r => r.type === 'spring_spring' && r.props?.layout === 'parallel' &&
+              ((r.aId === springEl2.id && r.bId === e.id) || (r.bId === springEl2.id && r.aId === e.id))
+            ))
+          );
+          parGroup2.forEach(sp => { sp.props._showReaction = true; });
+        } else {
+          springEl2.props._showReaction = true;
+        }
+      }
     }
     // Piano inclinato
     const planeRel = relations.find(r => r.type === 'body_on_plane' && (r.aId === el.id || r.bId === el.id));
@@ -12427,7 +12832,45 @@ function render() {
     }
   }
 
-  // Pre-pass: molla nascosta su piano inclinato → reazione sul piano
+  // Pre-pass: molla nascosta in serie/parallelo → reazione sui vicini visibili
+  for (const el of elements) {
+    if (el.type !== 'spring' || el.props?.visible !== false) continue;
+    const F_el = parseFloat(el.props?._F_el) || 0;
+    if (Math.abs(F_el) < 1e-9) continue;
+    const anchor = el.props?.anchor || 'left';
+    const horiz  = anchor === 'left' || anchor === 'right';
+
+    const seriesRels   = relations.filter(r => r.type === 'spring_spring' && r.props?.layout === 'series'   && (r.aId === el.id || r.bId === el.id));
+    const parallelRels = relations.filter(r => r.type === 'spring_spring' && r.props?.layout === 'parallel' && (r.aId === el.id || r.bId === el.id));
+    const bodyRel      = relations.find(r => r.type === 'spring_body' && (r.aId === el.id || r.bId === el.id));
+
+    // ── Serie: segna il vicino visibile per disegnare T al suo estremo di giunzione ──
+    for (const sr of seriesRels) {
+      const neighbor = elements.find(e => e.id === (sr.aId === el.id ? sr.bId : sr.aId));
+      if (!neighbor || neighbor.type !== 'spring' || neighbor.props?.visible === false) continue;
+      if (!neighbor._showJunctionReaction) neighbor._showJunctionReaction = [];
+      neighbor._showJunctionReaction.push({ F: F_el, hiddenSpring: el, horiz, atFreeEnd: false });
+    }
+
+    // ── Corpo visibile collegato alla molla nascosta ──────────────────────
+    if (bodyRel) {
+      const bodyEl = elements.find(e => e.id === (bodyRel.aId === el.id ? bodyRel.bId : bodyRel.aId));
+      if (bodyEl && bodyEl.props?.visible !== false) {
+        if (!bodyEl._springReactions) bodyEl._springReactions = [];
+        bodyEl._springReactions.push({ F: F_el, anchor, horiz });
+      }
+    }
+
+    // ── Parallelo: disegna direttamente sulla canvas all'estremo libero della molla nascosta ──
+    if (parallelRels.length > 0) {
+      const F_show = parseFloat(el.props?._Ftot) || 0;
+      if (!el._drawHiddenReaction) el._drawHiddenReaction = { F: F_el, anchor, horiz };
+      // Salva anche la forza applicata per ridisegnarla
+      if (Math.abs(F_show) > 1e-9) {
+        el._drawHiddenApplied = { F: F_show, anchor, horiz };
+      }
+    }
+  }
   for (const el of elements) {
     if (el.type !== 'spring') continue;
     if (el.props?.visible !== false) continue;
@@ -12447,11 +12890,159 @@ function render() {
     planeEl3.props._showSpringReactions.push({ springEl: el, rel: spPlaneRel });
   }
 
+  // Pre-pass: corpo/molla nascosti collegati a fune → tensione sulla fune
+  for (const el of elements) {
+    const isHiddenBody = BODY_TYPES.includes(el.type) && el.props?.visible === false;
+    const isHiddenSpring = el.type === 'spring' && el.props?.visible === false;
+    if (!isHiddenBody && !isHiddenSpring) continue;
+
+    const ropeBodyRels = relations.filter(r =>
+      (r.type === 'rope_body' || r.type === 'rope_spring') &&
+      (r.aId === el.id || r.bId === el.id)
+    );
+    for (const rr of ropeBodyRels) {
+      const ropeEl4 = elements.find(e => e.id === (rr.aId === el.id ? rr.bId : rr.aId));
+      if (!ropeEl4 || ropeEl4.props?.visible === false) continue;
+      if (!ropeEl4._showTensions) ropeEl4._showTensions = [];
+      let Tfx = 0, Tfy = 0, T = 0;
+
+      if (isHiddenSpring) {
+        // Molla: tensione = |F_el|, direzione = forza che la fune esercita sulla molla = su per il piano
+        const F_el = parseFloat(el.props?._F_el) || 0;
+        if (Math.abs(F_el) > 1e-9) {
+          const spPlaneRel = relations.find(r =>
+            r.type === 'spring_on_plane' && (r.aId === el.id || r.bId === el.id)
+          );
+          const planeEl5 = spPlaneRel ? elements.find(e =>
+            e.id === (spPlaneRel.aId === el.id ? spPlaneRel.bId : spPlaneRel.aId)
+          ) : null;
+          if (planeEl5 && typeof getPlaneGeometry === 'function') {
+            const geo5 = getPlaneGeometry(planeEl5);
+            T = Math.abs(F_el);
+            // Forza che la fune esercita sulla molla = verso l'alto del piano (dx_fis, dy_fis)
+            Tfx = geo5.dx_fis * T;
+            Tfy = geo5.dy_fis * T;
+          }
+        }
+      } else if (isHiddenBody) {
+        if (rr.props?.anchor === 'hanging') {
+          // Cerca se la fune è collegata a una molla → usa la tensione della molla
+          const ropeEl_tmp = elements.find(e => e.id === (rr.aId === el.id ? rr.bId : rr.aId));
+          const sprRel = ropeEl_tmp ? relations.find(r =>
+            r.type === 'rope_spring' && (r.aId === ropeEl_tmp.id || r.bId === ropeEl_tmp.id)
+          ) : null;
+          const sprEl = sprRel ? elements.find(e =>
+            e.id === (sprRel.aId === ropeEl_tmp?.id ? sprRel.bId : sprRel.aId)
+          ) : null;
+          if (sprEl && Math.abs(parseFloat(sprEl.props?._F_el) || 0) > 1e-9) {
+            T = Math.abs(parseFloat(sprEl.props._F_el));
+            Tfx = 0; Tfy = T; // hanging: forza fune→corpo = verso l'alto (fy fisica positiva)
+          } else if (typeof getPulleyForceOnHangingBodyCorrect === 'function') {
+            const pf = getPulleyForceOnHangingBodyCorrect(el);
+            if (pf) { Tfx = pf.fx || 0; Tfy = pf.fy || 0; T = Math.hypot(Tfx, Tfy); }
+          }
+        } else if (typeof getPulleyForceOnBodyCorrect === 'function') {
+          const pf = getPulleyForceOnBodyCorrect(el);
+          if (pf) { Tfx = pf.fx || 0; Tfy = pf.fy || 0; T = Math.hypot(Tfx, Tfy); }
+        }
+      }
+
+      const anchor = rr.type === 'rope_spring' ? 'spring' : rr.props?.anchor;
+      ropeEl4._showTensions.push({ bodyEl: el, anchor, T, Tfx, Tfy, refMaxMag: el._vecMaxMag || T || 1 });
+    }
+  }
+  // Normalizza refMaxMag per tutte le tensioni sulla stessa fune (stessa scala)
+  for (const el of elements) {
+    if (!el._showTensions || el._showTensions.length < 2) continue;
+    const maxT = Math.max(...el._showTensions.map(t => t.T));
+    el._showTensions.forEach(t => { t.refMaxMag = maxT; });
+  }
+
   const ropeLayer = svgEl('g', { 'pointer-events': 'none', class: 'rope-layer' });
   for (const rel of relations) {
     if (rel.type === 'body_body') drawRope(ropeLayer, rel);
   }
   canvas.appendChild(ropeLayer);
+
+  // Disegna reazioni molle parallele nascoste direttamente sulla canvas
+  for (const el of elements) {
+    if (el.type !== 'spring' || !el._drawHiddenReaction) continue;
+    const rh = el._drawHiddenReaction;
+    el._drawHiddenReaction = null;
+    const def = DEFS[el.type];
+    if (!def) continue;
+
+    const tmpG2 = svgEl('g', { visibility: 'hidden' });
+    try { def.draw(tmpG2, el); } catch(e) {}
+
+    const elW = el._wPx ?? def.w;
+    const elH = el._hPx ?? def.h;
+    const pan = (typeof getCanvasPan === 'function') ? getCanvasPan() : { x:0, y:0 };
+    const px = el.x + pan.x, py = el.y + pan.y;
+
+    // Posizione estremo libero in coordinate canvas
+    let wxFree, wyFree;
+    if (rh.horiz) {
+      wxFree = (rh.anchor === 'left') ? px + elW : px;
+      wyFree = py + elH / 2;
+    } else {
+      wxFree = px + elW / 2;
+      wyFree = (rh.anchor === 'top') ? py + elH : py;
+    }
+
+    // Forza applicata (arancione) — disegnata PRIMA della reazione
+    if (el._drawHiddenApplied) {
+      const ra = el._drawHiddenApplied;
+      el._drawHiddenApplied = null;
+      const F_abs_a = Math.abs(ra.F);
+      const MAX_LEN_a = window._vectorScale || 140;
+      // Usa stesso refF del gruppo parallelo
+      const parGroupA = elements.filter(e =>
+        e.type === 'spring' && e._inParallel && relations.some(r =>
+          r.type === 'spring_spring' && r.props?.layout === 'parallel' &&
+          ((r.aId === el.id && r.bId === e.id)||(r.bId === el.id && r.aId === e.id))
+        )
+      ).concat([el]);
+      const refF_a = Math.max(...parGroupA.map(s => Math.abs(parseFloat(s.props?._Ftot)||0)), F_abs_a);
+      const fLen_a = Math.max(14, F_abs_a * MAX_LEN_a / refF_a);
+      const fCol_a = '#f0a060';
+      const gA = svgEl('g', { transform: `translate(${wxFree},${wyFree})`, 'pointer-events': 'none' });
+      canvas.appendChild(gA);
+      if (ra.horiz) {
+        const dir_a = ra.F > 0 ? 1 : -1;
+        arrow(gA, 0, 0, dir_a * fLen_a, 0, fCol_a);
+        text(gA, dir_a * fLen_a + (dir_a>0?6:-6), -8, 'F', fCol_a, '13px', dir_a>0?'start':'end');
+      } else {
+        const dir_a = ra.F > 0 ? 1 : -1;
+        arrow(gA, 0, 0, 0, dir_a * fLen_a, fCol_a);
+        text(gA, -8, dir_a * fLen_a * 0.5 + 4, 'F', fCol_a, '13px', 'end');
+      }
+    }
+
+    const F_abs = Math.abs(rh.F);
+    const MAX_LEN_h = window._vectorScale || 140;
+    // Scala rispetto al massimo storico della molla
+    el._refMaxF = Math.max(F_abs, el._refMaxF || 0);
+    const refF_h = el._refMaxF || F_abs;
+    const fLen_h = Math.max(14, F_abs * MAX_LEN_h / refF_h);
+    const fCol_h = '#a060f0';
+    const gH = svgEl('g', { transform: `translate(${wxFree},${wyFree})`, 'pointer-events': 'none' });
+    canvas.appendChild(gH);
+
+    if (rh.horiz) {
+      // Reazione: verso l'ancora (opposta alla forza che stira la molla)
+      const dir_h = rh.anchor === 'left' ? -1 : 1;
+      const sign_h = rh.F >= 0 ? dir_h : -dir_h;
+      arrow(gH, 0, 0, sign_h * fLen_h, 0, fCol_h);
+      text(gH, sign_h * fLen_h + (sign_h>0?6:-6), -8, 'F', fCol_h, '13px', sign_h>0?'start':'end');
+    } else {
+      // Reazione: verso l'ancora
+      const dir_h = rh.anchor === 'top' ? -1 : 1;
+      const sign_h = rh.F >= 0 ? dir_h : -dir_h;
+      arrow(gH, 0, 0, 0, sign_h * fLen_h, fCol_h);
+      text(gH, -8, sign_h * fLen_h * 0.5 + 4, 'F', fCol_h, '13px', 'end');
+    }
+  }
 
   // Disegna prima tutti gli elementi NON-rope, poi le funi sopra (catturano i click)
   const ropeEls = elements.filter(e => e.type === 'rope');
@@ -12634,11 +13225,48 @@ function render() {
       const { Fx, Fy, m, planeN } = computeTotalForcesWithWall(el);
       // Salva tensione fune se presente
       if (typeof getPulleyForceOnBodyCorrect === 'function') {
-        const tf = getPulleyForceOnBodyCorrect(el);
-        el.props._T_rope = tf ? parseFloat(Math.abs(tf.T).toFixed(4)) : null;
-        if (el.props._T_rope === null && typeof getPulleyForceOnHangingBodyCorrect === 'function') {
-          const th = getPulleyForceOnHangingBodyCorrect(el);
-          el.props._T_rope = th ? parseFloat(Math.abs(th.T).toFixed(4)) : null;
+        // Per sistemi Atwood, usa sempre getPulleyForceOnAtwoodBody (aggiornato)
+        let usedAtwood = false;
+        if (typeof getPulleyForceOnAtwoodBody === 'function') {
+          const ta = getPulleyForceOnAtwoodBody(el);
+          if (ta && Math.abs(ta.T) > 1e-9) {
+            el.props._T_rope = parseFloat(Math.abs(ta.T).toFixed(4));
+            usedAtwood = true;
+          }
+        }
+        if (!usedAtwood) {
+          const tf = getPulleyForceOnBodyCorrect(el);
+          el.props._T_rope = tf ? parseFloat(Math.abs(tf.T).toFixed(4)) : null;
+          if (el.props._T_rope === null && typeof getPulleyForceOnHangingBodyCorrect === 'function') {
+            const th = getPulleyForceOnHangingBodyCorrect(el);
+            el.props._T_rope = th ? parseFloat(Math.abs(th.T).toFixed(4)) : null;
+          }
+        }
+        // Fallback: fune collegata a molla → usa |F_el| della molla
+        if (!el.props._T_rope || el.props._T_rope < 1e-9) {
+          const ropeRel_t = relations.find(r =>
+            r.type === 'rope_body' && (r.aId === el.id || r.bId === el.id)
+          );
+          const ropeEl_t = ropeRel_t ? elements.find(e =>
+            e.id === (ropeRel_t.aId === el.id ? ropeRel_t.bId : ropeRel_t.aId)
+          ) : null;
+          const sprRel_t = ropeEl_t ? relations.find(r =>
+            r.type === 'rope_spring' && (r.aId === ropeEl_t.id || r.bId === ropeEl_t.id)
+          ) : null;
+          const sprEl_t = sprRel_t ? elements.find(e =>
+            e.id === (sprRel_t.aId === ropeEl_t?.id ? sprRel_t.bId : sprRel_t.aId)
+          ) : null;
+          if (sprEl_t) {
+            // Ricalcola F_el dalla _L_calc aggiornata (non usa il valore cached)
+            const k_t = parseFloat(sprEl_t.props?.k);
+            const L0_t = parseFloat(sprEl_t.props?.L0);
+            const Lc_t = parseFloat(sprEl_t.props?._L_calc);
+            if (!isNaN(k_t) && !isNaN(L0_t) && !isNaN(Lc_t)) {
+              sprEl_t.props._F_el = k_t * (Lc_t - L0_t);
+            }
+            const F_el_t = parseFloat(sprEl_t.props?._F_el) || 0;
+            if (Math.abs(F_el_t) > 1e-9) el.props._T_rope = parseFloat(Math.abs(F_el_t).toFixed(4));
+          }
         }
       }
       el.props._Fx    = parseFloat(Fx.toFixed(4));
@@ -12862,6 +13490,29 @@ function render() {
         deco.appendChild(svgEl('line',{x1:xMid,y1:yBar,x2:xMid,y2:yBar+attachDir*16,
           stroke:col,'stroke-width':2}));
 
+        // Reazione vincolare al centro della barra (solo se NON c'è corpo agganciato visibile)
+        const hasVisibleBodyV = allSprings.some(sp => {
+          const br = relations.find(r => r.type === 'spring_body' && (r.aId === sp.id || r.bId === sp.id));
+          if (!br) return false;
+          const bodyE = elements.find(e => e.id === (br.aId === sp.id ? br.bId : br.aId));
+          return bodyE && bodyE.props?.visible !== false;
+        });
+        if (!hasVisibleBodyV) {
+          let FtotReactV = 0;
+          allSprings.forEach(sp => { FtotReactV += parseFloat(sp.props?._F_el) || 0; });
+          if (Math.abs(FtotReactV) > 1e-9) {
+            const MAX_LEN_rv = window._vectorScale || 140;
+            const refF_rv = allSprings.reduce((mx, sp) => Math.max(mx, Math.abs(sp._refMaxF||0), Math.abs(parseFloat(sp.props?._F_el)||0)), 1e-9);
+            const fLen_rv = Math.max(14, Math.abs(FtotReactV) * MAX_LEN_rv / (refF_rv * allSprings.length));
+            const fCol_rv = '#a060f0';
+            const dir_rv = FtotReactV > 0 ? (anchor === 'top' ? -1 : 1) : (anchor === 'top' ? 1 : -1);
+            const gRv = svgEl('g', { transform: `translate(${xMid},${yBar})`, 'pointer-events': 'none' });
+            arrow(gRv, 0, 0, 0, dir_rv * fLen_rv, fCol_rv);
+            text(gRv, -8, dir_rv * fLen_rv * 0.5 + 4, 'F', fCol_rv, '13px', 'end');
+            deco.appendChild(gRv);
+          }
+        }
+
       } else {
         // ── Orizzontale parallelo ──
         const getFreeX = sp => {
@@ -12892,6 +13543,33 @@ function render() {
         const attachDirH = anchor==='left' ? 1 : -1;
         deco.appendChild(svgEl('line',{x1:xBar,y1:yMid,x2:xBar+attachDirH*16,y2:yMid,
           stroke:col,'stroke-width':2}));
+
+        // Reazione vincolare al centro della barra (solo se NON c'è corpo agganciato visibile)
+        const hasVisibleBody = allSprings.some(sp => {
+          const br = relations.find(r => r.type === 'spring_body' && (r.aId === sp.id || r.bId === sp.id));
+          if (!br) return false;
+          const bodyE = elements.find(e => e.id === (br.aId === sp.id ? br.bId : br.aId));
+          return bodyE && bodyE.props?.visible !== false;
+        });
+        if (!hasVisibleBody) {
+          // Calcola F totale del gruppo parallelo
+          let FtotReact = 0;
+          allSprings.forEach(sp => {
+            FtotReact += parseFloat(sp.props?._F_el) || 0;
+          });
+          if (Math.abs(FtotReact) > 1e-9) {
+            const MAX_LEN_r = window._vectorScale || 140;
+            const refF_r = allSprings.reduce((mx, sp) => Math.max(mx, Math.abs(sp._refMaxF||0), Math.abs(parseFloat(sp.props?._F_el)||0)), 1e-9);
+            const fLen_r = Math.max(14, Math.abs(FtotReact) * MAX_LEN_r / (refF_r * allSprings.length));
+            const fCol_r = '#a060f0';
+            // Direzione: verso la parete (reazione equilibra forza esterna)
+            const dir_r = FtotReact > 0 ? (anchor === 'left' ? -1 : 1) : (anchor === 'left' ? 1 : -1);
+            const gR = svgEl('g', { transform: `translate(${xBar},${yMid})`, 'pointer-events': 'none' });
+            arrow(gR, 0, 0, dir_r * fLen_r, 0, fCol_r);
+            text(gR, dir_r * fLen_r + (dir_r>0?6:-6), -8, 'F', fCol_r, '13px', dir_r>0?'start':'end');
+            deco.appendChild(gR);
+          }
+        }
       }
     } else {
       // ── Serie: il pallino di giunzione è già disegnato dalla molla successiva
@@ -12912,9 +13590,10 @@ function render() {
     const freeEnd = getRopeFreeEnd(el);
     if (!freeEnd) continue;
 
-    // Punto libero della fune
+    // Punto libero della fune — coordinate locali (senza pan), disegniamo nel gruppo della fune
     const fx = freeEnd === 'right' ? el._rx : el._lx;
     const fy = freeEnd === 'right' ? el._ry : el._ly;
+    const pan_rv = (typeof getCanvasPan === 'function') ? getCanvasPan() : { x:0, y:0 };
 
     // Usa la scala vettori del corpo collegato se disponibile
     const ropeBodyRel = relations.find(r => r.type === 'rope_body' && (r.aId === el.id || r.bId === el.id));
@@ -12936,26 +13615,26 @@ function render() {
 
     const col = '#ff6b6b';
     const vecG = svgEl('g', { 'pointer-events': 'none' });
-    arrow(vecG, fx, fy, ex, ey, col);
-    // Label solo "F"
-    const LOFF = 8;
-    const lx_lbl = ex + ux * LOFF;
-    const ly_lbl = ey + uy * LOFF;
-    text(vecG, lx_lbl, ly_lbl + 4, 'F', col, '13px', 'middle');
-    canvas.appendChild(vecG);
+    // Coordinate locali rispetto al gruppo fune (translate = el.x+pan, el.y+pan)
+    const lx = fx - el.x, ly = fy - el.y;
+    const ex2 = lx + ux * vecLen_rv, ey2 = ly + uy * vecLen_rv;
+    arrow(vecG, lx, ly, ex2, ey2, col);
+    text(vecG, ex2 + ux * 8, ey2 + uy * 8 - 4, 'F', col, '13px', 'middle');
+    // Trova il gruppo SVG della fune (data-id) e aggiungi dentro
+    const ropeGroup = canvas.querySelector(`g[data-id="${el.id}"]`);
+    (ropeGroup || canvas).appendChild(vecG);
 
     // ── Se corpo nascosto: mostra -T sul punto di aggancio alla fune (3° principio) ──
     if (ropeBody && ropeBody.props?.visible === false) {
       const attachEnd = freeEnd === 'right' ? 'left' : 'right';
-      const ax = attachEnd === 'left' ? el._lx : el._rx;
-      const ay = attachEnd === 'left' ? el._ly : el._ry;
-      // -T: direzione opposta alla forza (verso il corpo)
-      const ex2 = ax - ux * vecLen_rv;
-      const ey2 = ay - uy * vecLen_rv;
+      const ax = (attachEnd === 'left' ? el._lx : el._rx) - el.x;
+      const ay = (attachEnd === 'left' ? el._ly : el._ry) - el.y;
+      const ex3 = ax - ux * vecLen_rv;
+      const ey3 = ay - uy * vecLen_rv;
       const vecG2 = svgEl('g', { 'pointer-events': 'none' });
-      arrow(vecG2, ax, ay, ex2, ey2, '#ff9060');
-      text(vecG2, ex2 - ux * 8, ey2 - uy * 8 + 4, '−T', '#ff9060', '13px', 'middle');
-      canvas.appendChild(vecG2);
+      arrow(vecG2, ax, ay, ex3, ey3, '#ff9060');
+      text(vecG2, ex3 - ux * 8, ey3 - uy * 8 + 4, '−T', '#ff9060', '13px', 'middle');
+      (ropeGroup || canvas).appendChild(vecG2);
     }
   }
 
@@ -13121,17 +13800,22 @@ function renderMixedLatex(text, color, fontSize) {
     parts.push({ type: 'text', content: text.slice(lastIndex) });
   }
 
-  return parts.map(p => {
+  return parts.map((p, i) => {
     if (p.type === 'text') {
-      return `<span style="font-family:'IBM Plex Mono',monospace">${escapeHtml(p.content)}</span>`;
+      return `<span style="white-space:pre">${escapeHtml(p.content)}</span>`;
     }
     try {
-      return katex.renderToString(p.formula, {
+      const rendered = katex.renderToString(p.formula, {
         displayMode: p.display,
         throwOnError: false,
         output: 'html',
         trust: false,
       });
+      // Aggiunge margine CSS per spaziatura corretta (katex è inline-block, ignora whitespace)
+      if (!p.display) {
+        return `<span style="display:inline-block;margin:0 0.4em;vertical-align:middle">${rendered}</span>`;
+      }
+      return rendered;
     } catch(e) {
       return escapeHtml(p.formula);
     }
@@ -14756,7 +15440,7 @@ function updatePropsPanel(forceRebuild = false) {
           } else {
             addSep(modeContP);
             addSectionLabel(modeContP, 'Forza totale sul gruppo');
-            modeContP.appendChild(makePropField(el, '_Ftot', 'F totale', 'N', 'es. 100', false, () => { render(); updateParallelRiepilogo(); }));
+            modeContP.appendChild(makePropField(el, '_Ftot', 'F', 'N', 'es. 100', false, () => { render(); updateParallelRiepilogo(); }));
             const h = document.createElement('div'); h.className = 'prop-hint';
             h.textContent = '+ = allungamento, − = compressione.';
             modeContP.appendChild(h);
@@ -14853,7 +15537,7 @@ function updatePropsPanel(forceRebuild = false) {
           addSep(riepilogoParDiv);
           riepilogoParDiv.appendChild(makeReadonlyField('Δx comune', fmt4(dx_par), 'm'));
           riepilogoParDiv.appendChild(makeReadonlyField('L = L₀ + Δx', fmt4(L_par), 'm'));
-          riepilogoParDiv.appendChild(makeReadonlyField('F totale = k_eq·Δx', fmt4(Ftot_par), 'N'));
+          riepilogoParDiv.appendChild(makeReadonlyField('F = k_eq·Δx', fmt4(Ftot_par), 'N'));
           ks.forEach((k, i) => {
             if (k > 0) riepilogoParDiv.appendChild(makeReadonlyField(`F su molla ${i+1}`, fmt4(k * dx_par), 'N'));
           });
@@ -17842,6 +18526,8 @@ function initCanvasPan() {
     if (_isPanning) {
       _isPanning = false;
       canvas.style.cursor = spaceDown ? 'grab' : (_panModeEnabled ? 'grab' : '');
+      // Re-render per aggiornare i vettori forza fune alle coordinate corrette
+      if (typeof render === 'function') render();
     }
   });
 }
@@ -18050,7 +18736,9 @@ document.addEventListener('keydown', e => {
           const vtype = virtualMatch[2];
           const f = targetEl.props.forces?.[idx];
           if (f) {
-            if (vtype === 'ang') {
+            if (vtype === 'val') {
+              f.val = String(val);
+            } else if (vtype === 'ang') {
               const mag = Math.hypot(parseFloat(f.fx)||0, parseFloat(f.fy)||0) || (parseFloat(f.fMod)||0);
               f.fAngle = val;
               f.fx = mag * Math.cos(val * Math.PI / 180);
@@ -18462,10 +19150,13 @@ canvas.addEventListener('mousedown', e => {
           const virtualMatch = activeKey.match(/^forces\[(\d+)\]\.__(\w+)$/);
           if (virtualMatch) {
             const idx = parseInt(virtualMatch[1]);
-            const vtype = virtualMatch[2]; // mag o ang
+            const vtype = virtualMatch[2]; // mag, ang, val
             const f = targetEl.props.forces?.[idx];
             if (f) {
-              if (vtype === 'mag') {
+              if (vtype === 'val') {
+                // Forza scalare sulla molla (serie/singola)
+                f.val = String(val);
+              } else if (vtype === 'mag') {
                 // Mantieni angolo, cambia modulo — usa fAngle se fx/fy sono entrambi 0
                 const ang = (Math.abs(parseFloat(f.fx)||0) < 1e-9 && Math.abs(parseFloat(f.fy)||0) < 1e-9)
                   ? ((parseFloat(f.fAngle) || 0) * Math.PI / 180)
@@ -19344,5 +20035,31 @@ function setTheme(name) {
   const saved = localStorage.getItem('physics-composer-theme') || 'dark';
   setTheme(saved);
 })();</script>
+
+  <script>
+    // MVP: carica automaticamente workspace.json dalla stessa cartella
+    window.addEventListener('load', function() {
+      const MVP_WORKSPACE_URL = './workspace.json';
+      fetch(MVP_WORKSPACE_URL)
+        .then(r => {
+          if (!r.ok) throw new Error('workspace.json non trovato (' + r.status + ')');
+          return r.json();
+        })
+        .then(data => {
+          if (typeof applyWorkspace === 'function') {
+            applyWorkspace(data);
+          } else {
+            // Fallback: aspetta che applyWorkspace sia disponibile
+            setTimeout(() => {
+              if (typeof applyWorkspace === 'function') applyWorkspace(data);
+            }, 500);
+          }
+        })
+        .catch(err => {
+          console.warn('[MVP] Impossibile caricare workspace.json:', err.message);
+        });
+    });
+  </script>
+
 </body>
 </html>
